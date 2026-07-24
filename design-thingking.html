@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Thinking — Presentasi Kelas X RPL</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root{
+    --bg:#0F1419;
+    --bg-2:#161C24;
+    --fg:#F7F5EF;
+    --muted:#9AA5B1;
+    --orange:#FF6B35;
+    --teal:#00D9C0;
+    --yellow:#FFD23F;
+    --pink:#FF4D8D;
+    --purple:#8B5CF6;
+    --card:#1A2229;
+    --border:#262F38;
+  }
+  *{ -webkit-font-smoothing:antialiased; box-sizing:border-box; }
+  html,body{ margin:0; padding:0; height:100%; overflow:hidden; }
+  body{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    background:var(--bg);
+    color:var(--fg);
+  }
+  .font-display{ font-family:'Space Grotesk',sans-serif; }
+
+  /* Background mesh */
+  .bg-mesh{
+    position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(circle at 12% 18%, rgba(255,107,53,0.18), transparent 45%),
+      radial-gradient(circle at 85% 12%, rgba(0,217,192,0.15), transparent 45%),
+      radial-gradient(circle at 70% 85%, rgba(255,77,141,0.12), transparent 45%),
+      radial-gradient(circle at 25% 80%, rgba(139,92,246,0.12), transparent 45%),
+      var(--bg);
+  }
+  .grain{
+    position:fixed; inset:0; z-index:1; opacity:0.04; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .blob{
+    position:fixed; border-radius:50%; filter:blur(80px); opacity:0.4; z-index:0;
+    animation:float 14s ease-in-out infinite;
+  }
+  @keyframes float{
+    0%,100%{ transform:translateY(0) translateX(0) scale(1); }
+    50%{ transform:translateY(-30px) translateX(20px) scale(1.08); }
+  }
+
+  /* Slide system */
+  .deck{
+    position:relative; width:100vw; height:100vh;
+    overflow:hidden; z-index:2;
+  }
+  .slides{
+    position:relative; width:100%; height:100%;
+    transition:transform .7s cubic-bezier(.7,.0,.2,1);
+  }
+  .slide{
+    position:absolute; top:0; left:0;
+    width:100%; height:100%;
+    padding: 80px 60px 80px;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; transition:opacity .5s;
+    pointer-events:none;
+  }
+  .slide.active{ opacity:1; pointer-events:auto; }
+  .slide.active .anim{ animation:slideIn .8s cubic-bezier(.2,.7,.2,1) both; }
+  .slide.active .anim-2{ animation:slideIn .8s cubic-bezier(.2,.7,.2,1) .15s both; }
+  .slide.active .anim-3{ animation:slideIn .8s cubic-bezier(.2,.7,.2,1) .3s both; }
+  .slide.active .anim-4{ animation:slideIn .8s cubic-bezier(.2,.7,.2,1) .45s both; }
+  @keyframes slideIn{
+    from{ opacity:0; transform:translateY(30px); }
+    to{ opacity:1; transform:none; }
+  }
+
+  .slide-inner{
+    width:100%; max-width:1280px; max-height:100%;
+  }
+
+  /* Navigation */
+  .nav-bar{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    z-index:50; display:flex; align-items:center; gap:16px;
+    background:rgba(26,34,41,0.7); backdrop-filter:blur(20px);
+    border:1px solid var(--border);
+    padding:10px 14px; border-radius:99px;
+  }
+  .nav-btn{
+    width:38px; height:38px; border-radius:50%;
+    display:grid; place-items:center;
+    background:rgba(255,255,255,0.05); border:1px solid var(--border);
+    color:var(--fg); cursor:pointer; transition:all .25s;
+  }
+  .nav-btn:hover{ background:var(--orange); border-color:var(--orange); transform:scale(1.05); }
+  .nav-btn:disabled{ opacity:0.3; cursor:not-allowed; }
+  .nav-btn:disabled:hover{ background:rgba(255,255,255,0.05); border-color:var(--border); transform:none; }
+
+  .dots{ display:flex; gap:6px; }
+  .dot{
+    width:8px; height:8px; border-radius:50%;
+    background:rgba(255,255,255,0.2); cursor:pointer; transition:all .3s;
+  }
+  .dot.active{ background:var(--orange); width:24px; border-radius:4px; }
+
+  .slide-counter{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:13px; font-weight:600; color:var(--muted);
+    min-width:60px; text-align:center;
+  }
+  .slide-counter b{ color:var(--fg); }
+
+  /* Top bar */
+  .top-bar{
+    position:fixed; top:0; left:0; right:0; z-index:40;
+    padding:20px 32px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .progress-track{
+    position:fixed; top:0; left:0; right:0; height:3px; z-index:45;
+    background:rgba(255,255,255,0.05);
+  }
+  .progress-fill{
+    height:100%; width:0%;
+    background:linear-gradient(90deg,var(--orange),var(--pink),var(--teal));
+    transition:width .7s cubic-bezier(.7,.0,.2,1);
+  }
+
+  .logo{
+    display:flex; align-items:center; gap:10px;
+  }
+  .logo-mark{
+    width:36px; height:36px; border-radius:10px; display:grid; place-items:center;
+    background:linear-gradient(135deg,#FF6B35,#FF4D8D);
+  }
+  .logo-text{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:13px; line-height:1.1; }
+  .logo-sub{ font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:2px; }
+
+  .hint-keys{
+    display:flex; gap:6px; align-items:center;
+    font-size:11px; color:var(--muted);
+  }
+  .key{
+    padding:3px 8px; border:1px solid var(--border); border-radius:5px;
+    background:rgba(255,255,255,0.03); font-family:'Space Grotesk',sans-serif;
+    font-size:10px; font-weight:600;
+  }
+
+  /* Common components */
+  .stage-pill{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:99px; padding:6px 14px;
+    font-size:11px; font-weight:600;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .card{
+    background:linear-gradient(180deg,var(--card),#141A21);
+    border:1px solid var(--border);
+    border-radius:20px;
+  }
+  .accent-bar{
+    height:5px; border-radius:99px;
+    background:linear-gradient(90deg,var(--c1),var(--c2));
+  }
+  .step-num{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    background:linear-gradient(135deg,var(--orange),var(--pink));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .icon-bubble{
+    border-radius:14px; display:grid; place-items:center;
+    background:linear-gradient(135deg,var(--c1),var(--c2));
+    box-shadow:0 10px 25px -8px var(--c1);
+  }
+
+  .accent-empathize{ --c1:#FF6B35; --c2:#FF4D8D; }
+  .accent-define   { --c1:#FFD23F; --c2:#FF6B35; }
+  .accent-ideate   { --c1:#8B5CF6; --c2:#FF4D8D; }
+  .accent-prototype{ --c1:#00D9C0; --c2:#8B5CF6; }
+  .accent-test     { --c1:#FFD23F; --c2:#00D9C0; }
+
+  /* Quiz option */
+  .quiz-opt{
+    background:rgba(255,255,255,0.03);
+    border:1.5px solid var(--border);
+    border-radius:12px; padding:14px 18px;
+    cursor:pointer; transition:all .25s;
+    display:flex; align-items:center; gap:12px;
+  }
+  .quiz-opt:hover{ border-color:var(--teal); background:rgba(0,217,192,0.06); transform:translateX(4px); }
+  .quiz-opt.correct{ border-color:#22c55e; background:rgba(34,197,94,0.12); }
+  .quiz-opt.wrong{ border-color:#ef4444; background:rgba(239,68,68,0.1); }
+  .quiz-opt.disabled{ pointer-events:none; }
+  .opt-letter{
+    width:28px; height:28px; border-radius:50%; border:1.5px solid var(--border);
+    display:grid; place-items:center; font-size:11px; font-weight:700;
+    font-family:'Space Grotesk',sans-serif; flex-shrink:0;
+  }
+  .quiz-opt.correct .opt-letter{ background:#22c55e; border-color:#22c55e; color:#fff; }
+  .quiz-opt.wrong .opt-letter{ background:#ef4444; border-color:#ef4444; color:#fff; }
+
+  /* Drag */
+  .drag-item{
+    background:rgba(255,255,255,0.05);
+    border:1.5px solid var(--border);
+    padding:8px 12px; border-radius:8px;
+    cursor:grab; transition:all .2s;
+    font-size:12px; font-weight:500;
+    user-select:none;
+  }
+  .drag-item:hover{ border-color:var(--orange); }
+  .drag-item:active{ cursor:grabbing; }
+  .drag-item.dragging{ opacity:0.4; }
+  .drop-zone{
+    border:2px dashed rgba(255,255,255,0.15);
+    border-radius:10px; padding:8px;
+    min-height:90px; transition:all .25s;
+  }
+  .drop-zone.over{ border-color:var(--teal); background:rgba(0,217,192,0.06); }
+
+  /* Big number style */
+  .big-num{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700; line-height:0.85;
+  }
+
+  /* Animations */
+  .pulse-dot{ position:relative; }
+  .pulse-dot::after{
+    content:""; position:absolute; inset:-5px; border-radius:50%;
+    border:2px solid var(--orange); animation:pulse 2s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{ transform:scale(0.8); opacity:1; }
+    100%{ transform:scale(1.8); opacity:0; }
+  }
+  .brain-pulse{ animation:brainPulse 3s ease-in-out infinite; transform-origin:center; }
+  @keyframes brainPulse{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.05); }
+  }
+  .float-y{ animation:floatY 4s ease-in-out infinite; }
+  @keyframes floatY{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-8px); }
+  }
+  .spin-slow{ animation:spin 40s linear infinite; transform-origin:center; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* Toast */
+  .toast{
+    position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--card); border:1px solid var(--border);
+    padding:12px 20px; border-radius:12px;
+    font-size:13px; z-index:60; opacity:0; transition:all .3s;
+    box-shadow:0 10px 40px -10px rgba(0,0,0,0.5);
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* Slide-specific layouts */
+  .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap:32px; align-items:center; }
+  .grid-3{ display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+  .grid-5{ display:grid; grid-template-columns:repeat(5,1fr); gap:14px; }
+
+  @media (max-width:1024px){
+    .grid-5{ grid-template-columns:repeat(3,1fr); }
+    .grid-2{ grid-template-columns:1fr; gap:24px; }
+    .slide{ padding:70px 30px 90px; }
+  }
+  @media (max-width:640px){
+    .grid-3, .grid-5{ grid-template-columns:1fr 1fr; }
+    .slide{ padding:70px 18px 90px; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="grain"></div>
+<div class="blob" style="width:380px;height:380px;background:#FF6B35;top:-100px;left:-100px;"></div>
+<div class="blob" style="width:300px;height:300px;background:#00D9C0;bottom:-80px;right:-80px;animation-delay:-4s;"></div>
+<div class="blob" style="width:280px;height:280px;background:#8B5CF6;top:40%;left:50%;animation-delay:-8s;"></div>
+
+<!-- Top bar -->
+<div class="top-bar">
+  <div class="logo">
+    <div class="logo-mark"><i class="fa-solid fa-lightbulb text-white text-xs"></i></div>
+    <div>
+      <p class="logo-text">Design Thinking</p>
+      <p class="logo-sub">Kelas X RPL</p>
+    </div>
+  </div>
+  <div class="hint-keys hidden md:flex">
+    <span class="key">←</span><span class="key">→</span>
+    <span>untuk navigasi</span>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<!-- DECK -->
+<div class="deck">
+  <div class="slides" id="slides">
+
+    <!-- SLIDE 1: COVER -->
+    <section class="slide active" data-stage="cover">
+      <div class="slide-inner grid-2">
+        <div>
+          <div class="stage-pill mb-5 anim">
+            <span class="w-2 h-2 rounded-full bg-[var(--teal)] pulse-dot"></span>
+            Modul Pembelajaran Interaktif
+          </div>
+          <h1 class="font-display font-bold text-5xl md:text-7xl leading-[0.95] mb-6 anim-2">
+            Berpikir seperti<br>
+            <span style="color:var(--orange)">desainer.</span><br>
+            Bertindak seperti<br>
+            <span style="color:var(--yellow)">inovator.</span>
+          </h1>
+          <p class="text-base md:text-lg text-[var(--muted)] max-w-xl mb-8 anim-3">
+            Selamat datang di petualangan <b class="text-white">Design Thinking</b> — metode yang dipakai Apple, Google, dan IDEO untuk menciptakan produk luar biasa.
+          </p>
+          <div class="flex flex-wrap gap-3 anim-4">
+            <button onclick="nextSlide()" class="px-6 py-3 rounded-xl font-semibold text-white text-sm" style="background:linear-gradient(135deg,#FF6B35,#FF4D8D)">
+              <i class="fa-solid fa-rocket mr-2"></i>Mulai Belajar
+            </button>
+            <button onclick="goToSlide(14)" class="px-6 py-3 rounded-xl font-semibold text-sm border border-[var(--border)] hover:bg-white/5">
+              Langsung ke Tugas
+            </button>
+          </div>
+        </div>
+        <div class="flex justify-center anim-3">
+          <svg viewBox="0 0 400 500" class="w-full max-w-md">
+            <defs>
+              <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#FF6B35"/><stop offset="100%" stop-color="#FF4D8D"/>
+              </linearGradient>
+              <linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00D9C0"/><stop offset="100%" stop-color="#8B5CF6"/>
+              </linearGradient>
+              <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#FFD23F"/><stop offset="100%" stop-color="#FF6B35"/>
+              </linearGradient>
+            </defs>
+            <circle cx="80" cy="80" r="40" fill="url(#g1)" opacity="0.2"/>
+            <circle cx="320" cy="120" r="60" fill="url(#g2)" opacity="0.18"/>
+            <circle cx="60" cy="380" r="50" fill="url(#g3)" opacity="0.2"/>
+            <g transform="translate(200,250)">
+              <circle r="140" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4 4" class="spin-slow"/>
+              <circle r="110" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.1)"/>
+              <g class="brain-pulse">
+                <path d="M -60,-20 Q -70,-50 -45,-60 Q -30,-75 -5,-65 Q 20,-78 40,-60 Q 65,-55 60,-25 Q 75,-5 60,20 Q 65,45 35,55 Q 10,68 -15,55 Q -45,62 -60,35 Q -78,15 -60,-20 Z" fill="url(#g1)" opacity="0.95"/>
+                <path d="M -40,-20 Q -20,-30 0,-15 Q 20,-25 40,-10" stroke="rgba(255,255,255,0.4)" stroke-width="2" fill="none"/>
+                <path d="M -35,5 Q -15,15 5,0 Q 25,10 45,0" stroke="rgba(255,255,255,0.4)" stroke-width="2" fill="none"/>
+              </g>
+              <g transform="translate(0,-110)">
+                <circle r="22" fill="url(#g3)"/>
+                <path d="M -8,-8 L -4,-2 L 0,-10 L 4,-2 L 8,-8" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <rect x="-6" y="14" width="12" height="6" rx="1" fill="rgba(255,255,255,0.4)"/>
+                <g stroke="#FFD23F" stroke-width="2" stroke-linecap="round">
+                  <line x1="0" y1="-35" x2="0" y2="-28"/>
+                  <line x1="-25" y1="-25" x2="-20" y2="-20"/>
+                  <line x1="25" y1="-25" x2="20" y2="-20"/>
+                </g>
+              </g>
+              <circle cx="130" cy="0" r="6" fill="#00D9C0"/>
+              <circle cx="-130" cy="20" r="5" fill="#FFD23F"/>
+              <circle cx="80" cy="-100" r="4" fill="#FF4D8D"/>
+              <circle cx="-100" cy="80" r="5" fill="#8B5CF6"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: APA ITU DESIGN THINKING -->
+    <section class="slide" data-stage="intro">
+      <div class="slide-inner">
+        <div class="text-center mb-10 anim">
+          <span class="stage-pill mb-4"><i class="fa-solid fa-book-open" style="color:var(--orange)"></i> Apa itu Design Thinking?</span>
+          <h2 class="font-display font-bold text-4xl md:text-6xl leading-tight">
+            Bukan soal <span class="line-through opacity-40">menggambar</span>,<br>
+            tapi soal <span style="color:var(--orange)">memecahkan masalah</span>.
+          </h2>
+        </div>
+        <div class="grid-3 mt-10">
+          <div class="card p-6 anim-2">
+            <div class="icon-bubble mb-4" style="--c1:#FF6B35;--c2:#FF4D8D;width:52px;height:52px">
+              <i class="fa-solid fa-heart text-white"></i>
+            </div>
+            <h3 class="font-display font-bold text-lg mb-2">Human-Centered</h3>
+            <p class="text-sm text-[var(--muted)] leading-relaxed mb-3">Solusi lahir dari kebutuhan nyata manusia, bukan asumsi.</p>
+            <p class="text-xs text-white/80 bg-white/5 p-2 rounded-lg">📱 Gojek awalnya hanya ingin bantu ojek pangkalan dapet penumpang.</p>
+          </div>
+          <div class="card p-6 anim-3">
+            <div class="icon-bubble mb-4" style="--c1:#00D9C0;--c2:#8B5CF6;width:52px;height:52px">
+              <i class="fa-solid fa-arrows-rotate text-white"></i>
+            </div>
+            <h3 class="font-display font-bold text-lg mb-2">Iteratif</h3>
+            <p class="text-sm text-[var(--muted)] leading-relaxed mb-3">Gagal = data. Boleh kembali ke tahap sebelumnya.</p>
+            <p class="text-xs text-white/80 bg-white/5 p-2 rounded-lg">📸 Instagram sempat jadi app check-in bernama Burbn. Lalu pivot.</p>
+          </div>
+          <div class="card p-6 anim-4">
+            <div class="icon-bubble mb-4" style="--c1:#FFD23F;--c2:#FF6B35;width:52px;height:52px">
+              <i class="fa-solid fa-people-group text-white"></i>
+            </div>
+            <h3 class="font-display font-bold text-lg mb-2">Kolaboratif</h3>
+            <p class="text-sm text-[var(--muted)] leading-relaxed mb-3">Solusi terbaik lahir dari banyak sudut pandang.</p>
+            <p class="text-xs text-white/80 bg-white/5 p-2 rounded-lg">🏠 Airbnb pakai tim photographer & host untuk percantik foto listing.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: MINDSET SHIFT -->
+    <section class="slide" data-stage="mindset">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="text-xs uppercase tracking-widest anim" style="color:var(--orange)">Mindset Shift</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl mt-2 mb-5 anim-2">
+            Dari "Saya tahu" ke <span style="color:var(--teal)">"Saya bertanya"</span>
+          </h2>
+          <p class="text-[var(--muted)] leading-relaxed mb-6 anim-3">
+            Design Thinking mengubah cara kamu menyikapi masalah. Bukan langsung ngasih solusi, tapi bertanya dulu sampai akar masalahnya kelihatan.
+          </p>
+          <div class="flex items-start gap-3 anim-4">
+            <i class="fa-solid fa-quote-left text-3xl" style="color:var(--orange)"></i>
+            <div>
+              <p class="italic text-lg text-white/90">"Fall in love with the problem, not the solution."</p>
+              <p class="text-xs text-[var(--muted)] mt-2">— Uri Levine, founder Waze</p>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 text-sm anim-3">
+          <div class="card p-4" style="border-color:rgba(239,68,68,0.3)">
+            <p class="text-xs text-[var(--muted)] mb-2">❌ Biasanya</p>
+            <p class="text-white/80 line-through opacity-60">"Aku bikin app ini aja, pasti laku."</p>
+          </div>
+          <div class="card p-4" style="border-color:rgba(0,217,192,0.4)">
+            <p class="text-xs mb-2" style="color:var(--teal)">✓ Design Thinking</p>
+            <p class="text-white/90">"Masalah apa yang dialami user?"</p>
+          </div>
+          <div class="card p-4" style="border-color:rgba(239,68,68,0.3)">
+            <p class="text-xs text-[var(--muted)] mb-2">❌ Biasanya</p>
+            <p class="text-white/80 line-through opacity-60">"Fiturnya keren, pasti dipakai."</p>
+          </div>
+          <div class="card p-4" style="border-color:rgba(0,217,192,0.4)">
+            <p class="text-xs mb-2" style="color:var(--teal)">✓ Design Thinking</p>
+            <p class="text-white/90">"Apa user benar-benar butuh ini?"</p>
+          </div>
+          <div class="card p-4" style="border-color:rgba(239,68,68,0.3)">
+            <p class="text-xs text-[var(--muted)] mb-2">❌ Biasanya</p>
+            <p class="text-white/80 line-through opacity-60">"Aku yang tahu terbaik."</p>
+          </div>
+          <div class="card p-4" style="border-color:rgba(0,217,192,0.4)">
+            <p class="text-xs mb-2" style="color:var(--teal)">✓ Design Thinking</p>
+            <p class="text-white/90">"User yang tahu kebutuhannya."</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: 5 TAHAP OVERVIEW -->
+    <section class="slide" data-stage="overview">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-layer-group" style="color:var(--teal)"></i> 5 Tahap Design Thinking</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Lima langkah jadi<br><span style="color:var(--teal)">problem solver</span> kelas dunia.
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Prosesnya <b class="text-white">melingkar</b>, bukan garis lurus. Kamu bisa kembali ke tahap sebelumnya kapan saja.</p>
+          <ul class="space-y-2.5 text-sm anim-4">
+            <li class="flex items-center gap-3">
+              <span class="w-7 h-7 rounded-lg grid place-items-center font-bold text-xs" style="background:rgba(255,107,53,0.2);color:var(--orange)">1</span>
+              <span><b style="color:var(--orange)">Empathize</b> — Pahami pengguna</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-7 h-7 rounded-lg grid place-items-center font-bold text-xs" style="background:rgba(255,210,63,0.2);color:var(--yellow)">2</span>
+              <span><b style="color:var(--yellow)">Define</b> — Rumuskan masalah</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-7 h-7 rounded-lg grid place-items-center font-bold text-xs" style="background:rgba(139,92,246,0.2);color:var(--purple)">3</span>
+              <span><b style="color:var(--purple)">Ideate</b> — Cari solusi kreatif</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-7 h-7 rounded-lg grid place-items-center font-bold text-xs" style="background:rgba(0,217,192,0.2);color:var(--teal)">4</span>
+              <span><b style="color:var(--teal)">Prototype</b> — Wujudkan ide</span>
+            </li>
+            <li class="flex items-center gap-3">
+              <span class="w-7 h-7 rounded-lg grid place-items-center font-bold text-xs" style="background:rgba(255,210,63,0.2);color:var(--yellow)">5</span>
+              <span><b style="color:var(--yellow)">Test</b> — Uji & perbaiki</span>
+            </li>
+          </ul>
+        </div>
+        <div class="flex justify-center anim-3">
+          <svg viewBox="0 0 400 400" class="w-full max-w-md">
+            <defs>
+              <linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#FF6B35"/>
+                <stop offset="25%" stop-color="#FFD23F"/>
+                <stop offset="50%" stop-color="#8B5CF6"/>
+                <stop offset="75%" stop-color="#00D9C0"/>
+                <stop offset="100%" stop-color="#FF6B35"/>
+              </linearGradient>
+            </defs>
+            <circle cx="200" cy="200" r="140" fill="none" stroke="url(#ring)" stroke-width="3" stroke-dasharray="8 4" opacity="0.5" class="spin-slow"/>
+            <g transform="translate(200,60)">
+              <circle r="28" fill="#FF6B35"/>
+              <text text-anchor="middle" dy="5" fill="white" font-size="10" font-weight="700" font-family="Space Grotesk">01</text>
+              <text text-anchor="middle" y="50" fill="#FF6B35" font-size="11" font-weight="600" font-family="Space Grotesk">EMPATHIZE</text>
+            </g>
+            <g transform="translate(333,160)">
+              <circle r="28" fill="#FFD23F"/>
+              <text text-anchor="middle" dy="5" fill="#0F1419" font-size="10" font-weight="700" font-family="Space Grotesk">02</text>
+              <text text-anchor="middle" y="55" fill="#FFD23F" font-size="11" font-weight="600" font-family="Space Grotesk">DEFINE</text>
+            </g>
+            <g transform="translate(282,310)">
+              <circle r="28" fill="#8B5CF6"/>
+              <text text-anchor="middle" dy="5" fill="white" font-size="10" font-weight="700" font-family="Space Grotesk">03</text>
+              <text text-anchor="middle" y="55" fill="#8B5CF6" font-size="11" font-weight="600" font-family="Space Grotesk">IDEATE</text>
+            </g>
+            <g transform="translate(118,310)">
+              <circle r="28" fill="#00D9C0"/>
+              <text text-anchor="middle" dy="5" fill="#0F1419" font-size="10" font-weight="700" font-family="Space Grotesk">04</text>
+              <text text-anchor="middle" y="55" fill="#00D9C0" font-size="11" font-weight="600" font-family="Space Grotesk">PROTOTYPE</text>
+            </g>
+            <g transform="translate(67,160)">
+              <circle r="28" fill="#FFD23F"/>
+              <text text-anchor="middle" dy="5" fill="#0F1419" font-size="10" font-weight="700" font-family="Space Grotesk">05</text>
+              <text text-anchor="middle" y="-40" fill="#FFD23F" font-size="11" font-weight="600" font-family="Space Grotesk">TEST</text>
+            </g>
+            <text x="200" y="195" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="11" font-weight="600" font-family="Space Grotesk">DESIGN</text>
+            <text x="200" y="215" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="11" font-weight="600" font-family="Space Grotesk">THINKING</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: EMPATHIZE -->
+    <section class="slide accent-empathize" data-stage="empathize">
+      <div class="slide-inner grid-2">
+        <div>
+          <div class="flex items-center gap-3 mb-4 anim">
+            <span class="step-num text-6xl">01</span>
+            <div>
+              <p class="text-xs uppercase tracking-widest text-[var(--muted)]">Tahap Pertama</p>
+              <h2 class="font-display font-bold text-5xl">Empathize</h2>
+            </div>
+          </div>
+          <div class="accent-bar mb-5 w-24 anim-2"></div>
+          <p class="text-lg text-[var(--muted)] leading-relaxed mb-6 anim-2">
+            Saatnya <b style="color:var(--orange)">merasakan</b> apa yang dirasakan pengguna. Bukan menebak — tapi benar-benar mendengar, melihat, dan turun ke lapangan.
+          </p>
+          <div class="grid grid-cols-3 gap-3 anim-3">
+            <div class="card p-4">
+              <i class="fa-solid fa-eye text-xl mb-2" style="color:var(--orange)"></i>
+              <p class="font-semibold text-sm">Observe</p>
+              <p class="text-xs text-[var(--muted)]">Amati perilaku</p>
+            </div>
+            <div class="card p-4">
+              <i class="fa-solid fa-comments text-xl mb-2" style="color:var(--orange)"></i>
+              <p class="font-semibold text-sm">Interview</p>
+              <p class="text-xs text-[var(--muted)]">Ngobrol mendalam</p>
+            </div>
+            <div class="card p-4">
+              <i class="fa-solid fa-user-group text-xl mb-2" style="color:var(--orange)"></i>
+              <p class="font-semibold text-sm">Engage</p>
+              <p class="text-xs text-[var(--muted)]">Ikut merasakan</p>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3">
+          <div class="card p-6 mb-4">
+            <h3 class="font-display font-bold text-xl mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-mug-hot" style="color:var(--orange)"></i> Contoh: Tumbler Siswa
+            </h3>
+            <p class="text-sm text-[var(--muted)] mb-4">Bayangkan kamu ingin mendesain tumbler untuk siswa SMA. Daripada langsung desain, kamu:</p>
+            <ul class="space-y-2.5 text-sm">
+              <li class="flex gap-2"><i class="fa-solid fa-circle-check mt-1 text-xs" style="color:var(--orange)"></i><span class="text-white/85"><b>Observe:</b> Amati siswa bawa botol apa, di mana taruh</span></li>
+              <li class="flex gap-2"><i class="fa-solid fa-circle-check mt-1 text-xs" style="color:var(--orange)"></i><span class="text-white/85"><b>Interview:</b> "Kamu sering lupa bawa botol nggak?"</span></li>
+              <li class="flex gap-2"><i class="fa-solid fa-circle-check mt-1 text-xs" style="color:var(--orange)"></i><span class="text-white/85"><b>Engage:</b> Ikut bawa tumbler 1 minggu, rasakan sendiri</span></li>
+            </ul>
+          </div>
+          <div class="card p-5">
+            <p class="text-xs uppercase tracking-wider mb-3" style="color:var(--orange)">Tools: Empathy Map</p>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-white/5 p-2.5 rounded-lg"><b>Says:</b> "Aku sering lupa bawa botol."</div>
+              <div class="bg-white/5 p-2.5 rounded-lg"><b>Does:</b> Beli air galon tiap istirahat.</div>
+              <div class="bg-white/5 p-2.5 rounded-lg"><b>Thinks:</b> "Boros uang, tapi aku gampang haus."</div>
+              <div class="bg-white/5 p-2.5 rounded-lg"><b>Feels:</b> Malas, bersalah, kesal.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: DEFINE -->
+    <section class="slide accent-define" data-stage="define">
+      <div class="slide-inner grid-2">
+        <div>
+          <div class="flex items-center gap-3 mb-4 anim">
+            <span class="step-num text-6xl">02</span>
+            <div>
+              <p class="text-xs uppercase tracking-widest text-[var(--muted)]">Tahap Kedua</p>
+              <h2 class="font-display font-bold text-5xl">Define</h2>
+            </div>
+          </div>
+          <div class="accent-bar mb-5 w-24 anim-2"></div>
+          <p class="text-lg text-[var(--muted)] leading-relaxed mb-6 anim-2">
+            Dari ratusan data observasi, temukan <b style="color:var(--yellow)">satu masalah utama</b> yang benar-benar perlu dipecahkan. Fokus adalah kunci.
+          </p>
+          <div class="card p-5 anim-3" style="background:rgba(255,210,63,0.05);border-color:rgba(255,210,63,0.2)">
+            <p class="font-display font-bold text-2xl text-center mb-2" style="color:var(--yellow)">"How might we... ?"</p>
+            <p class="text-xs text-center text-[var(--muted)]">"Bagaimana mungkin kita..." — pertanyaan terbuka untuk memicu ide.</p>
+          </div>
+        </div>
+        <div class="anim-3 space-y-3">
+          <div class="card p-4">
+            <p class="text-xs text-[var(--muted)] mb-1">❌ Terlalu Sempit</p>
+            <p class="text-sm text-white/85 line-through opacity-60">"Bikin botol yang bisa nyimpan 2 liter."</p>
+          </div>
+          <div class="card p-4">
+            <p class="text-xs text-[var(--muted)] mb-1">❌ Terlalu Luas</p>
+            <p class="text-sm text-white/85 line-through opacity-60">"Bikin siswa sehat."</p>
+          </div>
+          <div class="card p-4" style="border-color:rgba(255,210,63,0.4)">
+            <p class="text-xs mb-1" style="color:var(--yellow)">✓ Tepat</p>
+            <p class="text-sm text-white/90"><b>HMW</b> membuat siswa ingat bawa tumbler tanpa harus mikir?</p>
+          </div>
+          <div class="card p-5 mt-4" style="background:rgba(255,210,63,0.05)">
+            <p class="text-xs text-[var(--muted)] mb-2">POV Statement:</p>
+            <p class="font-display text-sm leading-relaxed">
+              <span style="color:var(--orange)">[Siswa SMA]</span> needs <span style="color:var(--teal)">[tumbler ringan & lipat]</span> because <span style="color:var(--purple)">[mereka sering lupa bawa & tertukar]</span>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: IDEATE -->
+    <section class="slide accent-ideate" data-stage="ideate">
+      <div class="slide-inner grid-2">
+        <div>
+          <div class="flex items-center gap-3 mb-4 anim">
+            <span class="step-num text-6xl">03</span>
+            <div>
+              <p class="text-xs uppercase tracking-widest text-[var(--muted)]">Tahap Ketiga</p>
+              <h2 class="font-display font-bold text-5xl">Ideate</h2>
+            </div>
+          </div>
+          <div class="accent-bar mb-5 w-24 anim-2"></div>
+          <p class="text-lg text-[var(--muted)] leading-relaxed mb-6 anim-2">
+            Saatnya <b style="color:var(--purple)">berimajinasi liar</b>. Tidak ada ide buruk di tahap ini. Semakin banyak, semakin baik.
+          </p>
+          <div class="grid grid-cols-2 gap-3 anim-3">
+            <div class="card p-3">
+              <p class="font-semibold text-sm mb-1" style="color:var(--purple)">Brainstorming</p>
+              <p class="text-xs text-[var(--muted)]">Lempar ide terbatas, dilarang kritik</p>
+            </div>
+            <div class="card p-3">
+              <p class="font-semibold text-sm mb-1" style="color:var(--purple)">Crazy 8s</p>
+              <p class="text-xs text-[var(--muted)]">8 ide dalam 8 menit</p>
+            </div>
+            <div class="card p-3">
+              <p class="font-semibold text-sm mb-1" style="color:var(--purple)">SCAMPER</p>
+              <p class="text-xs text-[var(--muted)]">7 sudut pandang ide</p>
+            </div>
+            <div class="card p-3">
+              <p class="font-semibold text-sm mb-1" style="color:var(--purple)">Mind Map</p>
+              <p class="text-xs text-[var(--muted)]">Peta ide bercabang</p>
+            </div>
+          </div>
+          <div class="mt-4 p-3.5 rounded-xl anim-4" style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3)">
+            <p class="text-xs" style="color:var(--purple)"><b>Aturan Emas:</b></p>
+            <p class="text-sm text-white/90 mt-1">Kuantitas > Kualitas. Jangan kritik. Ide gila diterima.</p>
+          </div>
+        </div>
+        <div class="anim-3">
+          <h3 class="font-display font-bold text-xl mb-3">Contoh: Ide Solusi Tumbler</h3>
+          <div class="grid grid-cols-2 gap-2 mb-5">
+            <div class="card p-3 flex items-start gap-2"><i class="fa-solid fa-lightbulb mt-1 text-xs" style="color:var(--purple)"></i><p class="text-xs">Tumbler lipat jadi gantungan kunci</p></div>
+            <div class="card p-3 flex items-start gap-2"><i class="fa-solid fa-lightbulb mt-1 text-xs" style="color:var(--purple)"></i><p class="text-xs">QR code nama sebagai identitas</p></div>
+            <div class="card p-3 flex items-start gap-2"><i class="fa-solid fa-lightbulb mt-1 text-xs" style="color:var(--purple)"></i><p class="text-xs">Pengingat alarm via sticker NFC</p></div>
+            <div class="card p-3 flex items-start gap-2"><i class="fa-solid fa-lightbulb mt-1 text-xs" style="color:var(--purple)"></i><p class="text-xs">Modular: bisa tambah kapasitas</p></div>
+          </div>
+          <div class="card p-4">
+            <p class="text-xs text-[var(--muted)] mb-3">Pilih ide pakai matriks <b>Impact vs Effort</b>:</p>
+            <svg viewBox="0 0 200 160" class="w-full">
+              <line x1="100" y1="15" x2="100" y2="145" stroke="rgba(255,255,255,0.2)"/>
+              <line x1="20" y1="80" x2="180" y2="80" stroke="rgba(255,255,255,0.2)"/>
+              <text x="105" y="20" fill="rgba(255,255,255,0.5)" font-size="7">HIGH IMPACT</text>
+              <text x="25" y="85" fill="rgba(255,255,255,0.5)" font-size="7">LOW EFFORT</text>
+              <circle cx="60" cy="50" r="10" fill="#22c55e"/>
+              <text x="60" y="54" text-anchor="middle" fill="white" font-size="8" font-weight="700">A</text>
+              <circle cx="140" cy="40" r="9" fill="#FFD23F"/>
+              <text x="140" y="44" text-anchor="middle" fill="#0F1419" font-size="8" font-weight="700">B</text>
+              <circle cx="60" cy="120" r="9" fill="#00D9C0"/>
+              <text x="60" y="124" text-anchor="middle" fill="#0F1419" font-size="8" font-weight="700">C</text>
+              <circle cx="140" cy="125" r="9" fill="#ef4444"/>
+              <text x="140" y="129" text-anchor="middle" fill="white" font-size="8" font-weight="700">D</text>
+            </svg>
+            <p class="text-xs mt-2"><span class="text-[#22c55e]">A = Quick Win</span> → Prioritas!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: PROTOTYPE -->
+    <section class="slide accent-prototype" data-stage="prototype">
+      <div class="slide-inner grid-2">
+        <div>
+          <div class="flex items-center gap-3 mb-4 anim">
+            <span class="step-num text-6xl">04</span>
+            <div>
+              <p class="text-xs uppercase tracking-widest text-[var(--muted)]">Tahap Keempat</p>
+              <h2 class="font-display font-bold text-5xl">Prototype</h2>
+            </div>
+          </div>
+          <div class="accent-bar mb-5 w-24 anim-2"></div>
+          <p class="text-lg text-[var(--muted)] leading-relaxed mb-6 anim-2">
+            Wujudkan ide jadi <b style="color:var(--teal)">versi murah & cepat</b>. Tujuannya bukan sempurna — tapi cukup untuk dapat feedback.
+          </p>
+          <div class="card p-4 anim-3" style="background:rgba(0,217,192,0.08)">
+            <i class="fa-solid fa-lightbulb mb-2" style="color:var(--teal)"></i>
+            <p class="text-sm text-white/90"><b>Prinsip:</b> Buat prototype sekasar mungkin yang masih bisa mendapat feedback berguna. Makin kasar, makin murah ubahnya.</p>
+          </div>
+        </div>
+        <div class="anim-3">
+          <h3 class="font-display font-bold text-xl mb-3">3 Level Prototype</h3>
+          <div class="grid grid-cols-3 gap-3 mb-4">
+            <div class="card p-3 text-center">
+              <svg viewBox="0 0 100 80" class="w-full mb-2">
+                <rect x="35" y="15" width="30" height="55" rx="3" fill="none" stroke="#9AA5B1" stroke-width="1.5" stroke-dasharray="3 2"/>
+                <rect x="40" y="10" width="20" height="8" rx="2" fill="none" stroke="#9AA5B1" stroke-width="1.5"/>
+              </svg>
+              <p class="text-xs font-semibold">Low-Fi</p>
+              <p class="text-[10px] text-[var(--muted)]">Sketsa kertas</p>
+            </div>
+            <div class="card p-3 text-center">
+              <svg viewBox="0 0 100 80" class="w-full mb-2">
+                <rect x="32" y="12" width="36" height="60" rx="6" fill="#00D9C0" opacity="0.4" stroke="#00D9C0"/>
+                <rect x="38" y="5" width="24" height="10" rx="3" fill="#00D9C0"/>
+              </svg>
+              <p class="text-xs font-semibold">Mid-Fi</p>
+              <p class="text-[10px] text-[var(--muted)]">Wireframe Figma</p>
+            </div>
+            <div class="card p-3 text-center">
+              <svg viewBox="0 0 100 80" class="w-full mb-2">
+                <defs>
+                  <linearGradient id="hb" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#00D9C0"/><stop offset="100%" stop-color="#8B5CF6"/>
+                  </linearGradient>
+                </defs>
+                <rect x="30" y="12" width="40" height="62" rx="8" fill="url(#hb)"/>
+                <rect x="36" y="4" width="28" height="12" rx="3" fill="#FFD23F"/>
+              </svg>
+              <p class="text-xs font-semibold">High-Fi</p>
+              <p class="text-[10px] text-[var(--muted)]">Mockup final</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="card p-3 text-center">
+              <i class="fa-brands fa-figma text-lg mb-1" style="color:var(--teal)"></i>
+              <p class="text-xs font-semibold">Figma</p>
+            </div>
+            <div class="card p-3 text-center">
+              <i class="fa-solid fa-pen text-lg mb-1" style="color:var(--orange)"></i>
+              <p class="text-xs font-semibold">Kertas & Pulpen</p>
+            </div>
+            <div class="card p-3 text-center">
+              <i class="fa-solid fa-paintbrush text-lg mb-1" style="color:var(--purple)"></i>
+              <p class="text-xs font-semibold">Canva</p>
+            </div>
+            <div class="card p-3 text-center">
+              <i class="fa-solid fa-cube text-lg mb-1" style="color:var(--yellow)"></i>
+              <p class="text-xs font-semibold">Karton 3D</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: TEST -->
+    <section class="slide accent-test" data-stage="test">
+      <div class="slide-inner grid-2">
+        <div>
+          <div class="flex items-center gap-3 mb-4 anim">
+            <span class="step-num text-6xl">05</span>
+            <div>
+              <p class="text-xs uppercase tracking-widest text-[var(--muted)]">Tahap Kelima</p>
+              <h2 class="font-display font-bold text-5xl">Test</h2>
+            </div>
+          </div>
+          <div class="accent-bar mb-5 w-24 anim-2"></div>
+          <p class="text-lg text-[var(--muted)] leading-relaxed mb-6 anim-2">
+            Hadirkan prototype ke pengguna asli. <b style="color:var(--yellow)">Dengarkan</b> tanpa defensif. Critik = emas.
+          </p>
+          <div class="grid grid-cols-2 gap-3 anim-3">
+            <div class="card p-3">
+              <i class="fa-solid fa-user-check mb-1" style="color:var(--yellow)"></i>
+              <p class="font-semibold text-xs">Test ke User Asli</p>
+              <p class="text-[10px] text-[var(--muted)]">Bukan teman dekat</p>
+            </div>
+            <div class="card p-3">
+              <i class="fa-solid fa-eye mb-1" style="color:var(--yellow)"></i>
+              <p class="font-semibold text-xs">Observasi, Bukan Ajari</p>
+              <p class="text-[10px] text-[var(--muted)]">Lihat, jangan jelaskan</p>
+            </div>
+            <div class="card p-3">
+              <i class="fa-solid fa-comment-dots mb-1" style="color:var(--yellow)"></i>
+              <p class="font-semibold text-xs">Tanya "Mengapa"</p>
+              <p class="text-[10px] text-[var(--muted)]">Gali pemikiran user</p>
+            </div>
+            <div class="card p-3">
+              <i class="fa-solid fa-rotate mb-1" style="color:var(--yellow)"></i>
+              <p class="font-semibold text-xs">Iterasi Lagi</p>
+              <p class="text-[10px] text-[var(--muted)]">Ulangi tahap yang perlu</p>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3">
+          <h3 class="font-display font-bold text-xl mb-3">Contoh Test Tumbler</h3>
+          <div class="space-y-2.5 mb-4">
+            <div class="card p-3" style="border-left:3px solid #22c55e">
+              <p class="text-xs mb-1" style="color:#22c55e">✓ POSITIF</p>
+              <p class="text-sm text-white/90">"Lipatannya keren, muat di tas kecil."</p>
+            </div>
+            <div class="card p-3" style="border-left:3px solid #ef4444">
+              <p class="text-xs mb-1" style="color:#ef4444">✗ NEGATIF</p>
+              <p class="text-sm text-white/90">"Bocor kalau gak dilipat pakai kunci."</p>
+            </div>
+            <div class="card p-3" style="border-left:3px solid var(--yellow)">
+              <p class="text-xs mb-1" style="color:var(--yellow)">⚡ INSIGHT</p>
+              <p class="text-sm text-white/90">Perlu mekanisme auto-lock. Kembali ke Ideate & Prototype.</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div class="card p-3">
+              <i class="fa-solid fa-check mb-1" style="color:#22c55e"></i>
+              <p class="font-semibold text-xs">Iterate</p>
+            </div>
+            <div class="card p-3">
+              <i class="fa-solid fa-arrows-rotate mb-1" style="color:var(--yellow)"></i>
+              <p class="font-semibold text-xs">Pivot</p>
+            </div>
+            <div class="card p-3">
+              <i class="fa-solid fa-rocket mb-1" style="color:var(--teal)"></i>
+              <p class="font-semibold text-xs">Launch</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10: STUDI KASUS -->
+    <section class="slide" data-stage="case">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-trophy" style="color:var(--yellow)"></i> Studi Kasus Nyata</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Design Thinking di <span style="color:var(--yellow)">dunia nyata</span>
+          </h2>
+        </div>
+        <div class="grid-3">
+          <div class="card p-6 anim-2">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-11 h-11 rounded-xl grid place-items-center" style="background:#FF5A5F"><i class="fa-solid fa-house text-white"></i></div>
+              <div>
+                <p class="font-display font-bold">Airbnb</p>
+                <p class="text-[10px] text-[var(--muted)]">2009</p>
+              </div>
+            </div>
+            <p class="text-xs text-[var(--muted)] mb-4">Penghasilan hampir 0. Founder curiga foto listing jelek jadi penyebab.</p>
+            <div class="space-y-1.5 text-[11px]">
+              <p><span style="color:var(--orange)"><b>E:</b></span> Foto listing pakai kamera saku — buram.</p>
+              <p><span style="color:var(--yellow)"><b>D:</b></span> Foto jelek = orang gak percaya booking.</p>
+              <p><span style="color:var(--purple)"><b>I:</b></span> Bayar photographer profesional.</p>
+              <p><span style="color:var(--teal)"><b>P:</b></span> Test di 1 kota dulu.</p>
+              <p><span style="color:var(--yellow)"><b>T:</b></span> Booking naik 2.5x → fitur global.</p>
+            </div>
+          </div>
+          <div class="card p-6 anim-3">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-11 h-11 rounded-xl grid place-items-center" style="background:#00AA13"><i class="fa-solid fa-motorcycle text-white"></i></div>
+              <div>
+                <p class="font-display font-bold">Gojek</p>
+                <p class="text-[10px] text-[var(--muted)]">2010</p>
+              </div>
+            </div>
+            <p class="text-xs text-[var(--muted)] mb-4">Nadiem ingin bantu ojek pangkalan dapet penumpang lebih banyak.</p>
+            <div class="space-y-1.5 text-[11px]">
+              <p><span style="color:var(--orange)"><b>E:</b></span> Ngobrol tukang ojek, lihat nunggu berjam-jam.</p>
+              <p><span style="color:var(--yellow)"><b>D:</b></span> Pangkalan tidak efisien.</p>
+              <p><span style="color:var(--purple)"><b>I:</b></span> Call center dulu, lalu app sederhana.</p>
+              <p><span style="color:var(--teal)"><b>P:</b></span> 1 call center, 1 kota, 3 layanan.</p>
+              <p><span style="color:var(--yellow)"><b>T:</b></span> Skalakan → jadi super app.</p>
+            </div>
+          </div>
+          <div class="card p-6 anim-4">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-11 h-11 rounded-xl grid place-items-center" style="background:#111"><i class="fa-solid fa-shoe-prints text-white"></i></div>
+              <div>
+                <p class="font-display font-bold">Nike FlyEase</p>
+                <p class="text-[10px] text-[var(--muted)]">2012</p>
+              </div>
+            </div>
+            <p class="text-xs text-[var(--muted)] mb-4">Remaja stroke survivor minta sepatu yang bisa dipakai tanpa tali.</p>
+            <div class="space-y-1.5 text-[11px]">
+              <p><span style="color:var(--orange)"><b>E:</b></span> Surat dari Walgreen: tolong bikin sepatu disabilitas.</p>
+              <p><span style="color:var(--yellow)"><b>D:</b></span> Banyak orang sulit pakai sepatu bertali.</p>
+              <p><span style="color:var(--purple)"><b>I:</b></span> Tanpa tali, sistem zip, 1 tangan.</p>
+              <p><span style="color:var(--teal)"><b>P:</b></span> Ratusan iterasi 3 tahun.</p>
+              <p><span style="color:var(--yellow)"><b>T:</b></span> Laris, dipakai atlet & komunitas.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11: QUIZ -->
+    <section class="slide" data-stage="quiz">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-circle-question" style="color:var(--teal)"></i> Quiz Singkat</span>
+          <h2 class="font-display font-bold text-3xl md:text-4xl">Coba kamu jawab! 🎯</h2>
+        </div>
+        <div id="quizContainer" class="max-w-3xl mx-auto space-y-4"></div>
+        <div id="quizResult" class="text-center mt-5 anim" style="display:none">
+          <div class="card p-5 inline-block">
+            <p class="font-display text-2xl font-bold mb-1" id="quizScore" style="color:var(--teal)">0/5</p>
+            <p class="text-sm text-[var(--muted)]" id="quizFeedback">Kerja bagus!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12: TUGAS - DRAG DROP -->
+    <section class="slide" data-stage="tugas-drag">
+      <div class="slide-inner">
+        <div class="text-center mb-5 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-hand-pointer" style="color:var(--orange)"></i> Aktivitas 1</span>
+          <h2 class="font-display font-bold text-3xl md:text-4xl">Urutkan Tahap Design Thinking</h2>
+          <p class="text-sm text-[var(--muted)] mt-2">Seret tiap aktivitas ke tahap yang benar</p>
+        </div>
+        <div class="grid grid-cols-5 gap-3 mb-4 anim-2" id="dragDropGrid">
+          <div class="drop-zone" data-stage="1">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--orange)">01 EMPATHIZE</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="2">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--yellow)">02 DEFINE</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="3">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--purple)">03 IDEATE</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="4">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--teal)">04 PROTOTYPE</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="5">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--yellow)">05 TEST</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+        </div>
+        <div class="p-3 rounded-xl flex flex-wrap gap-2 anim-3" id="dragItemsPool" style="background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1)">
+          <p class="w-full text-xs text-[var(--muted)] mb-1">📌 Seret kartu ke tahap yang sesuai:</p>
+        </div>
+        <div class="mt-4 flex flex-wrap items-center gap-3 anim-4">
+          <button id="checkDragBtn" class="px-5 py-2 rounded-lg font-semibold text-white text-sm" style="background:linear-gradient(135deg,#FF6B35,#FF4D8D)">
+            <i class="fa-solid fa-check mr-1"></i>Cek Jawaban
+          </button>
+          <button id="resetDragBtn" class="px-5 py-2 rounded-lg font-semibold text-sm border border-[var(--border)] hover:bg-white/5">
+            <i class="fa-solid fa-rotate-left mr-1"></i>Reset
+          </button>
+          <span id="dragFeedback" class="text-sm font-medium"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 13: TUGAS - BRIEF -->
+    <section class="slide" data-stage="tugas-brief">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3" style="border-color:rgba(255,107,53,0.3)"><i class="fa-solid fa-flag-checkered" style="color:var(--orange)"></i> Tugas Akhir • Bobot 30%</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Misimu: <span style="color:var(--orange)">Redesain</span> kantin sekolah.
+          </h2>
+          <p class="text-[var(--muted)] mt-3 max-w-2xl mx-auto">Kantin SMA Negeri 1 Maju Jaya sering macet saat istirahat, antrean panjang, banyak siswa kembali ke kelas tanpa makan. Pecahkan dengan 5 tahap Design Thinking.</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+          <div class="card p-4 anim-2">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="w-7 h-7 rounded-lg grid place-items-center text-xs font-bold" style="background:rgba(255,107,53,0.15);color:var(--orange)">1</span>
+              <p class="font-display font-bold text-sm">Empathize</p>
+            </div>
+            <ul class="text-xs text-white/85 space-y-1.5">
+              <li>• Wawancara 3 teman & 1 penjaga kantin</li>
+              <li>• Amati antrean 10 menit</li>
+              <li>• Buat Empathy Map</li>
+            </ul>
+          </div>
+          <div class="card p-4 anim-2">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="w-7 h-7 rounded-lg grid place-items-center text-xs font-bold" style="background:rgba(255,210,63,0.15);color:var(--yellow)">2</span>
+              <p class="font-display font-bold text-sm">Define</p>
+            </div>
+            <ul class="text-xs text-white/85 space-y-1.5">
+              <li>• Identifikasi pola wawancara</li>
+              <li>• Tulis 1 Problem Statement (HMW)</li>
+              <li>• Buat POV Statement</li>
+            </ul>
+          </div>
+          <div class="card p-4 anim-3">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="w-7 h-7 rounded-lg grid place-items-center text-xs font-bold" style="background:rgba(139,92,246,0.15);color:var(--purple)">3</span>
+              <p class="font-display font-bold text-sm">Ideate</p>
+            </div>
+            <ul class="text-xs text-white/85 space-y-1.5">
+              <li>• Brainstorm min. 10 ide</li>
+              <li>• Pilih pakai Impact vs Effort</li>
+              <li>• Pilih 1 ide terbaik</li>
+            </ul>
+          </div>
+          <div class="card p-4 anim-3">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="w-7 h-7 rounded-lg grid place-items-center text-xs font-bold" style="background:rgba(0,217,192,0.15);color:var(--teal)">4</span>
+              <p class="font-display font-bold text-sm">Prototype & Test</p>
+            </div>
+            <ul class="text-xs text-white/85 space-y-1.5">
+              <li>• Bikin prototype (sketsa/Figma)</li>
+              <li>• Test ke 3 siswa lain</li>
+              <li>• Catat feedback & iterasi</li>
+            </ul>
+          </div>
+        </div>
+        <div class="card p-4 anim-4">
+          <p class="text-xs font-semibold mb-2 flex items-center gap-2"><i class="fa-solid fa-folder-open" style="color:var(--orange)"></i>Yang Dikumpulkan:</p>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            <p class="bg-white/5 p-2 rounded-lg flex items-center gap-2"><i class="fa-solid fa-file-lines" style="color:var(--orange)"></i> Laporan PDF 5 tahap</p>
+            <p class="bg-white/5 p-2 rounded-lg flex items-center gap-2"><i class="fa-solid fa-image" style="color:var(--teal)"></i> Foto observasi</p>
+            <p class="bg-white/5 p-2 rounded-lg flex items-center gap-2"><i class="fa-solid fa-pen-nib" style="color:var(--purple)"></i> Sketsa prototype</p>
+            <p class="bg-white/5 p-2 rounded-lg flex items-center gap-2"><i class="fa-solid fa-video" style="color:var(--yellow)"></i> Video 1-2 menit</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 14: TUGAS - RUBRIK -->
+    <section class="slide" data-stage="rubrik">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-table-list" style="color:var(--teal)"></i> Rubrik Penilaian</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl">Bagaimana kamu dinilai?</h2>
+        </div>
+        <div class="max-w-3xl mx-auto anim-2">
+          <div class="card overflow-hidden">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-[var(--muted)] text-xs uppercase tracking-wider border-b border-[var(--border)]">
+                  <th class="py-3 px-5">Aspek</th>
+                  <th class="py-3 px-5">Bobot</th>
+                  <th class="py-3 px-5">Kriteria</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-[var(--border)]">
+                <tr class="hover:bg-white/[0.02]">
+                  <td class="py-3 px-5 font-semibold">Empathize</td>
+                  <td class="py-3 px-5"><span class="px-2 py-1 rounded text-xs font-bold" style="background:rgba(255,107,53,0.15);color:var(--orange)">20%</span></td>
+                  <td class="py-3 px-5 text-white/80 text-xs">Wawancara mendalam, empathy map lengkap</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02]">
+                  <td class="py-3 px-5 font-semibold">Define</td>
+                  <td class="py-3 px-5"><span class="px-2 py-1 rounded text-xs font-bold" style="background:rgba(255,210,63,0.15);color:var(--yellow)">20%</span></td>
+                  <td class="py-3 px-5 text-white/80 text-xs">Problem statement spesifik & berpusat pada user</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02]">
+                  <td class="py-3 px-5 font-semibold">Ideate</td>
+                  <td class="py-3 px-5"><span class="px-2 py-1 rounded text-xs font-bold" style="background:rgba(139,92,246,0.15);color:var(--purple)">20%</span></td>
+                  <td class="py-3 px-5 text-white/80 text-xs">Banyak ide, ada proses seleksi jelas</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02]">
+                  <td class="py-3 px-5 font-semibold">Prototype</td>
+                  <td class="py-3 px-5"><span class="px-2 py-1 rounded text-xs font-bold" style="background:rgba(0,217,192,0.15);color:var(--teal)">20%</span></td>
+                  <td class="py-3 px-5 text-white/80 text-xs">Prototype jelas, komunikatif, sesuai masalah</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02]">
+                  <td class="py-3 px-5 font-semibold">Test</td>
+                  <td class="py-3 px-5"><span class="px-2 py-1 rounded text-xs font-bold" style="background:rgba(255,210,63,0.15);color:var(--yellow)">10%</span></td>
+                  <td class="py-3 px-5 text-white/80 text-xs">Feedback nyata & rencana iterasi</td>
+                </tr>
+                <tr class="hover:bg-white/[0.02]">
+                  <td class="py-3 px-5 font-semibold">Presentasi</td>
+                  <td class="py-3 px-5"><span class="px-2 py-1 rounded text-xs font-bold" style="background:rgba(255,107,53,0.15);color:var(--orange)">10%</span></td>
+                  <td class="py-3 px-5 text-white/80 text-xs">Video jelas, kreatif, menjawab masalah</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-xs text-center text-[var(--muted)] mt-4">⏰ Deadline: 2 minggu • 📤 Kumpulkan via LMS sekolah</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 15: CLOSING -->
+    <section class="slide" data-stage="closing">
+      <div class="slide-inner text-center">
+        <div class="inline-block mb-6 anim">
+          <div class="w-16 h-16 rounded-2xl grid place-items-center mx-auto" style="background:linear-gradient(135deg,#FF6B35,#FF4D8D)">
+            <i class="fa-solid fa-graduation-cap text-2xl text-white"></i>
+          </div>
+        </div>
+        <h2 class="font-display font-bold text-4xl md:text-6xl leading-tight mb-5 anim-2">
+          Kamu sudah punya <span style="color:var(--orange)">tools</span>-nya.<br>
+          Sekarang <span style="color:var(--teal)">waktunya beraksi</span>.
+        </h2>
+        <p class="text-lg text-[var(--muted)] max-w-2xl mx-auto mb-10 anim-3">
+          Design Thinking bukan teori untuk dihafal, tapi cara berpikir untuk dilatih. Setiap masalah — tugas sekolah, konflik teman, sampai proyek RPL — bisa kamu pecahkan dengan 5 tahap ini.
+        </p>
+        <div class="flex flex-wrap gap-3 justify-center mb-12 anim-4">
+          <button onclick="goToSlide(0)" class="px-6 py-3 rounded-xl font-semibold text-white text-sm" style="background:linear-gradient(135deg,#FF6B35,#FF4D8D)">
+            <i class="fa-solid fa-arrow-up mr-2"></i>Ulang dari Awal
+          </button>
+          <button onclick="goToSlide(12)" class="px-6 py-3 rounded-xl font-semibold text-sm border border-[var(--border)] hover:bg-white/5">
+            Lihat Tugas Lagi
+          </button>
+        </div>
+        <div class="overflow-hidden anim-4">
+          <div class="font-display font-bold opacity-20 whitespace-nowrap" style="font-size:clamp(24px,4vw,40px)">
+            EMPATHIZE • DEFINE • IDEATE • PROTOTYPE • TEST • EMPATHIZE • DEFINE • IDEATE • PROTOTYPE • TEST
+          </div>
+        </div>
+        <p class="text-xs text-[var(--muted)] mt-8">Modul Pembelajaran Design Thinking — Kelas X RPL • Dibuat dengan ❤️</p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" title="Slide sebelumnya">
+    <i class="fa-solid fa-chevron-left text-xs"></i>
+  </button>
+  <div class="dots" id="dots"></div>
+  <span class="slide-counter"><b id="curSlide">1</b> / <span id="totalSlides">15</span></span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" title="Slide berikutnya">
+    <i class="fa-solid fa-chevron-right text-xs"></i>
+  </button>
+  <button class="nav-btn" onclick="toggleFullscreen()" title="Fullscreen">
+    <i class="fa-solid fa-expand text-xs"></i>
+  </button>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span id="toastText"></span></div>
+
+<script>
+  /* ========== SLIDE NAVIGATION ========== */
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let curSlide = 0;
+
+  document.getElementById('totalSlides').textContent = totalSlides;
+
+  // Build dots
+  const dotsContainer = document.getElementById('dots');
+  slides.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    dotsContainer.appendChild(dot);
+  });
+
+  function updateSlide() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === curSlide));
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === curSlide));
+    document.getElementById('curSlide').textContent = curSlide + 1;
+    document.getElementById('progressFill').style.width = ((curSlide + 1) / totalSlides * 100) + '%';
+    document.getElementById('prevBtn').disabled = curSlide === 0;
+    document.getElementById('nextBtn').disabled = curSlide === totalSlides - 1;
+  }
+
+  function goToSlide(i) {
+    curSlide = Math.max(0, Math.min(totalSlides - 1, i));
+    updateSlide();
+  }
+  function nextSlide() { goToSlide(curSlide + 1); }
+  function prevSlide() { goToSlide(curSlide - 1); }
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+    else if (e.key === 'Home') goToSlide(0);
+    else if (e.key === 'End') goToSlide(totalSlides - 1);
+    else if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  });
+
+  // Touch swipe
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+  document.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(diff) > 60) {
+      if (diff < 0) nextSlide(); else prevSlide();
+    }
+  });
+
+  // Wheel (debounced)
+  let wheelLock = false;
+  document.addEventListener('wheel', e => {
+    if (wheelLock) return;
+    if (Math.abs(e.deltaY) < 30) return;
+    wheelLock = true;
+    setTimeout(() => wheelLock = false, 800);
+    if (e.deltaY > 0) nextSlide(); else prevSlide();
+  }, { passive: true });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  updateSlide();
+
+  /* ========== QUIZ ========== */
+  const quizData = [
+    {
+      q: "Tahap pertama Design Thinking yang fokus pada memahami pengguna disebut?",
+      options: ["Define", "Empathize", "Ideate", "Prototype"],
+      answer: 1
+    },
+    {
+      q: "Aturan PALING tepat saat brainstorming di tahap Ideate?",
+      options: ["Pilih ide terbaik secepatnya", "Kritik ide gila", "Kuantitas > kualitas", "Hanya ide ketua kelompok"],
+      answer: 2
+    },
+    {
+      q: "Manakah penulisan HMW yang PALING tepat?",
+      options: ["HMW bikin app kantin AI", "HMW bikin siswa tidak kelaparan", "HMW buat antrean kantin lebih cepat tanpa kurangi pembeli", "HMW bikin kantin modern"],
+      answer: 2
+    },
+    {
+      q: "Tujuan utama prototype low-fidelity (sketsa kertas)?",
+      options: ["Agar terlihat profesional", "Feedback cepat & murah sebelum bangun mahal", "Hemat tinta", "Karena belum bisa Figma"],
+      answer: 1
+    },
+    {
+      q: "Saat test prototype ke user, sikap PALING tepat?",
+      options: ["Jelaskan cara pakai", "Bela prototype kalau user bingung", "Diam & amati, tanya 'apa yang kamu pikirkan tadi?'", "Suruh baca manual"],
+      answer: 2
+    }
+  ];
+
+  const quizContainer = document.getElementById('quizContainer');
+  const quizResult = document.getElementById('quizResult');
+  let userAnswers = new Array(quizData.length).fill(null);
+
+  quizData.forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = 'card p-5';
+    div.innerHTML = `
+      <div class="flex items-start gap-3 mb-3">
+        <span class="w-7 h-7 rounded-lg grid place-items-center font-bold text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--teal)">${idx+1}</span>
+        <p class="font-display font-semibold text-sm md:text-base pt-0.5">${item.q}</p>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-2" id="qOptions-${idx}">
+        ${item.options.map((opt, i) => `
+          <div class="quiz-opt" data-q="${idx}" data-i="${i}">
+            <span class="opt-letter">${String.fromCharCode(65+i)}</span>
+            <span class="text-sm">${opt}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    quizContainer.appendChild(div);
+  });
+
+  document.querySelectorAll('.quiz-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const q = parseInt(opt.dataset.q);
+      const i = parseInt(opt.dataset.i);
+      userAnswers[q] = i;
+
+      const options = document.querySelectorAll(`#qOptions-${q} .quiz-opt`);
+      options.forEach((o, idx) => {
+        o.classList.remove('correct', 'wrong');
+        if (idx === quizData[q].answer) o.classList.add('correct');
+        else if (idx === i && i !== quizData[q].answer) o.classList.add('wrong');
+        o.classList.add('disabled');
+      });
+
+      if (userAnswers.every(a => a !== null)) {
+        const score = userAnswers.reduce((acc, a, idx) => acc + (a === quizData[idx].answer ? 1 : 0), 0);
+        document.getElementById('quizScore').textContent = `${score}/${quizData.length}`;
+        const fb = document.getElementById('quizFeedback');
+        if (score === 5) { fb.textContent = 'Sempurna! Kamu siap jadi Design Thinker! 🎉'; document.getElementById('quizScore').style.color = '#22c55e'; }
+        else if (score >= 3) { fb.textContent = 'Bagus! Beberapa konsep perlu dipertajam.'; document.getElementById('quizScore').style.color = 'var(--teal)'; }
+        else { fb.textContent = 'Yuk baca lagi materinya, kamu pasti bisa!'; document.getElementById('quizScore').style.color = 'var(--orange)'; }
+        quizResult.style.display = 'block';
+        showToast(`Quiz selesai! Skor: ${score}/${quizData.length}`);
+      }
+    });
+  });
+
+  /* ========== DRAG DROP ========== */
+  const dragItems = [
+    { id: 1, text: "Wawancara siswa yang sering antre", stage: 1 },
+    { id: 2, text: "Buat Empathy Map kantin", stage: 1 },
+    { id: 3, text: "Tulis HMW untuk masalah antrean", stage: 2 },
+    { id: 4, text: "Rumuskan POV Statement", stage: 2 },
+    { id: 5, text: "Brainstorm 10 ide solusi", stage: 3 },
+    { id: 6, text: "Pilih ide pakai Impact-Effort", stage: 3 },
+    { id: 7, text: "Sketsa layout kantin baru", stage: 4 },
+    { id: 8, text: "Bikin mockup di Figma", stage: 4 },
+    { id: 9, text: "Test prototype ke 5 siswa", stage: 5 },
+    { id: 10, text: "Catat feedback & iterasi", stage: 5 }
+  ];
+
+  const pool = document.getElementById('dragItemsPool');
+  const dropZones = document.querySelectorAll('.drop-zone');
+
+  function shuffleItems() {
+    // Clear all zones
+    dropZones.forEach(z => z.querySelector('.space-y-2').innerHTML = '');
+    pool.innerHTML = '<p class="w-full text-xs text-[var(--muted)] mb-1">📌 Seret kartu ke tahap yang sesuai:</p>';
+    const shuffled = [...dragItems].sort(() => Math.random() - 0.5);
+    shuffled.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'drag-item';
+      el.draggable = true;
+      el.dataset.id = item.id;
+      el.dataset.stage = item.stage;
+      el.textContent = item.text;
+      el.addEventListener('dragstart', e => {
+        el.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', item.id);
+      });
+      el.addEventListener('dragend', () => el.classList.remove('dragging'));
+      pool.appendChild(el);
+    });
+  }
+  shuffleItems();
+
+  dropZones.forEach(zone => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('over');
+      const id = e.dataTransfer.getData('text/plain');
+      const dragged = document.querySelector(`.drag-item[data-id="${id}"]`);
+      if (dragged) zone.querySelector('.space-y-2').appendChild(dragged);
+    });
+  });
+
+  pool.addEventListener('dragover', e => e.preventDefault());
+  pool.addEventListener('drop', e => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text/plain');
+    const dragged = document.querySelector(`.drag-item[data-id="${id}"]`);
+    if (dragged && !pool.contains(dragged)) pool.appendChild(dragged);
+  });
+
+  document.getElementById('checkDragBtn').addEventListener('click', () => {
+    let correct = 0;
+    dropZones.forEach(zone => {
+      const expected = zone.dataset.stage;
+      zone.querySelectorAll('.drag-item').forEach(item => {
+        if (item.dataset.stage === expected) {
+          item.style.borderColor = '#22c55e';
+          item.style.background = 'rgba(34,197,94,0.1)';
+          correct++;
+        } else {
+          item.style.borderColor = '#ef4444';
+          item.style.background = 'rgba(239,68,68,0.1)';
+        }
+      });
+    });
+    const fb = document.getElementById('dragFeedback');
+    if (correct === dragItems.length) {
+      fb.textContent = `🎉 Sempurna! ${correct}/${dragItems.length} benar!`;
+      fb.style.color = '#22c55e';
+      showToast('Kerja bagus! Kamu paham urutan Design Thinking.');
+    } else if (correct >= 7) {
+      fb.textContent = `Hampir! ${correct}/${dragItems.length} benar.`;
+      fb.style.color = 'var(--yellow)';
+    } else {
+      fb.textContent = `${correct}/${dragItems.length} benar. Coba lagi!`;
+      fb.style.color = 'var(--orange)';
+    }
+  });
+
+  document.getElementById('resetDragBtn').addEventListener('click', () => {
+    shuffleItems();
+    document.getElementById('dragFeedback').textContent = '';
+  });
+
+  /* ========== TOAST ========== */
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+</script>
+</body>
+</html>

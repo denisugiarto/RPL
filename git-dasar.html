@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Petualangan Git - Belajar Dasar Version Control</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg-card: #131826;
+  --bg-elevated: #1c2333;
+  --fg: #e8edf5;
+  --muted: #8b95a8;
+  --accent: #ff7849;
+  --accent-2: #4ade80;
+  --accent-3: #fbbf24;
+  --border: #2a3344;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    radial-gradient(circle at 15% 25%, rgba(255, 120, 73, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(74, 222, 128, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(251, 191, 36, 0.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(42, 51, 68, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42, 51, 68, 0.25) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+
+.presentation {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+.progress-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(42, 51, 68, 0.5);
+  z-index: 100;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-3), var(--accent-2));
+  width: 9.09%;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(255, 120, 73, 0.6);
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 4rem 3rem 6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  overflow-y: auto;
+}
+
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.slide.prev {
+  transform: translateX(-60px);
+}
+
+.slide::-webkit-scrollbar { width: 6px; }
+.slide::-webkit-scrollbar-track { background: transparent; }
+.slide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Navigation */
+.navigation {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(19, 24, 38, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  padding: 0.75rem 1.25rem;
+  border-radius: 100px;
+  z-index: 100;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.nav-btn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(255, 120, 73, 0.5);
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.slide-info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--muted);
+  min-width: 70px;
+  text-align: center;
+}
+
+.slide-info .current {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Typography */
+.heading-display {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.heading-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.glow-text {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-3) 50%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Slide 1: Cover */
+.cover-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.cover-title {
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  margin-bottom: 1.5rem;
+}
+
+.cover-subtitle {
+  font-size: 1.25rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  max-width: 500px;
+}
+
+.badge-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.badge {
+  background: rgba(255, 120, 73, 0.1);
+  border: 1px solid rgba(255, 120, 73, 0.3);
+  color: var(--accent);
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.badge.green {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: rgba(74, 222, 128, 0.3);
+  color: var(--accent-2);
+}
+
+.badge.yellow {
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: var(--accent-3);
+}
+
+.git-logo-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.git-logo-svg {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  filter: drop-shadow(0 0 40px rgba(255, 120, 73, 0.4));
+  animation: floatLogo 6s ease-in-out infinite;
+}
+
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+}
+
+.floating-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: floatParticle 8s ease-in-out infinite;
+}
+
+@keyframes floatParticle {
+  0%, 100% { transform: translate(0, 0); opacity: 0.4; }
+  50% { transform: translate(20px, -30px); opacity: 0.8; }
+}
+
+.start-btn {
+  background: linear-gradient(135deg, var(--accent), #ff5722);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 100px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(255, 120, 73, 0.4);
+  font-family: 'Outfit', sans-serif;
+}
+
+.start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(255, 120, 73, 0.6);
+}
+
+/* Slide Headers */
+.slide-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.slide-number {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.slide-tag {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.slide-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.slide-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  max-width: 700px;
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-3));
+}
+
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+/* Analogy box */
+.analogy-box {
+  background: linear-gradient(135deg, rgba(255, 120, 73, 0.08), rgba(74, 222, 128, 0.05));
+  border: 1px solid rgba(255, 120, 73, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.analogy-label {
+  position: absolute;
+  top: -10px;
+  left: 1.5rem;
+  background: var(--bg);
+  padding: 0 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+/* Terminal */
+.terminal {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+}
+
+.terminal-header {
+  background: var(--bg-elevated);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-title {
+  margin-left: 0.5rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.terminal-body {
+  padding: 1.25rem;
+  line-height: 1.7;
+}
+
+.term-prompt { color: var(--accent-2); }
+.term-command { color: var(--fg); }
+-term-output { color: var(--muted); }
+.term-comment { color: #6b7280; font-style: italic; }
+.term-success { color: var(--accent-2); }
+.term-accent { color: var(--accent); }
+.term-yellow { color: var(--accent-3); }
+
+/* Quiz */
+.quiz-container {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.quiz-question {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.quiz-question.answered { opacity: 0.7; }
+
+.question-text {
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.question-num {
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.option {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.option:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: rgba(255, 120, 73, 0.08);
+  transform: translateX(4px);
+}
+
+.option.correct {
+  background: rgba(74, 222, 128, 0.15);
+  border-color: var(--accent-2);
+  color: var(--accent-2);
+}
+
+.option.wrong {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #fca5a5;
+}
+
+.option-letter {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.option.correct .option-letter { background: var(--accent-2); color: var(--bg); }
+.option.wrong .option-letter { background: #ef4444; color: white; }
+
+.quiz-result {
+  background: linear-gradient(135deg, rgba(255, 120, 73, 0.1), rgba(74, 222, 128, 0.08));
+  border: 1px solid var(--accent);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  margin-top: 1.5rem;
+  display: none;
+}
+
+.quiz-result.show { display: block; animation: slideUp 0.5s ease; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.score-display {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+}
+
+.retry-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.75rem;
+  border-radius: 100px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  font-family: 'Outfit', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.retry-btn:hover { background: #ff5722; transform: translateY(-2px); }
+
+/* Animations for slide content */
+.slide.active .anim-up {
+  animation: animUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+.slide.active .anim-up:nth-child(1) { animation-delay: 0.1s; }
+.slide.active .anim-up:nth-child(2) { animation-delay: 0.2s; }
+.slide.active .anim-up:nth-child(3) { animation-delay: 0.3s; }
+.slide.active .anim-up:nth-child(4) { animation-delay: 0.4s; }
+.slide.active .anim-up:nth-child(5) { animation-delay: 0.5s; }
+.slide.active .anim-up:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes animUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Branch diagram */
+.branch-line {
+  stroke: var(--accent);
+  stroke-width: 3;
+  fill: none;
+}
+
+.branch-node {
+  fill: var(--bg);
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+
+.branch-node-filled {
+  fill: var(--accent);
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+
+.commit-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  fill: var(--muted);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .slide { padding: 3rem 1.5rem 5rem; }
+  .cover-hero { grid-template-columns: 1fr; gap: 1.5rem; }
+  .git-logo-svg { max-width: 250px; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .options { grid-template-columns: 1fr; }
+  .slide-title { font-size: 2rem; }
+}
+
+@media (max-width: 600px) {
+  .navigation { padding: 0.5rem 0.75rem; gap: 0.5rem; }
+  .nav-btn { width: 38px; height: 38px; }
+  .slide-info { font-size: 0.8rem; min-width: 50px; }
+}
+
+/* Hint keyboard */
+.keyboard-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 50;
+}
+
+.kbd {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+@media (max-width: 768px) { .keyboard-hint { display: none; } }
+
+/* Code badge inline */
+.code-inline {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.9em;
+  color: var(--accent-2);
+}
+
+/* Icon container */
+.icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  background: rgba(255, 120, 73, 0.1);
+  border: 1px solid rgba(255, 120, 73, 0.2);
+}
+
+.icon-wrap.green { background: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.2); }
+.icon-wrap.yellow { background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.2); }
+
+</style>
+</head>
+<body>
+
+<div class="presentation">
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Slides -->
+  <div class="slide-container">
+    
+    <!-- SLIDE 1: COVER -->
+    <div class="slide active" data-slide="0">
+      <div class="cover-hero">
+        <div>
+          <div class="badge-row anim-up">
+            <span class="badge">MODUL PEMBELAJARAN</span>
+            <span class="badge green">RPL - KELAS X</span>
+          </div>
+          <h1 class="cover-title anim-up">
+            Petualangan<br>
+            <span class="glow-text">Git & GitHub</span>
+          </h1>
+          <p class="cover-subtitle anim-up">
+            Belajar dasar-dasar <strong style="color: var(--fg);">Version Control System</strong> 
+            dengan cara yang seru, visual, dan mudah dipahami. 
+            Siap jadi programmer andal? Yuk mulai!
+          </p>
+          <div class="anim-up">
+            <button class="start-btn" onclick="nextSlide()">
+              Mulai Belajar
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="git-logo-container anim-up">
+          <div class="floating-particle" style="width: 12px; height: 12px; background: var(--accent); top: 10%; left: 10%;"></div>
+          <div class="floating-particle" style="width: 8px; height: 8px; background: var(--accent-2); top: 80%; left: 20%; animation-delay: 2s;"></div>
+          <div class="floating-particle" style="width: 10px; height: 10px; background: var(--accent-3); top: 30%; right: 5%; animation-delay: 4s;"></div>
+          
+          <svg class="git-logo-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+            <!-- Branch lines -->
+            <path d="M 100 80 Q 100 200 100 320" stroke="#ff7849" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M 100 180 Q 200 180 300 180" stroke="#4ade80" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M 300 180 Q 300 250 300 320" stroke="#4ade80" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path d="M 200 180 Q 200 250 200 320" stroke="#fbbf24" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="6 6"/>
+            
+            <!-- Nodes -->
+            <circle cx="100" cy="80" r="18" fill="#0a0e1a" stroke="#ff7849" stroke-width="4"/>
+            <circle cx="100" cy="180" r="18" fill="#ff7849" stroke="#ff7849" stroke-width="4"/>
+            <circle cx="100" cy="320" r="18" fill="#0a0e1a" stroke="#ff7849" stroke-width="4"/>
+            <circle cx="300" cy="180" r="18" fill="#4ade80" stroke="#4ade80" stroke-width="4"/>
+            <circle cx="300" cy="320" r="18" fill="#0a0e1a" stroke="#4ade80" stroke-width="4"/>
+            <circle cx="200" cy="320" r="18" fill="#fbbf24" stroke="#fbbf24" stroke-width="4"/>
+            
+            <!-- Center icon -->
+            <circle cx="200" cy="180" r="35" fill="#0a0e1a" stroke="#fbbf24" stroke-width="3"/>
+            <text x="200" y="190" text-anchor="middle" font-family="JetBrains Mono" font-size="20" font-weight="700" fill="#fbbf24">git</text>
+            
+            <!-- Labels -->
+            <text x="100" y="55" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#8b95a8">main</text>
+            <text x="300" y="155" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#4ade80">feature</text>
+            <text x="200" y="355" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#fbbf24">merge</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: APA ITU GIT? -->
+    <div class="slide" data-slide="1">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">01</span>
+          <span class="slide-tag">// Pengenalan</span>
+        </div>
+        <h2 class="slide-title anim-up">Apa itu <span class="glow-text">Git</span>?</h2>
+        <p class="slide-subtitle anim-up">
+          Git adalah sistem pelacak perubahan pada file. Bayangkan Git seperti <strong style="color: var(--accent);">"mesin waktu"</strong> untuk kode-mu!
+        </p>
+
+        <div class="grid-2 anim-up" style="margin-top: 1.5rem;">
+          <div class="card card-glow">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div class="icon-wrap" style="margin: 0; width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff7849" stroke-width="2.5">
+                  <path d="M12 8v4l3 3M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem; font-weight: 600;">Tanpa Git</h3>
+            </div>
+            <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.95rem; line-height: 1.6;">
+              File berantakan dengan nama seperti:
+            </p>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.8;">
+              <div style="color: #fca5a5;">📄 tugas.txt</div>
+              <div style="color: #fca5a5;">📄 tugas_v2.txt</div>
+              <div style="color: #fca5a5;">📄 tugas_fix.txt</div>
+              <div style="color: #fca5a5;">📄 tugas_final.txt</div>
+              <div style="color: #fca5a5;">📄 tugas_FINAL_banget.txt</div>
+              <div style="color: #fca5a5;">📄 tugas_jadi_ini.txt</div>
+            </div>
+          </div>
+
+          <div class="card" style="border-color: var(--accent-2);">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div class="icon-wrap green" style="margin: 0; width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5">
+                  <path d="M5 13l4 4L19 7"/>
+                </svg>
+              </div>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem; font-weight: 600;">Dengan Git</h3>
+            </div>
+            <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.95rem; line-height: 1.6;">
+              Cukup satu file, semua versi tercatat rapi:
+            </p>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; line-height: 1.8;">
+              <div style="color: var(--accent-2);">📝 tugas.txt</div>
+              <div style="color: var(--muted);">├── v1: "versi awal"</div>
+              <div style="color: var(--muted);">├── v2: "tambah gambar"</div>
+              <div style="color: var(--muted);">├── v3: "perbaiki typo"</div>
+              <div style="color: var(--muted);">└── v4: "versi final" ✨</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">💡 ANALOGI KEHIDUPAN</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            <strong style="color: var(--accent);">Git itu seperti fitur "Save" di game.</strong><br>
+            Saat main game, kamu bisa save progress. Kalau kalah, kamu bisa load save terakhir. 
+            Git melakukan hal yang sama untuk kode-mu — kamu bisa <em>"kembali ke masa lalu"</em> 
+            kapan saja kamu mau!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: KENAPA BELAJAR GIT -->
+    <div class="slide" data-slide="2">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">02</span>
+          <span class="slide-tag">// Manfaat</span>
+        </div>
+        <h2 class="slide-title anim-up">Kenapa Harus <span class="glow-text">Belajar Git</span>?</h2>
+        <p class="slide-subtitle anim-up">4 alasan kuat mengapa Git adalah skill wajib buat programmer masa kini.</p>
+
+        <div class="grid-4 anim-up">
+          <div class="card">
+            <div class="icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff7849" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">Melacak Perubahan</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Tahu persis <em>kapan, siapa,</em> dan <em>apa</em> yang berubah di setiap baris kode.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="icon-wrap green">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">Kolaborasi Tim</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Bekerja bareng teman tanpa saling timpa kode. Semua kontribusi tercatat rapi.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="icon-wrap yellow">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">Backup Otomatis</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Kode aman tersimpan di server. Laptop rusak? Tenang, kode tetap aman!
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff7849" stroke-width="2">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">Eksperimen Bebas</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Coba ide gila tanpa takut rusak. Kalau gagal, balik ke versi sebelumnya dengan mudah.
+            </p>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">🌟 FUN FACT</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            <strong style="color: var(--accent-3);">90% perusahaan teknologi</strong> di dunia menggunakan Git untuk mengelola kode mereka. 
+            Dari Google, Facebook, sampai startup kecil — semua pakai Git! Jadi, belajar Git = investasi masa depan. 🚀
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: ISTILAH PENTING -->
+    <div class="slide" data-slide="3">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">03</span>
+          <span class="slide-tag">// Kosakata Git</span>
+        </div>
+        <h2 class="slide-title anim-up">Istilah Penting dalam <span class="glow-text">Git</span></h2>
+        <p class="slide-subtitle anim-up">5 istilah yang wajib kamu kuasai dulu sebelum mulai ngoding dengan Git.</p>
+
+        <div class="grid-3 anim-up">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+              <div class="icon-wrap" style="margin: 0;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff7849" stroke-width="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                  <polyline points="9 22 9 12 15 12 15 22"/>
+                </svg>
+              </div>
+              <span class="code-inline">repository</span>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Repository</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+              Folder khusus berisi semua file proyek + riwayat perubahannya.
+            </p>
+            <p style="font-size: 0.85rem; color: var(--accent); font-style: italic;">
+              💡 Sepelin "brankas proyek" yang mencatat semua kejadian
+            </p>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+              <div class="icon-wrap green" style="margin: 0;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                  <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+                  <line x1="12" y1="22.08" x2="12" y2="12"/>
+                </svg>
+              </div>
+              <span class="code-inline">commit</span>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Commit</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+              Menyimpan snapshot (foto) perubahan kode ke dalam repository.
+            </p>
+            <p style="font-size: 0.85rem; color: var(--accent-2); font-style: italic;">
+              💡 Seperti "save game" di video game
+            </p>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+              <div class="icon-wrap yellow" style="margin: 0;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2">
+                  <line x1="6" y1="3" x2="6" y2="15"/>
+                  <circle cx="18" cy="6" r="3"/>
+                  <circle cx="6" cy="18" r="3"/>
+                  <path d="M18 9a9 9 0 01-9 9"/>
+                </svg>
+              </div>
+              <span class="code-inline">branch</span>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Branch</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+              Cabang paralel untuk mengembangkan fitur tanpa ganggu branch utama.
+            </p>
+            <p style="font-size: 0.85rem; color: var(--accent-3); font-style: italic;">
+              💡 Seperti "dimensi alternatif" untuk proyekmu
+            </p>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+              <div class="icon-wrap" style="margin: 0;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff7849" stroke-width="2">
+                  <polyline points="17 1 21 5 17 9"/>
+                  <path d="M3 11V9a4 4 0 014-4h14"/>
+                  <polyline points="7 23 3 19 7 15"/>
+                  <path d="M21 13v2a4 4 0 01-4 4H3"/>
+                </svg>
+              </div>
+              <span class="code-inline">push/pull</span>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Push & Pull</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+              <strong>Push</strong>: kirim kode ke server. <strong>Pull</strong>: ambil kode terbaru dari server.
+            </p>
+            <p style="font-size: 0.85rem; color: var(--accent); font-style: italic;">
+              💡 Seperti "kirim & terima email" kode
+            </p>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+              <div class="icon-wrap green" style="margin: 0;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="8" x2="12" y2="12"/>
+                  <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+              </div>
+              <span class="code-inline">merge</span>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Merge</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+              Menggabungkan perubahan dari satu branch ke branch lain.
+            </p>
+            <p style="font-size: 0.85rem; color: var(--accent-2); font-style: italic;">
+              💡 Seperti "menyatukan dua sungai" jadi satu
+            </p>
+          </div>
+
+          <div class="card" style="background: linear-gradient(135deg, rgba(255, 120, 73, 0.08), rgba(74, 222, 128, 0.05)); border-style: dashed;">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; flex-direction: column; text-align: center;">
+              <div style="font-size: 2.5rem; margin-bottom: 0.5rem;"> mnemonic</div>
+              <p style="font-size: 0.95rem; line-height: 1.6; color: var(--fg);">
+                <strong style="color: var(--accent);">Ingat:</strong> Repository → Commit → Branch → Merge → Push<br>
+                <span style="color: var(--muted); font-size: 0.85rem;">Itu siklus hidup Git!</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: ANALOGI GAME SAVE -->
+    <div class="slide" data-slide="4">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">04</span>
+          <span class="slide-tag">// Analogi</span>
+        </div>
+        <h2 class="slide-title anim-up">Git itu seperti <span class="glow-text">Save Game</span></h2>
+        <p class="slide-subtitle anim-up">Biar lebih mudah dipahami, mari bandingkan Git dengan game favoritmu!</p>
+
+        <div class="grid-2 anim-up" style="margin-top: 1rem;">
+          <div class="card card-glow">
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.5rem;">🎮</span> Di Game
+            </h3>
+            
+            <!-- Game save timeline -->
+            <svg viewBox="0 0 500 280" style="width: 100%; height: auto;">
+              <!-- Timeline -->
+              <line x1="40" y1="140" x2="460" y2="140" stroke="#2a3344" stroke-width="3"/>
+              
+              <!-- Save points -->
+              <g>
+                <circle cx="80" cy="140" r="15" fill="#ff7849"/>
+                <text x="80" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">Level 1</text>
+                <text x="80" y="180" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8b95a8">Start</text>
+              </g>
+              <g>
+                <circle cx="180" cy="140" r="15" fill="#ff7849"/>
+                <text x="180" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">Level 5</text>
+                <text x="180" y="180" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8b95a8">Save 1</text>
+              </g>
+              <g>
+                <circle cx="280" cy="140" r="15" fill="#fbbf24"/>
+                <text x="280" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">Level 10</text>
+                <text x="280" y="180" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8b95a8">Save 2</text>
+              </g>
+              <g>
+                <circle cx="380" cy="140" r="15" fill="#4ade80"/>
+                <text x="380" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">Level 15</text>
+                <text x="380" y="180" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8b95a8">Boss!</text>
+              </g>
+              
+              <!-- Side quest branch -->
+              <path d="M 280 140 Q 330 80 380 60" stroke="#4ade80" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+              <circle cx="380" cy="60" r="10" fill="#4ade80" opacity="0.7"/>
+              <text x="380" y="40" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#4ade80">Side Quest</text>
+              
+              <!-- Annotations -->
+              <text x="250" y="240" text-anchor="middle" font-family="Outfit" font-size="13" fill="#8b95a8">Bisa kembali ke save point kapan saja</text>
+              <text x="250" y="260" text-anchor="middle" font-family="Outfit" font-size="11" fill="#ff7849">Coba side quest gagal? Load save terakhir!</text>
+            </svg>
+          </div>
+
+          <div class="card" style="border-color: var(--accent-2);">
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+              <span style="font-size: 1.5rem;">💻</span> Di Git
+            </h3>
+            
+            <svg viewBox="0 0 500 280" style="width: 100%; height: auto;">
+              <!-- Timeline -->
+              <line x1="40" y1="140" x2="460" y2="140" stroke="#2a3344" stroke-width="3"/>
+              
+              <!-- Commits -->
+              <g>
+                <circle cx="80" cy="140" r="15" fill="#ff7849"/>
+                <text x="80" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">Commit 1</text>
+                <text x="80" y="180" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8b95a8">init project</text>
+              </g>
+              <g>
+                <circle cx="180" cy="140" r="15" fill="#ff7849"/>
+                <text x="180" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">Commit 2</text>
+                <text x="180" y="180" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8b95a8">add login</text>
+              </g>
+              <g>
+                <circle cx="280" cy="140" r="15" fill="#fbbf24"/>
+                <text x="280" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">Commit 3</text>
+                <text x="280" y="180" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8b95a8">add UI</text>
+              </g>
+              <g>
+                <circle cx="380" cy="140" r="15" fill="#4ade80"/>
+                <text x="380" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">Commit 4</text>
+                <text x="380" y="180" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8b95a8">finished!</text>
+              </g>
+              
+              <!-- Feature branch -->
+              <path d="M 280 140 Q 330 80 380 60" stroke="#4ade80" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+              <circle cx="380" cy="60" r="10" fill="#4ade80" opacity="0.7"/>
+              <text x="380" y="40" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#4ade80">feature branch</text>
+              
+              <text x="250" y="240" text-anchor="middle" font-family="Outfit" font-size="13" fill="#8b95a8">Bisa kembali ke commit mana pun</text>
+              <text x="250" y="260" text-anchor="middle" font-family="Outfit" font-size="11" fill="#4ade80">Eksperimen gagal? Balik ke commit terakhir!</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">🎯 KESIMPULAN</span>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 0.5rem;">
+            <div>
+              <strong style="color: var(--accent);">Save Point</strong>
+              <p style="color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem;">= Commit</p>
+            </div>
+            <div>
+              <strong style="color: var(--accent-3);">Side Quest</strong>
+              <p style="color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem;">= Branch</p>
+            </div>
+            <div>
+              <strong style="color: var(--accent-2);">Selesaikan Quest</strong>
+              <p style="color: var(--muted); font-size: 0.9rem; margin-top: 0.25rem;">= Merge</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: CARA KERJA GIT -->
+    <div class="slide" data-slide="5">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">05</span>
+          <span class="slide-tag">// Cara Kerja</span>
+        </div>
+        <h2 class="slide-title anim-up">3 Area Kerja <span class="glow-text">Git</span></h2>
+        <p class="slide-subtitle anim-up">Kode kamu akan "mengalir" melalui 3 tahap ini sebelum benar-benar tersimpan.</p>
+
+        <div class="anim-up" style="margin: 2rem 0;">
+          <svg viewBox="0 0 1000 320" style="width: 100%; height: auto;">
+            <!-- Working Directory -->
+            <rect x="20" y="80" width="240" height="160" rx="16" fill="#131826" stroke="#ff7849" stroke-width="2"/>
+            <text x="140" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="18" font-weight="600" fill="#ff7849">Working Directory</text>
+            <text x="140" y="145" text-anchor="middle" font-family="Outfit" font-size="12" fill="#8b95a8">Folder tempat kamu</text>
+            <text x="140" y="162" text-anchor="middle" font-family="Outfit" font-size="12" fill="#8b95a8">mengedit kode</text>
+            <text x="140" y="195" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">📁 project/</text>
+            <text x="140" y="215" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">├── index.html</text>
+            
+            <!-- Arrow 1 -->
+            <path d="M 270 160 L 350 160" stroke="#fbbf24" stroke-width="3" marker-end="url(#arrow1)" fill="none"/>
+            <text x="310" y="145" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#fbbf24" font-weight="600">git add</text>
+            <text x="310" y="180" text-anchor="middle" font-family="Outfit" font-size="11" fill="#8b95a8">tandai siap simpan</text>
+            
+            <!-- Staging Area -->
+            <rect x="370" y="80" width="240" height="160" rx="16" fill="#131826" stroke="#fbbf24" stroke-width="2"/>
+            <text x="490" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="18" font-weight="600" fill="#fbbf24">Staging Area</text>
+            <text x="490" y="145" text-anchor="middle" font-family="Outfit" font-size="12" fill="#8b95a8">Ruang tunggu</text>
+            <text x="490" y="162" text-anchor="middle" font-family="Outfit" font-size="12" fill="#8b95a8">sebelum disimpan</text>
+            <text x="490" y="195" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">📋 Changes ready:</text>
+            <text x="490" y="215" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">+ index.html</text>
+            
+            <!-- Arrow 2 -->
+            <path d="M 620 160 L 700 160" stroke="#4ade80" stroke-width="3" marker-end="url(#arrow2)" fill="none"/>
+            <text x="660" y="145" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#4ade80" font-weight="600">git commit</text>
+            <text x="660" y="180" text-anchor="middle" font-family="Outfit" font-size="11" fill="#8b95a8">simpan permanen</text>
+            
+            <!-- Repository -->
+            <rect x="720" y="80" width="240" height="160" rx="16" fill="#131826" stroke="#4ade80" stroke-width="2"/>
+            <text x="840" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="18" font-weight="600" fill="#4ade80">Repository</text>
+            <text x="840" y="145" text-anchor="middle" font-family="Outfit" font-size="12" fill="#8b95a8">Database berisi</text>
+            <text x="840" y="162" text-anchor="middle" font-family="Outfit" font-size="12" fill="#8b95a8">semua riwayat</text>
+            <text x="840" y="195" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">📦 Commit history:</text>
+            <text x="840" y="215" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#e8edf5">abc123 ✓</text>
+            
+            <!-- Arrow markers -->
+            <defs>
+              <marker id="arrow1" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L9,3 z" fill="#fbbf24"/>
+              </marker>
+              <marker id="arrow2" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L9,3 z" fill="#4ade80"/>
+              </marker>
+            </defs>
+            
+            <!-- Bottom labels -->
+            <text x="140" y="280" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#ff7849">📂 Dapur</text>
+            <text x="490" y="280" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#fbbf24">🍽️ Meja Serve</text>
+            <text x="840" y="280" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#4ade80">🏛️ Ruang Arsip</text>
+          </svg>
+        </div>
+
+        <div class="analogy-box anim-up">
+          <span class="analogy-label">🍕 ANALOGI RESTORAN</span>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 0.5rem;">
+            <div>
+              <p style="font-size: 0.95rem; line-height: 1.6;">
+                <strong style="color: var(--accent);">Working Directory = Dapur</strong><br>
+                <span style="color: var(--muted); font-size: 0.9rem;">Kamu masak (edit kode) di sini</span>
+              </p>
+            </div>
+            <div>
+              <p style="font-size: 0.95rem; line-height: 1.6;">
+                <strong style="color: var(--accent-3);">Staging Area = Meja Serve</strong><br>
+                <span style="color: var(--muted); font-size: 0.9rem;">Masakan siap disajikan (ditandai siap simpan)</span>
+              </p>
+            </div>
+            <div>
+              <p style="font-size: 0.95rem; line-height: 1.6;">
+                <strong style="color: var(--accent-2);">Repository = Ruang Arsip</strong><br>
+                <span style="color: var(--muted); font-size: 0.9rem;">Resep tersimpan permanen (commit tersimpan)</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: PERINTAH DASAR -->
+    <div class="slide" data-slide="6">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">06</span>
+          <span class="slide-tag">// Perintah Dasar</span>
+        </div>
+        <h2 class="slide-title anim-up">Perintah <span class="glow-text">Sakti</span> Git</h2>
+        <p class="slide-subtitle anim-up">6 perintah dasar yang akan sering kamu gunakan sehari-hari.</p>
+
+        <div class="grid-2 anim-up">
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">bash — perintah-dasar</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="term-comment"># 1. Buat repository baru</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git init</span></div>
+              <div><span class="term-success">Initialized empty Git repository</span></div>
+              <div style="height: 0.6rem;"></div>
+              <div><span class="term-comment"># 2. Cek status perubahan</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git status</span></div>
+              <div><span class="term-output">On branch main</span></div>
+              <div><span class="term-output">Untracked files: index.html</span></div>
+              <div style="height: 0.6rem;"></div>
+              <div><span class="term-comment"># 3. Tandai perubahan siap disimpan</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git add index.html</span></div>
+              <div><span class="term-comment"># atau semua file: git add .</span></div>
+              <div style="height: 0.6rem;"></div>
+              <div><span class="term-comment"># 4. Simpan dengan pesan</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git commit -m </span><span class="term-yellow">"menambah halaman utama"</span></div>
+              <div><span class="term-success">[main abc1234] menambah halaman utama</span></div>
+            </div>
+          </div>
+
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">bash — perintah-dasar</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="term-comment"># 5. Lihat riwayat commit</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git log</span></div>
+              <div><span class="term-accent">commit abc1234...</span></div>
+              <div><span class="term-output">Author: Budi &lt;budi@email.com&gt;</span></div>
+              <div><span class="term-output">Date: Mon Jan 15 10:30:00</span></div>
+              <div><span class="term-yellow">    menambah halaman utama</span></div>
+              <div style="height: 0.6rem;"></div>
+              <div><span class="term-comment"># 6. Kirim ke server (GitHub)</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git push origin main</span></div>
+              <div><span class="term-output">Enumerating objects: 5, done.</span></div>
+              <div><span class="term-success">To github.com:budi/project.git</span></div>
+              <div style="height: 0.6rem;"></div>
+              <div><span class="term-comment"># Bonus: ambil update dari server</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git pull</span></div>
+              <div><span class="term-success">Already up to date.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-3 anim-up" style="margin-top: 1.5rem;">
+          <div class="card" style="padding: 1rem;">
+            <code class="code-inline" style="display: block; margin-bottom: 0.5rem;">git init</code>
+            <p style="font-size: 0.85rem; color: var(--muted);">Mulai proyek baru, sekali seumur hidup proyek</p>
+          </div>
+          <div class="card" style="padding: 1rem;">
+            <code class="code-inline" style="display: block; margin-bottom: 0.5rem;">git add + commit</code>
+            <p style="font-size: 0.85rem; color: var(--muted);">Duo sakti: lakukan berulang setiap ada perubahan</p>
+          </div>
+          <div class="card" style="padding: 1rem;">
+            <code class="code-inline" style="display: block; margin-bottom: 0.5rem;">git push</code>
+            <p style="font-size: 0.85rem; color: var(--muted);">Kirim ke cloud, lakukan setelah commit</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: STUDI KASUS -->
+    <div class="slide" data-slide="7">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">07</span>
+          <span class="slide-tag">// Studi Kasus</span>
+        </div>
+        <h2 class="slide-title anim-up">Praktik: Membuat <span class="glow-text">Website Portofolio</span></h2>
+        <p class="slide-subtitle anim-up">Mari ikuti kisah Andi yang membuat website portofolio pertamanya dengan Git!</p>
+
+        <div class="grid-2 anim-up">
+          <div>
+            <div class="card" style="margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <div style="background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'JetBrains Mono';">1</div>
+                <strong>Mulai proyek</strong>
+              </div>
+              <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">Andi membuat folder <span class="code-inline">portofolio</span> dan menjalankan <span class="code-inline">git init</span></p>
+            </div>
+
+            <div class="card" style="margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <div style="background: var(--accent-3); color: var(--bg); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'JetBrains Mono';">2</div>
+                <strong>Buat file index.html</strong>
+              </div>
+              <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">Andi menulis HTML dasar lalu <span class="code-inline">git add .</span> dan <span class="code-inline">git commit -m "versi awal"</span></p>
+            </div>
+
+            <div class="card" style="margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <div style="background: var(--accent-2); color: var(--bg); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'JetBrains Mono';">3</div>
+                <strong>Tambah CSS</strong>
+              </div>
+              <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">Andi menambah style.css, commit lagi: <span class="code-inline">"tambah styling"</span></p>
+            </div>
+
+            <div class="card">
+              <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <div style="background: var(--accent); color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: 'JetBrains Mono';">4</div>
+                <strong>Push ke GitHub</strong>
+              </div>
+              <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">Andi <span class="code-inline">git push</span> agar teman bisa lihat hasilnya di GitHub</p>
+            </div>
+          </div>
+
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">andi@laptop — portofolio</span>
+            </div>
+            <div class="terminal-body" style="font-size: 0.82rem;">
+              <div><span class="term-prompt">$ </span><span class="term-command">mkdir portofolio && cd portofolio</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git init</span></div>
+              <div><span class="term-success">✓ Initialized Git repository</span></div>
+              <div style="height: 0.4rem;"></div>
+              <div><span class="term-comment"># Andi membuat index.html</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git status</span></div>
+              <div><span class="term-output">?? index.html</span></div>
+              <div style="height: 0.4rem;"></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git add index.html</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git commit -m </span><span class="term-yellow">"versi awal portofolio"</span></div>
+              <div><span class="term-success">✓ [main abc123] versi awal</span></div>
+              <div><span class="term-success"> 1 file changed, 15 insertions</span></div>
+              <div style="height: 0.4rem;"></div>
+              <div><span class="term-comment"># Andi tambah CSS</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git add style.css</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git commit -m </span><span class="term-yellow">"tambah styling"</span></div>
+              <div><span class="term-success">✓ [main def456] tambah styling</span></div>
+              <div style="height: 0.4rem;"></div>
+              <div><span class="term-comment"># Kirim ke GitHub</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git push origin main</span></div>
+              <div><span class="term-success">✓ Pushed to GitHub! 🎉</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1rem;">
+          <span class="analogy-label">💡 PESAN MORAL</span>
+          <p style="margin-top: 0.5rem; line-height: 1.6; font-size: 1rem;">
+            Andi tidak pernah kehilangan kode! Kalau besok CSS-nya rusak, dia bisa <strong style="color: var(--accent);">kembali ke "versi awal"</strong> dengan mudah. 
+            Itulah kekuatan commit yang rutin! 💪
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: BRANCH & TIM -->
+    <div class="slide" data-slide="8">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">08</span>
+          <span class="slide-tag">// Kolaborasi</span>
+        </div>
+        <h2 class="slide-title anim-up">Branch: <span class="glow-text">Bekerja Rame-rame</span></h2>
+        <p class="slide-subtitle anim-up">Bagaimana tim developer mengerjakan fitur berbeda tanpa saling ganggu? Pakai branch!</p>
+
+        <div class="grid-2 anim-up">
+          <div class="card card-glow">
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem;">
+              🌳 Visual Branch
+            </h3>
+            <svg viewBox="0 0 500 280" style="width: 100%; height: auto;">
+              <!-- Main branch -->
+              <line x1="40" y1="80" x2="460" y2="80" stroke="#ff7849" stroke-width="3"/>
+              <text x="40" y="60" font-family="JetBrains Mono" font-size="11" fill="#ff7849" font-weight="600">main</text>
+              
+              <circle cx="80" cy="80" r="12" fill="#0a0e1a" stroke="#ff7849" stroke-width="3"/>
+              <circle cx="200" cy="80" r="12" fill="#ff7849"/>
+              <circle cx="340" cy="80" r="12" fill="#0a0e1a" stroke="#ff7849" stroke-width="3"/>
+              <circle cx="440" cy="80" r="12" fill="#4ade80"/>
+              
+              <!-- Feature branch -->
+              <path d="M 200 80 Q 200 140 200 180" stroke="#4ade80" stroke-width="3" fill="none"/>
+              <line x1="200" y1="180" x2="380" y2="180" stroke="#4ade80" stroke-width="3"/>
+              <text x="200" y="220" font-family="JetBrains Mono" font-size="11" fill="#4ade80" font-weight="600">feature/login</text>
+              
+              <circle cx="280" cy="180" r="10" fill="#0a0e1a" stroke="#4ade80" stroke-width="3"/>
+              <circle cx="380" cy="180" r="10" fill="#4ade80"/>
+              
+              <!-- Merge line -->
+              <path d="M 380 180 Q 410 130 440 80" stroke="#fbbf24" stroke-width="3" fill="none" stroke-dasharray="5 5"/>
+              
+              <text x="80" y="110" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8b95a8">init</text>
+              <text x="200" y="110" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8b95a8">add base</text>
+              <text x="340" y="110" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8b95a8">merge</text>
+              <text x="440" y="110" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#4ade80">final</text>
+              
+              <text x="280" y="210" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8b95a8">kerja fitur</text>
+              
+              <text x="420" y="140" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#fbbf24">merge!</text>
+            </svg>
+          </div>
+
+          <div>
+            <div class="terminal" style="margin-bottom: 1rem;">
+              <div class="terminal-header">
+                <div class="terminal-dot" style="background: #ef4444;"></div>
+                <div class="terminal-dot" style="background: #fbbf24;"></div>
+                <div class="terminal-dot" style="background: #4ade80;"></div>
+                <span class="terminal-title">bash — branch-commands</span>
+              </div>
+              <div class="terminal-body" style="font-size: 0.85rem;">
+                <div><span class="term-comment"># Buat branch baru</span></div>
+                <div><span class="term-prompt">$ </span><span class="term-command">git branch feature/login</span></div>
+                <div style="height: 0.3rem;"></div>
+                <div><span class="term-comment"># Pindah ke branch tersebut</span></div>
+                <div><span class="term-prompt">$ </span><span class="term-command">git checkout feature/login</span></div>
+                <div><span class="term-success">Switched to branch 'feature/login'</span></div>
+                <div style="height: 0.3rem;"></div>
+                <div><span class="term-comment"># Atau keduanya sekaligus:</span></div>
+                <div><span class="term-prompt">$ </span><span class="term-command">git checkout -b feature/login</span></div>
+                <div style="height: 0.3rem;"></div>
+                <div><span class="term-comment"># Setelah selesai, merge ke main</span></div>
+                <div><span class="term-prompt">$ </span><span class="term-command">git checkout main</span></div>
+                <div><span class="term-prompt">$ </span><span class="term-command">git merge feature/login</span></div>
+                <div><span class="term-success">✓ Merge berhasil!</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1rem;">
+          <span class="analogy-label">👥 ANALOGI TUGAS KELOMPOK</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1rem;">
+            Bayangkan mengerjakan tugas kelompok: <strong style="color: var(--accent);">Budi nulis bab 1</strong>, 
+            <strong style="color: var(--accent-2);">Siti nulis bab 2</strong>, <strong style="color: var(--accent-3);">Agus nulis bab 3</strong>.<br>
+            Mereka kerja di <em>"branch"</em> masing-masing. Setelah selesai, semua bab digabung (<strong>merge</strong>) jadi satu dokumen utuh. 
+            Tidak ada yang saling timpa kerjaan! ✨
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: TUGAS / QUIZ -->
+    <div class="slide" data-slide="9">
+      <div class="quiz-container">
+        <div class="slide-header anim-up">
+          <span class="slide-number">09</span>
+          <span class="slide-tag">// Tugas Akhir</span>
+        </div>
+        <h2 class="slide-title anim-up">🎯 Uji Kemampuanmu!</h2>
+        <p class="slide-subtitle anim-up">Jawab 5 soal berikut untuk menguji pemahamanmu tentang Git. Klik jawaban yang menurutmu benar!</p>
+
+        <div id="quizContainer"></div>
+
+        <div class="quiz-result" id="quizResult">
+          <h3 style="font-family: 'Space Grotesk'; font-size: 1.5rem; margin-bottom: 0.5rem;">Hasil Tes Kamu</h3>
+          <div class="score-display" id="scoreDisplay">0/5</div>
+          <p id="scoreMessage" style="color: var(--muted); margin-bottom: 1rem;"></p>
+          <button class="retry-btn" onclick="resetQuiz()">Coba Lagi 🔄</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: PENUTUP -->
+    <div class="slide" data-slide="10">
+      <div style="max-width: 1100px; margin: 0 auto; width: 100%; text-align: center;">
+        <div class="anim-up" style="margin-bottom: 2rem;">
+          <svg width="120" height="120" viewBox="0 0 200 200" style="margin: 0 auto;">
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#ff7849" stroke-width="3" stroke-dasharray="8 4"/>
+            <circle cx="100" cy="100" r="60" fill="#131826" stroke="#4ade80" stroke-width="2"/>
+            <path d="M 80 100 L 95 115 L 125 85" stroke="#4ade80" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <h2 class="slide-title anim-up" style="font-size: clamp(2.5rem, 5vw, 4rem);">
+          Selamat! Kamu Sudah <br><span class="glow-text">Lulus Dasar Git</span> 🎉
+        </h2>
+
+        <p class="slide-subtitle anim-up" style="margin: 1rem auto 2rem; max-width: 600px;">
+          Kamu sudah mengenal istilah, cara kerja, dan perintah dasar Git. 
+          Sekarang waktunya praktik beneran!
+        </p>
+
+        <div class="grid-3 anim-up" style="margin-bottom: 2rem;">
+          <div class="card" style="text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📚</div>
+            <h4 style="font-family: 'Space Grotesk'; font-weight: 600; margin-bottom: 0.5rem;">Langkah Selanjutnya</h4>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Install Git di laptop, daftar GitHub, dan mulai proyek pertamamu!
+            </p>
+          </div>
+          <div class="card" style="text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔗</div>
+            <h4 style="font-family: 'Space Grotesk'; font-weight: 600; margin-bottom: 0.5rem;">Sumber Belajar</h4>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              <span class="code-inline">git-scm.com</span><br>
+              <span class="code-inline">learngitbranching.js.org</span>
+            </p>
+          </div>
+          <div class="card" style="text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">💪</div>
+            <h4 style="font-family: 'Space Grotesk'; font-weight: 600; margin-bottom: 0.5rem;">Tips Sukses</h4>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Commit sering, pesan jelas, dan jangan takut salah. Git = mesin waktu!
+            </p>
+          </div>
+        </div>
+
+        <div class="anim-up" style="padding: 1.5rem; background: linear-gradient(135deg, rgba(255, 120, 73, 0.1), rgba(74, 222, 128, 0.08)); border-radius: 16px; border: 1px solid var(--accent);">
+          <p style="font-size: 1.1rem; line-height: 1.7;">
+            <strong style="color: var(--accent);">"Code is like humor. When you have to explain it, it's bad."</strong><br>
+            <span style="color: var(--muted); font-size: 0.95rem;">— Cory House</span>
+          </p>
+        </div>
+
+        <p class="anim-up" style="margin-top: 2rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;">
+          // Terima kasih sudah belajar bersama! Keep coding! 🚀
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation -->
+  <div class="navigation">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <div class="slide-info">
+      <span class="current" id="currentSlide">1</span> / <span id="totalSlides">11</span>
+    </div>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Keyboard hint -->
+  <div class="keyboard-hint">
+    <span>Gunakan</span>
+    <span class="kbd">←</span>
+    <span class="kbd">→</span>
+    <span>untuk navigasi</span>
+  </div>
+
+</div>
+
+<script>
+let currentSlide = 0;
+const totalSlides = 11;
+const slides = document.querySelectorAll('.slide');
+const progressBar = document.getElementById('progressBar');
+const currentSlideEl = document.getElementById('currentSlide');
+const totalSlidesEl = document.getElementById('totalSlides');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+totalSlidesEl.textContent = totalSlides;
+
+function updateSlide(newIndex) {
+  if (newIndex < 0 || newIndex >= totalSlides) return;
+  
+  slides[currentSlide].classList.remove('active');
+  if (newIndex > currentSlide) {
+    slides[currentSlide].classList.add('prev');
+  } else {
+    slides[currentSlide].classList.remove('prev');
+  }
+  
+  currentSlide = newIndex;
+  slides[currentSlide].classList.add('active');
+  slides[currentSlide].classList.remove('prev');
+  
+  // Update progress
+  const progress = ((currentSlide + 1) / totalSlides) * 100;
+  progressBar.style.width = progress + '%';
+  currentSlideEl.textContent = currentSlide + 1;
+  
+  // Update buttons
+  prevBtn.disabled = currentSlide === 0;
+  nextBtn.disabled = currentSlide === totalSlides - 1;
+  
+  // Scroll to top of slide
+  slides[currentSlide].scrollTop = 0;
+}
+
+function nextSlide() { updateSlide(currentSlide + 1); }
+function prevSlide() { updateSlide(currentSlide - 1); }
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    nextSlide();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    prevSlide();
+  }
+});
+
+// Quiz Data
+const quizQuestions = [
+  {
+    question: "Perintah apa yang digunakan untuk menginisialisasi repository Git baru?",
+    options: ["git start", "git init", "git create", "git new"],
+    correct: 1
+  },
+  {
+    question: "Apa fungsi utama dari perintah 'git commit'?",
+    options: [
+      "Mengirim kode ke server GitHub",
+      "Menghapus perubahan yang salah",
+      "Menyimpan snapshot perubahan ke repository lokal",
+      "Membuat branch baru"
+    ],
+    correct: 2
+  },
+  {
+    question: "Urutan workflow Git yang benar dari mulai edit kode hingga tersimpan adalah?",
+    options: [
+      "commit → add → push",
+      "add → commit → push",
+      "push → add → commit",
+      "add → push → commit"
+    ],
+    correct: 1
+  },
+  {
+    question: "Apa yang dilakukan perintah 'git branch fitur-baru'?",
+    options: [
+      "Pindah ke branch fitur-baru",
+      "Membuat branch baru bernama fitur-baru",
+      "Menghapus branch fitur-baru",
+      "Menggabungkan branch fitur-baru ke main"
+    ],
+    correct: 1
+  },
+  {
+    question: "Kamu sedang kerja kelompok. Teman sudah upload perubahan ke GitHub. Perintah apa yang kamu gunakan untuk mendapatkan perubahan tersebut?",
+    options: ["git push", "git pull", "git clone", "git branch"],
+    correct: 1
+  }
+];
+
+let userAnswers = new Array(quizQuestions.length).fill(null);
+
+function renderQuiz() {
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = '';
+  
+  quizQuestions.forEach((q, qIndex) => {
+    const questionEl = document.createElement('div');
+    questionEl.className = 'quiz-question';
+    if (userAnswers[qIndex] !== null) questionEl.classList.add('answered');
+    
+    const optionsHtml = q.options.map((opt, oIndex) => {
+      let classes = 'option';
+      if (userAnswers[qIndex] !== null) {
+        if (oIndex === q.correct) classes += ' correct';
+        else if (oIndex === userAnswers[qIndex]) classes += ' wrong';
+      }
+      
+      const letter = String.fromCharCode(65 + oIndex);
+      return `
+        <button class="${classes}" onclick="selectAnswer(${qIndex}, ${oIndex})" ${userAnswers[qIndex] !== null ? 'disabled' : ''}>
+          <span class="option-letter">${letter}</span>
+          <span>${opt}</span>
+        </button>
+      `;
+    }).join('');
+    
+    questionEl.innerHTML = `
+      <div class="question-text">
+        <span class="question-num">Soal ${qIndex + 1}.</span>
+        <span>${q.question}</span>
+      </div>
+      <div class="options">${optionsHtml}</div>
+    `;
+    
+    container.appendChild(questionEl);
+  });
+}
+
+function selectAnswer(qIndex, oIndex) {
+  userAnswers[qIndex] = oIndex;
+  renderQuiz();
+  checkQuizComplete();
+}
+
+function checkQuizComplete() {
+  const allAnswered = userAnswers.every(a => a !== null);
+  if (allAnswered) {
+    const score = userAnswers.reduce((acc, ans, i) => acc + (ans === quizQuestions[i].correct ? 1 : 0), 0);
+    
+    const result = document.getElementById('quizResult');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const scoreMessage = document.getElementById('scoreMessage');
+    
+    scoreDisplay.textContent = `${score}/5`;
+    
+    let message = '';
+    if (score === 5) {
+      message = '🏆 SEMPURNA! Kamu siap jadi Git Master!';
+      scoreDisplay.style.color = 'var(--accent-2)';
+    } else if (score >= 3) {
+      message = '👍 Bagus! Pemahaman dasarmu sudah baik. Tinggal berlatih lagi!';
+      scoreDisplay.style.color = 'var(--accent-3)';
+    } else {
+      message = '💪 Jangan menyerah! Coba ulangi materi dan coba lagi ya.';
+      scoreDisplay.style.color = 'var(--accent)';
+    }
+    
+    scoreMessage.textContent = message;
+    result.classList.add('show');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function resetQuiz() {
+  userAnswers = new Array(quizQuestions.length).fill(null);
+  document.getElementById('quizResult').classList.remove('show');
+  renderQuiz();
+}
+
+// Initialize
+renderQuiz();
+</script>
+
+</body>
+</html>

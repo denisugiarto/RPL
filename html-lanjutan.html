@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTML Lanjutan — Presentasi Kelas X RPL</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root{
+    --bg:#0F1419;
+    --bg-2:#161C24;
+    --fg:#F7F5EF;
+    --muted:#9AA5B1;
+    --html:#FF6B35;       /* Orange */
+    --css:#00D9C0;        /* Teal */
+    --js:#FFD23F;         /* Yellow */
+    --pink:#FF4D8D;
+    --purple:#8B5CF6;
+    --card:#1A2229;
+    --border:#262F38;
+  }
+  *{ -webkit-font-smoothing:antialiased; box-sizing:border-box; }
+  html,body{ margin:0; padding:0; height:100%; overflow:hidden; }
+  body{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    background:var(--bg);
+    color:var(--fg);
+  }
+  .font-display{ font-family:'Space Grotesk',sans-serif; }
+  .font-mono{ font-family: 'Consolas', 'Monaco', monospace; }
+
+  .bg-mesh{
+    position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(circle at 15% 15%, rgba(255,107,53,0.18), transparent 45%),
+      radial-gradient(circle at 85% 15%, rgba(139,92,246,0.12), transparent 45%),
+      radial-gradient(circle at 75% 85%, rgba(255,210,63,0.10), transparent 45%),
+      radial-gradient(circle at 20% 80%, rgba(0,217,192,0.10), transparent 45%),
+      var(--bg);
+  }
+  .grain{
+    position:fixed; inset:0; z-index:1; opacity:0.04; pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .blob{
+    position:fixed; border-radius:50%; filter:blur(80px); opacity:0.35; z-index:0;
+    animation:float 14s ease-in-out infinite;
+  }
+  @keyframes float{
+    0%,100%{ transform:translateY(0) translateX(0) scale(1); }
+    50%{ transform:translateY(-30px) translateX(20px) scale(1.08); }
+  }
+
+  .deck{
+    position:relative; width:100vw; height:100vh; height:100dvh;
+    overflow:hidden; z-index:2;
+  }
+  .slides{
+    position:relative; width:100%; height:100%;
+  }
+  
+  .slide{
+    position:absolute; top:0; left:0;
+    width:100%; height:100%;
+    padding: 70px 40px 90px;
+    display:grid; place-items:center;
+    opacity:0; transition:opacity .5s;
+    pointer-events:none;
+    overflow-y:auto;
+    overflow-x:hidden;
+  }
+  .slide.active{ opacity:1; pointer-events:auto; }
+  
+  .slide::-webkit-scrollbar { width: 5px; }
+  .slide::-webkit-scrollbar-track { background: transparent; }
+  .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+  .slide::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+  .slide.active .anim{ animation:slideIn .8s cubic-bezier(.2,.7,.2,1) both; }
+  .slide.active .anim-2{ animation:slideIn .8s cubic-bezier(.2,.7,.2,1) .15s both; }
+  .slide.active .anim-3{ animation:slideIn .8s cubic-bezier(.2,.7,.2,1) .3s both; }
+  .slide.active .anim-4{ animation:slideIn .8s cubic-bezier(.2,.7,.2,1) .45s both; }
+  @keyframes slideIn{
+    from{ opacity:0; transform:translateY(30px); }
+    to{ opacity:1; transform:none; }
+  }
+
+  .slide-inner{
+    width:100%; max-width:1280px;
+    margin: auto;
+  }
+
+  .nav-bar{
+    position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+    z-index:50; display:flex; align-items:center; gap:12px;
+    background:rgba(26,34,41,0.8); backdrop-filter:blur(20px);
+    border:1px solid var(--border);
+    padding:8px 12px; border-radius:99px;
+  }
+  .nav-btn{
+    width:36px; height:36px; border-radius:50%;
+    display:grid; place-items:center;
+    background:rgba(255,255,255,0.05); border:1px solid var(--border);
+    color:var(--fg); cursor:pointer; transition:all .25s;
+    flex-shrink: 0;
+  }
+  .nav-btn:hover{ background:var(--html); border-color:var(--html); transform:scale(1.05); }
+  .nav-btn:disabled{ opacity:0.3; cursor:not-allowed; }
+
+  .dots{ display:flex; gap:5px; }
+  .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:rgba(255,255,255,0.2); cursor:pointer; transition:all .3s;
+  }
+  .dot.active{ background:var(--html); width:22px; border-radius:4px; }
+
+  .slide-counter{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:12px; font-weight:600; color:var(--muted);
+    min-width:45px; text-align:center;
+  }
+  .slide-counter b{ color:var(--fg); }
+
+  .top-bar{
+    position:fixed; top:0; left:0; right:0; z-index:40;
+    padding:16px 20px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .progress-track{
+    position:fixed; top:0; left:0; right:0; height:3px; z-index:45;
+    background:rgba(255,255,255,0.05);
+  }
+  .progress-fill{
+    height:100%; width:0%;
+    background:linear-gradient(90deg,var(--html),var(--purple));
+    transition:width .7s cubic-bezier(.7,.0,.2,1);
+  }
+
+  .logo{ display:flex; align-items:center; gap:10px; }
+  .logo-mark{
+    width:32px; height:32px; border-radius:8px; display:grid; place-items:center;
+    background:linear-gradient(135deg,var(--html),var(--purple));
+  }
+  .logo-text{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:12px; line-height:1.1; }
+  .logo-sub{ font-size:8px; color:var(--muted); text-transform:uppercase; letter-spacing:2px; }
+
+  .hint-keys{ display:flex; gap:6px; align-items:center; font-size:11px; color:var(--muted); }
+  .key{
+    padding:3px 8px; border:1px solid var(--border); border-radius:5px;
+    background:rgba(255,255,255,0.03); font-family:'Space Grotesk',sans-serif;
+    font-size:10px; font-weight:600;
+  }
+
+  .stage-pill{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:99px; padding:5px 12px;
+    font-size:11px; font-weight:600;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .card{
+    background:linear-gradient(180deg,var(--card),#141A21);
+    border:1px solid var(--border);
+    border-radius:16px;
+  }
+  .accent-bar{
+    height:4px; border-radius:99px;
+    background:linear-gradient(90deg,var(--c1),var(--c2));
+  }
+  
+  .code-block{
+    background:#0b0e12; border:1px solid var(--border);
+    border-radius:10px; padding:12px;
+    font-family:'Consolas', monospace; font-size:12px;
+    line-height:1.5; white-space:pre; overflow-x:auto;
+  }
+  .tag-html{ color:var(--html); }
+  .tag-attr{ color:var(--css); }
+  .tag-val{ color:var(--js); }
+  .code-text{ color:#9AA5B1; }
+  .code-comment{ color:#4b5563; font-style:italic; }
+
+  .quiz-opt{
+    background:rgba(255,255,255,0.03);
+    border:1.5px solid var(--border);
+    border-radius:10px; padding:12px 14px;
+    cursor:pointer; transition:all .25s;
+    display:flex; align-items:center; gap:10px;
+  }
+  .quiz-opt:hover{ border-color:var(--html); background:rgba(255,107,53,0.06); transform:translateX(4px); }
+  .quiz-opt.correct{ border-color:#22c55e; background:rgba(34,197,94,0.12); }
+  .quiz-opt.wrong{ border-color:#ef4444; background:rgba(239,68,68,0.1); }
+  .quiz-opt.disabled{ pointer-events:none; }
+  .opt-letter{
+    width:26px; height:26px; border-radius:50%; border:1.5px solid var(--border);
+    display:grid; place-items:center; font-size:11px; font-weight:700;
+    font-family:'Space Grotesk',sans-serif; flex-shrink:0;
+  }
+  .quiz-opt.correct .opt-letter{ background:#22c55e; border-color:#22c55e; color:#fff; }
+  .quiz-opt.wrong .opt-letter{ background:#ef4444; border-color:#ef4444; color:#fff; }
+
+  .drag-item{
+    background:rgba(255,255,255,0.05);
+    border:1.5px solid var(--border);
+    padding:8px 12px; border-radius:8px;
+    cursor:grab; transition:all .2s;
+    font-size:12px; font-weight:500; user-select:none;
+    -webkit-touch-callout: none;
+  }
+  .drag-item:hover{ border-color:var(--html); }
+  .drag-item:active{ cursor:grabbing; }
+  .drag-item.dragging{ opacity:0.4; }
+  .drag-item.selected-mobile{ border-color:var(--html); background:rgba(255,107,53,0.15); }
+  
+  .drop-zone{
+    border:2px dashed rgba(255,255,255,0.15);
+    border-radius:10px; padding:8px;
+    min-height:90px; transition:all .25s;
+  }
+  .drop-zone.over{ border-color:var(--html); background:rgba(255,107,53,0.06); }
+
+  .pulse-dot{ position:relative; }
+  .pulse-dot::after{
+    content:""; position:absolute; inset:-5px; border-radius:50%;
+    border:2px solid var(--html); animation:pulse 2s ease-out infinite;
+  }
+  @keyframes pulse{
+    0%{ transform:scale(0.8); opacity:1; }
+    100%{ transform:scale(1.8); opacity:0; }
+  }
+  .float-y{ animation:floatY 4s ease-in-out infinite; }
+  @keyframes floatY{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-8px); }
+  }
+
+  .toast{
+    position:fixed; bottom:90px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--card); border:1px solid var(--border);
+    padding:12px 20px; border-radius:12px;
+    font-size:13px; z-index:60; opacity:0; transition:all .3s;
+    box-shadow:0 10px 40px -10px rgba(0,0,0,0.5);
+    max-width: 90vw;
+    text-align: center;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  /* Responsive classes */
+  .grid-2-custom { display:grid; grid-template-columns:1fr; gap:24px; align-items:center; }
+  .grid-3-custom { display:grid; grid-template-columns:1fr; gap:16px; }
+  .grid-4-custom { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .grid-5-custom { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  @media (min-width: 640px) {
+    .grid-3-custom { grid-template-columns:repeat(2, 1fr); gap:20px; }
+    .grid-5-custom { grid-template-columns:repeat(3, 1fr); }
+    .slide{ padding: 70px 30px 90px; }
+    .code-block { font-size: 13px; padding: 16px; }
+  }
+  @media (min-width: 1024px) {
+    .grid-2-custom { grid-template-columns:1fr 1fr; gap:32px; }
+    .grid-3-custom { grid-template-columns:repeat(3, 1fr); gap:20px; }
+    .grid-4-custom { grid-template-columns:repeat(2, 1fr); gap:16px; }
+    .grid-5-custom { grid-template-columns:repeat(5, 1fr); gap:12px; }
+    .slide{ padding: 70px 40px 90px; }
+    .logo-text { font-size:13px; }
+    .logo-sub { font-size:9px; }
+    .logo-mark { width:36px; height:36px; }
+    .nav-btn { width:38px; height:38px; }
+    .dots { gap:6px; }
+    .dot { width:8px; height:8px; }
+    .dot.active { width:24px; }
+    .slide-counter { font-size:13px; min-width:60px; }
+    .top-bar { padding:20px 32px; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="grain"></div>
+<div class="blob" style="width:380px;height:380px;background:var(--html);top:-100px;left:-100px;"></div>
+<div class="blob" style="width:300px;height:300px;background:var(--purple);bottom:-80px;right:-80px;animation-delay:-4s;"></div>
+
+<div class="top-bar">
+  <div class="logo">
+    <div class="logo-mark"><i class="fa-solid fa-layer-group text-white text-xs"></i></div>
+    <div>
+      <p class="logo-text">HTML Lanjutan</p>
+      <p class="logo-sub">Kelas X RPL</p>
+    </div>
+  </div>
+  <div class="hint-keys hidden md:flex">
+    <span class="key">←</span><span class="key">→</span>
+    <span>untuk navigasi</span>
+  </div>
+</div>
+
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="deck">
+  <div class="slides" id="slides">
+
+    <!-- SLIDE 1: COVER -->
+    <section class="slide active" data-stage="cover">
+      <div class="slide-inner grid-2-custom">
+        <div>
+          <div class="stage-pill mb-5 anim">
+            <span class="w-2 h-2 rounded-full bg-[var(--html)] pulse-dot"></span>
+            Modul Pembelajaran Web Front-End
+          </div>
+          <h1 class="font-display font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[0.95] mb-6 anim-2">
+            <span style="color:var(--html)">HTML</span> Lanjutan
+          </h1>
+          <p class="text-sm sm:text-base md:text-lg text-[var(--muted)] max-w-xl mb-8 anim-3">
+            Siap membawa halaman webmu ke level selanjutnya? Pelajari cara membuat formulir interaktif, tabel data, menyematkan media, dan menyusun struktur web modern menggunakan HTML Semantik.
+          </p>
+          <div class="flex flex-wrap gap-3 anim-4">
+            <button onclick="nextSlide()" class="px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl font-semibold text-white text-sm" style="background:linear-gradient(135deg,var(--html),var(--purple))">
+              <i class="fa-solid fa-rocket mr-2"></i>Mulai Belajar
+            </button>
+            <button onclick="goToSlide(9)" class="px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl font-semibold text-sm border border-[var(--border)] hover:bg-white/5">
+              Langsung ke Tugas
+            </button>
+          </div>
+        </div>
+        <div class="flex justify-center anim-3 mt-8 lg:mt-0">
+          <svg viewBox="0 0 400 480" class="w-full max-w-xs sm:max-w-sm md:max-w-md">
+            <g transform="translate(50, 40)" class="float-y">
+              <rect width="300" height="80" rx="12" fill="rgba(255,107,53,0.1)" stroke="var(--html)" stroke-width="2"/>
+              <text x="20" y="35" fill="var(--html)" font-family="monospace" font-size="14" font-weight="700">&lt;form&gt;</text>
+              <rect x="20" y="45" width="150" height="20" rx="4" fill="var(--html)" opacity="0.3"/>
+              <rect x="180" y="45" width="60" height="20" rx="4" fill="var(--html)"/>
+            </g>
+            <g transform="translate(50, 160)" class="float-y" style="animation-delay:-1s">
+              <rect width="300" height="80" rx="12" fill="rgba(139,92,246,0.1)" stroke="var(--purple)" stroke-width="2"/>
+              <text x="20" y="35" fill="var(--purple)" font-family="monospace" font-size="14" font-weight="700">&lt;table&gt;</text>
+              <line x1="20" y1="45" x2="280" y2="45" stroke="var(--purple)" stroke-width="2"/>
+              <line x1="100" y1="45" x2="100" y2="65" stroke="var(--purple)" stroke-width="2"/>
+              <line x1="190" y1="45" x2="190" y2="65" stroke="var(--purple)" stroke-width="2"/>
+              <line x1="20" y1="65" x2="280" y2="65" stroke="var(--purple)" stroke-width="2"/>
+            </g>
+            <g transform="translate(50, 280)" class="float-y" style="animation-delay:-2s">
+              <rect width="300" height="80" rx="12" fill="rgba(0,217,192,0.1)" stroke="var(--css)" stroke-width="2"/>
+              <text x="20" y="35" fill="var(--css)" font-family="monospace" font-size="14" font-weight="700">&lt;header&gt; &lt;nav&gt; &lt;main&gt;</text>
+              <rect x="20" y="45" width="260" height="20" rx="4" fill="var(--css)" opacity="0.2"/>
+              <rect x="20" y="45" width="80" height="20" rx="4" fill="var(--css)" opacity="0.5"/>
+            </g>
+            <g transform="translate(50, 400)" class="float-y" style="animation-delay:-3s">
+              <rect width="300" height="60" rx="12" fill="rgba(255,210,63,0.1)" stroke="var(--js)" stroke-width="2"/>
+              <text x="20" y="35" fill="var(--js)" font-family="monospace" font-size="14" font-weight="700">&lt;video&gt; &lt;iframe&gt;</text>
+              <polygon points="160,25 160,40 175,32" fill="var(--js)"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: FORMULIR (FORM) -->
+    <section class="slide" data-stage="form">
+      <div class="slide-inner grid-2-custom">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-rectangle-list" style="color:var(--html)"></i> Formulir Interaktif</span>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Mengumpulkan Data dengan <span style="color:var(--html)">&lt;form&gt;</span>
+          </h2>
+          <p class="text-sm md:text-base text-[var(--muted)] mb-6 anim-3">Formulir adalah cara website untuk "mendengar" input dari user. Digunakan untuk login, pendaftaran, dan mengirim pesan.</p>
+          
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,107,53,0.15);color:var(--html)">&lt;input&gt;</span>
+              <span class="text-white/80">Kotak untuk mengetik (teks, email, password).</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,107,53,0.15);color:var(--html)">&lt;label&gt;</span>
+              <span class="text-white/80">Judul untuk menjelaskan apa yang harus diketik.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,107,53,0.15);color:var(--html)">&lt;textarea&gt;</span>
+              <span class="text-white/80">Kotak teks panjang untuk paragraf.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,107,53,0.15);color:var(--html)">&lt;button&gt;</span>
+              <span class="text-white/80">Tombol untuk mengirim data.</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4 mt-6 lg:mt-0">
+          <div class="card p-4 sm:p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">daftar.html</p>
+            <div class="code-block text-xs">
+<span class="tag-html">&lt;form&gt;</span>
+  <span class="tag-html">&lt;label&gt;</span><span class="code-text">Nama:</span><span class="tag-html">&lt;/label&gt;</span>
+  <span class="tag-html">&lt;input</span> <span class="tag-attr">type</span><span class="code-text">=</span><span class="tag-val">"text"</span> <span class="tag-attr">placeholder</span><span class="code-text">=</span><span class="tag-val">"Budi"</span><span class="tag-html">&gt;</span>
+  
+  <span class="tag-html">&lt;button</span> <span class="tag-attr">type</span><span class="code-text">=</span><span class="tag-val">"submit"</span><span class="tag-html">&gt;</span><span class="code-text">Kirim</span><span class="tag-html">&lt;/button&gt;</span>
+<span class="tag-html">&lt;/form&gt;</span>
+            </div>
+          </div>
+          <div class="card p-4 sm:p-5 bg-white/5">
+            <p class="text-xs text-[var(--muted)] mb-3 font-mono">Hasil di Browser:</p>
+            <div class="space-y-2">
+              <label class="text-xs text-white/80 block">Nama:</label>
+              <input type="text" placeholder="Budi" class="w-full bg-[#0b0e12] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-[var(--html)]" />
+              <button class="bg-[var(--html)] text-white px-4 py-2 rounded-lg text-sm font-semibold mt-2">Kirim</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: JENIS INPUT -->
+    <section class="slide" data-stage="input">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-keyboard" style="color:var(--html)"></i> Tipe-Tipe Input</span>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-5xl leading-tight">
+            Berbagai Jenis <span style="color:var(--html)">&lt;input&gt;</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-2 text-sm">Atribut <span class="font-mono text-[var(--css)]">type=""</span> menentukan bentuk kotak isian.</p>
+        </div>
+        <div class="grid-3-custom">
+          <div class="card p-4 sm:p-5 anim-2">
+            <code class="text-xs text-[var(--css)] mb-2 block">type="text"</code>
+            <input type="text" placeholder="Teks biasa" class="w-full bg-[#0b0e12] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-[var(--html)]" />
+          </div>
+          <div class="card p-4 sm:p-5 anim-2">
+            <code class="text-xs text-[var(--css)] mb-2 block">type="password"</code>
+            <input type="password" placeholder="••••••" class="w-full bg-[#0b0e12] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-[var(--html)]" />
+          </div>
+          <div class="card p-4 sm:p-5 anim-3">
+            <code class="text-xs text-[var(--css)] mb-2 block">type="email"</code>
+            <input type="email" placeholder="nama@email.com" class="w-full bg-[#0b0e12] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-[var(--html)]" />
+          </div>
+          <div class="card p-4 sm:p-5 anim-3">
+            <code class="text-xs text-[var(--css)] mb-2 block">type="number"</code>
+            <input type="number" placeholder="123" class="w-full bg-[#0b0e12] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-[var(--html)]" />
+          </div>
+          <div class="card p-4 sm:p-5 anim-4">
+            <code class="text-xs text-[var(--css)] mb-2 block">type="date"</code>
+            <input type="date" class="w-full bg-[#0b0e12] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-white/90 focus:outline-none focus:border-[var(--html)]" />
+          </div>
+          <div class="card p-4 sm:p-5 anim-4">
+            <code class="text-xs text-[var(--css)] mb-2 block">type="radio"</code>
+            <div class="flex items-center gap-4 h-[38px] px-2">
+              <label class="flex items-center gap-2 text-sm text-white/80"><input type="radio" name="gen" style="accent-color:var(--html)"/> Pria</label>
+              <label class="flex items-center gap-2 text-sm text-white/80"><input type="radio" name="gen" style="accent-color:var(--html)"/> Wanita</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: TABEL -->
+    <section class="slide" data-stage="table">
+      <div class="slide-inner grid-2-custom">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-table" style="color:var(--purple)"></i> Menyusun Data Tabular</span>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Membuat <span style="color:var(--purple)">Tabel</span>
+          </h2>
+          <p class="text-sm md:text-base text-[var(--muted)] mb-6 anim-3">Tabel digunakan untuk menampilkan data dalam baris dan kolom, seperti jadwal pelajaran atau daftar nilai.</p>
+          
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:var(--purple)">&lt;table&gt;</span>
+              <span class="text-white/80">Wadah utama tabel.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:var(--purple)">&lt;tr&gt;</span>
+              <span class="text-white/80">Table Row (Baris).</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:var(--purple)">&lt;th&gt;</span>
+              <span class="text-white/80">Table Header (Kepala kolom, teks tebal).</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:var(--purple)">&lt;td&gt;</span>
+              <span class="text-white/80">Table Data (Isi sel).</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 mt-6 lg:mt-0">
+          <div class="card p-4 sm:p-5">
+            <div class="code-block text-xs mb-4">
+<span class="tag-html">&lt;table&gt;</span>
+  <span class="tag-html">&lt;tr&gt;</span>
+    <span class="tag-html">&lt;th&gt;</span><span class="code-text">Nama</span><span class="tag-html">&lt;/th&gt;</span>
+    <span class="tag-html">&lt;th&gt;</span><span class="code-text">Nilai</span><span class="tag-html">&lt;/th&gt;</span>
+  <span class="tag-html">&lt;/tr&gt;</span>
+  <span class="tag-html">&lt;tr&gt;</span>
+    <span class="tag-html">&lt;td&gt;</span><span class="code-text">Budi</span><span class="tag-html">&lt;/td&gt;</span>
+    <span class="tag-html">&lt;td&gt;</span><span class="code-text">90</span><span class="tag-html">&lt;/td&gt;</span>
+  <span class="tag-html">&lt;/tr&gt;</span>
+<span class="tag-html">&lt;/table&gt;</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm border-collapse min-w-[200px]">
+                <thead>
+                  <tr style="background:rgba(139,92,246,0.2)">
+                    <th class="border border-[var(--border)] py-2 px-3 text-left text-[var(--purple)]">Nama</th>
+                    <th class="border border-[var(--border)] py-2 px-3 text-left text-[var(--purple)]">Nilai</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="border border-[var(--border)] py-2 px-3 text-white/80">Budi</td>
+                    <td class="border border-[var(--border)] py-2 px-3 text-white/80">90</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: MEDIA & IFRAME -->
+    <section class="slide" data-stage="media">
+      <div class="slide-inner grid-2-custom">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-photo-film" style="color:var(--js)"></i> Media & Embed</span>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Menampilkan <span style="color:var(--js)">Video & Web Lain</span>
+          </h2>
+          <p class="text-sm md:text-base text-[var(--muted)] mb-6 anim-3">HTML memungkinkan kamu memasukkan video langsung atau menyematkan (embed) halaman web lain seperti video YouTube atau Google Maps.</p>
+          
+          <div class="space-y-4 anim-4">
+            <div class="bg-white/5 p-4 rounded-lg">
+              <p class="font-mono text-sm text-[var(--js)] mb-1">&lt;video&gt;</p>
+              <p class="text-xs text-[var(--muted)]">Memutar video lokal. Gunakan atribut <span class="font-mono">controls</span> agar user bisa play/pause.</p>
+            </div>
+            <div class="bg-white/5 p-4 rounded-lg">
+              <p class="font-mono text-sm text-[var(--js)] mb-1">&lt;iframe&gt;</p>
+              <p class="text-xs text-[var(--muted)]">Menampilkan halaman web lain di dalam websitemu (seperti video YouTube).</p>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 mt-6 lg:mt-0">
+          <p class="text-xs text-[var(--muted)] mb-2 font-mono">media.html</p>
+          <div class="code-block text-xs mb-4">
+<span class="code-comment">&lt;!-- Video Lokal --&gt;</span>
+<span class="tag-html">&lt;video</span> <span class="tag-attr">src</span><span class="code-text">=</span><span class="tag-val">"film.mp4"</span> <span class="tag-attr">controls</span><span class="tag-html">&gt;&lt;/video&gt;</span>
+
+<span class="code-comment">&lt;!-- Embed YouTube --&gt;</span>
+<span class="tag-html">&lt;iframe</span> <span class="tag-attr">src</span><span class="code-text">=</span><span class="tag-val">"https://youtube.com/..."</span><span class="tag-html">&gt;</span>
+<span class="tag-html">&lt;/iframe&gt;</span>
+          </div>
+          <div class="bg-white/5 rounded-lg border border-[var(--border)] p-2 aspect-video flex items-center justify-center max-w-sm mx-auto">
+            <div class="w-12 h-12 rounded-full bg-[var(--js)] grid place-items-center">
+              <i class="fa-solid fa-play text-[#0F1419] ml-1"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: SEMANTIK -->
+    <section class="slide" data-stage="semantic">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-sitemap" style="color:var(--css)"></i> Struktur Modern</span>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-5xl leading-tight">
+            HTML <span style="color:var(--css)">Semantik</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-2 text-sm max-w-2xl mx-auto px-4">Dulu, orang pakai <span class="font-mono">&lt;div&gt;</span> untuk semua hal. Sekarang, HTML5 punya tag yang "bermakna" (semantik) untuk membantu browser & mesin pencari memahami struktur halaman.</p>
+        </div>
+        <div class="grid-2-custom gap-8 items-start">
+          <div class="anim-2">
+            <div class="border-2 border-[var(--border)] rounded-xl p-3 space-y-2 max-w-md mx-auto">
+              <div class="bg-[var(--css)]/20 border border-[var(--css)]/50 text-[var(--css)] text-center py-2 rounded text-xs font-bold font-mono">&lt;header&gt;</div>
+              <div class="bg-[var(--html)]/20 border border-[var(--html)]/50 text-[var(--html)] text-center py-2 rounded text-xs font-bold font-mono">&lt;nav&gt;</div>
+              <div class="grid grid-cols-3 gap-2">
+                <div class="col-span-2 bg-[var(--purple)]/20 border border-[var(--purple)]/50 text-[var(--purple)] text-center py-8 rounded text-xs font-bold font-mono flex items-center justify-center">&lt;main&gt;</div>
+                <div class="bg-[var(--js)]/20 border border-[var(--js)]/50 text-[var(--js)] text-center py-8 rounded text-xs font-bold font-mono flex items-center justify-center">&lt;aside&gt;</div>
+              </div>
+              <div class="bg-[var(--pink)]/20 border border-[var(--pink)]/50 text-[var(--pink)] text-center py-2 rounded text-xs font-bold font-mono">&lt;footer&gt;</div>
+            </div>
+          </div>
+          <div class="anim-3 space-y-3">
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-check mt-1 text-[var(--css)] flex-shrink-0"></i>
+              <div>
+                <b class="text-sm">SEO Lebih Baik</b>
+                <p class="text-xs text-[var(--muted)]">Google lebih mudah membaca kontenmu karena strukturnya jelas.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-check mt-1 text-[var(--css)] flex-shrink-0"></i>
+              <div>
+                <b class="text-sm">Aksesibilitas</b>
+                <p class="text-xs text-[var(--muted)]">Screen reader untuk tuna netra bisa menavigasi halaman dengan lebih baik.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-check mt-1 text-[var(--css)] flex-shrink-0"></i>
+              <div>
+                <b class="text-sm">Kode Lebih Rapi</b>
+                <p class="text-xs text-[var(--muted)]">Lebih mudah dibaca programmer lain (atau dirimu sendiri di masa depan).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: METADATA & HEAD -->
+    <section class="slide" data-stage="meta">
+      <div class="slide-inner grid-2-custom">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-tags" style="color:var(--pink)"></i> Bagian Tak Terlihat</span>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Metadata di <span style="color:var(--pink)">&lt;head&gt;</span>
+          </h2>
+          <p class="text-sm md:text-base text-[var(--muted)] mb-6 anim-3">Tag <span class="font-mono">&lt;head&gt;</span> berisi informasi tentang dokumen HTML yang tidak ditampilkan di badan web, tapi sangat penting untuk browser dan SEO.</p>
+          
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">&lt;meta charset&gt;</span>
+              <span class="text-white/80">Agar teks (huruf) tampil dengan benar.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">&lt;meta viewport&gt;</span>
+              <span class="text-white/80">Membuat web responsif di HP.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">&lt;meta description&gt;</span>
+              <span class="text-white/80">Deskripsi singkat untuk Google.</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 mt-6 lg:mt-0">
+          <p class="text-xs text-[var(--muted)] mb-2 font-mono">head.html</p>
+          <div class="code-block text-xs">
+<span class="tag-html">&lt;head&gt;</span>
+  <span class="code-comment">&lt;!-- Encoding Huruf --&gt;</span>
+  <span class="tag-html">&lt;meta</span> <span class="tag-attr">charset</span><span class="code-text">=</span><span class="tag-val">"UTF-8"</span><span class="tag-html">&gt;</span>
+
+  <span class="code-comment">&lt;!-- Responsif HP --&gt;</span>
+  <span class="tag-html">&lt;meta</span> <span class="tag-attr">name</span><span class="code-text">=</span><span class="tag-val">"viewport"</span> 
+        <span class="tag-attr">content</span><span class="code-text">=</span><span class="tag-val">"width=device-width, initial-scale=1.0"</span><span class="tag-html">&gt;</span>
+
+  <span class="code-comment">&lt;!-- SEO --&gt;</span>
+  <span class="tag-html">&lt;title&gt;</span><span class="code-text">Toko Sepatu Maju</span><span class="tag-html">&lt;/title&gt;</span>
+  <span class="tag-html">&lt;meta</span> <span class="tag-attr">name</span><span class="code-text">=</span><span class="tag-val">"description"</span> 
+        <span class="tag-attr">content</span><span class="code-text">=</span><span class="tag-val">"Jual sepatu original."</span><span class="tag-html">&gt;</span>
+<span class="tag-html">&lt;/head&gt;</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: QUIZ -->
+    <section class="slide" data-stage="quiz">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-circle-question" style="color:var(--html)"></i> Quiz Singkat</span>
+          <h2 class="font-display font-bold text-2xl sm:text-3xl md:text-4xl">Coba kamu jawab! 🎯</h2>
+        </div>
+        <div id="quizContainer" class="max-w-3xl mx-auto space-y-4"></div>
+        <div id="quizResult" class="text-center mt-5 anim" style="display:none">
+          <div class="card p-5 inline-block">
+            <p class="font-display text-2xl font-bold mb-1" id="quizScore" style="color:var(--html)">0/5</p>
+            <p class="text-sm text-[var(--muted)]" id="quizFeedback">Kerja bagus!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: DRAG DROP -->
+    <section class="slide" data-stage="drag">
+      <div class="slide-inner">
+        <div class="text-center mb-5 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-hand-pointer" style="color:var(--html)"></i> Aktivitas 1</span>
+          <h2 class="font-display font-bold text-2xl sm:text-3xl md:text-4xl">Cocokkan Tag Semantik!</h2>
+          <p class="text-xs sm:text-sm text-[var(--muted)] mt-2">Klik kartu untuk memilih, lalu klik zona tujuan. (Atau seret jika di PC)</p>
+        </div>
+        <div class="grid-5-custom mb-4 anim-2" id="dragDropGrid">
+          <div class="drop-zone" data-stage="1">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--css)">&lt;header&gt;</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="2">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--css)">&lt;nav&gt;</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="3">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--css)">&lt;main&gt;</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="4">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--css)">&lt;aside&gt;</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="5">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--css)">&lt;footer&gt;</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+        </div>
+        <div class="p-3 rounded-xl flex flex-wrap gap-2 anim-3" id="dragItemsPool" style="background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1)">
+          <p class="w-full text-xs text-[var(--muted)] mb-1">📌 Kartu yang belum ditempatkan:</p>
+        </div>
+        <div class="mt-4 flex flex-wrap items-center gap-3 anim-4">
+          <button id="checkDragBtn" class="px-5 py-2 rounded-lg font-semibold text-white text-sm" style="background:linear-gradient(135deg,var(--html),var(--purple))">
+            <i class="fa-solid fa-check mr-1"></i>Cek Jawaban
+          </button>
+          <button id="resetDragBtn" class="px-5 py-2 rounded-lg font-semibold text-sm border border-[var(--border)] hover:bg-white/5">
+            <i class="fa-solid fa-rotate-left mr-1"></i>Reset
+          </button>
+          <span id="dragFeedback" class="text-sm font-medium"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10: TUGAS -->
+    <section class="slide" data-stage="tugas">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3" style="border-color:rgba(255,107,53,0.3)"><i class="fa-solid fa-flag-checkered" style="color:var(--html)"></i> Tugas Akhir • Bobot 30%</span>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-5xl leading-tight">
+            Misimu: <span style="color:var(--html)">Form Pendaftaran Ekskul</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3 text-sm max-w-2xl mx-auto px-4">Buatlah halaman web pendaftaran ekstrakurikuler menggunakan semua materi HTML Lanjutan.</p>
+        </div>
+        <div class="card p-4 sm:p-6 mb-5 anim-2">
+          <p class="font-display font-bold text-lg mb-4">Syarat Wajib:</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-1 mt-1 text-[var(--html)] flex-shrink-0"></i>
+              <div>
+                <b class="text-sm">Struktur Semantik</b>
+                <p class="text-xs text-[var(--muted)]">Gunakan <span class="font-mono">&lt;header&gt;</span>, <span class="font-mono">&lt;main&gt;</span>, dan <span class="font-mono">&lt;footer&gt;</span>.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-2 mt-1 text-[var(--html)] flex-shrink-0"></i>
+              <div>
+                <b class="text-sm">Formulir Lengkap</b>
+                <p class="text-xs text-[var(--muted)]">Input Nama, Email, Password, Date (Tgl Lahir), Radio (Jenis Kelamin), Checkbox (Ekskul pilihan).</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-3 mt-1 text-[var(--html)] flex-shrink-0"></i>
+              <div>
+                <b class="text-sm">Tabel Jadwal</b>
+                <p class="text-xs text-[var(--muted)]">Buat tabel jadwal latihan ekskul (Hari, Waktu, Ruangan).</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-4 mt-1 text-[var(--html)] flex-shrink-0"></i>
+              <div>
+                <b class="text-sm">Video Profil</b>
+                <p class="text-xs text-[var(--muted)]">Embed 1 video YouTube tentang ekskul tersebut menggunakan <span class="font-mono">&lt;iframe&gt;</span>.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg md:col-span-2">
+              <i class="fa-solid fa-5 mt-1 text-[var(--html)] flex-shrink-0"></i>
+              <div>
+                <b class="text-sm">Metadata SEO</b>
+                <p class="text-xs text-[var(--muted)]">Lengkapi <span class="font-mono">&lt;title&gt;</span> dan <span class="font-mono">&lt;meta description&gt;</span>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card p-4 anim-4" style="background:rgba(0,217,192,0.05);border-color:rgba(0,217,192,0.2)">
+          <p class="text-xs font-semibold mb-2 flex items-center gap-2"><i class="fa-solid fa-circle-info" style="color:var(--css)"></i>Tugas dikumpulkan dalam format:</p>
+          <p class="text-sm text-white/90">1 file bernama <span class="font-mono text-[var(--css)]">tugas_html_lanjutan_nama.html</span>. Pastikan filenya bisa dibuka di browser dan tampil rapi.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11: CLOSING -->
+    <section class="slide" data-stage="closing">
+      <div class="slide-inner text-center">
+        <div class="inline-block mb-6 anim">
+          <div class="w-16 h-16 rounded-2xl grid place-items-center mx-auto" style="background:linear-gradient(135deg,var(--html),var(--purple))">
+            <i class="fa-solid fa-layer-group text-2xl text-white"></i>
+          </div>
+        </div>
+        <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-6xl leading-tight mb-5 anim-2">
+          Kamu sudah siap<br>membangun web <span style="color:var(--html)">modern</span>.
+        </h2>
+        <p class="text-base sm:text-lg text-[var(--muted)] max-w-2xl mx-auto mb-10 anim-3 px-4">
+          Dengan Form, Tabel, Media, dan Semantik, halaman webmu tidak lagi sekadar brosur statis, tapi aplikasi interaktif yang siap dipakai user.
+        </p>
+        <div class="flex flex-wrap gap-3 justify-center mb-12 anim-4">
+          <button onclick="goToSlide(0)" class="px-6 py-3 rounded-xl font-semibold text-white text-sm" style="background:linear-gradient(135deg,var(--html),var(--purple))">
+            <i class="fa-solid fa-arrow-up mr-2"></i>Ulang dari Awal
+          </button>
+        </div>
+        <p class="text-xs text-[var(--muted)] mt-8">Modul Pembelajaran HTML Lanjutan — Kelas X RPL • Dibuat dengan ❤️</p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" title="Slide sebelumnya">
+    <i class="fa-solid fa-chevron-left text-xs"></i>
+  </button>
+  <div class="dots" id="dots"></div>
+  <span class="slide-counter"><b id="curSlide">1</b> / <span id="totalSlides">11</span></span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" title="Slide berikutnya">
+    <i class="fa-solid fa-chevron-right text-xs"></i>
+  </button>
+  <button class="nav-btn" onclick="toggleFullscreen()" title="Fullscreen">
+    <i class="fa-solid fa-expand text-xs"></i>
+  </button>
+</div>
+
+<div class="toast" id="toast"><span id="toastText"></span></div>
+
+<script>
+  /* ========== SLIDE NAVIGATION ========== */
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let curSlide = 0;
+
+  document.getElementById('totalSlides').textContent = totalSlides;
+
+  const dotsContainer = document.getElementById('dots');
+  slides.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    dotsContainer.appendChild(dot);
+  });
+
+  function updateSlide() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === curSlide));
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === curSlide));
+    document.getElementById('curSlide').textContent = curSlide + 1;
+    document.getElementById('progressFill').style.width = ((curSlide + 1) / totalSlides * 100) + '%';
+    document.getElementById('prevBtn').disabled = curSlide === 0;
+    document.getElementById('nextBtn').disabled = curSlide === totalSlides - 1;
+    
+    if (slides[curSlide]) {
+      slides[curSlide].scrollTop = 0;
+    }
+  }
+
+  function goToSlide(i) {
+    curSlide = Math.max(0, Math.min(totalSlides - 1, i));
+    updateSlide();
+  }
+  function nextSlide() { goToSlide(curSlide + 1); }
+  function prevSlide() { goToSlide(curSlide - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+    else if (e.key === 'Home') goToSlide(0);
+    else if (e.key === 'End') goToSlide(totalSlides - 1);
+    else if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  });
+
+  // Touch swipe navigasi yang lebih pintar (tidak mengganggu scroll vertikal)
+  let touchStartX = 0;
+  let touchStartY = 0;
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', e => {
+    const diffX = e.changedTouches[0].clientX - touchStartX;
+    const diffY = e.changedTouches[0].clientY - touchStartY;
+    
+    // Hanya aktifkan swipe jika horizontal lebih dominan dari vertikal
+    if (Math.abs(diffX) > 60 && Math.abs(diffX) > Math.abs(diffY) * 1.2) {
+      if (diffX < 0) nextSlide(); else prevSlide();
+    }
+  }, { passive: true });
+
+  // Mouse wheel navigation (DISABLED) sesuai permintaan
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  updateSlide();
+
+  /* ========== QUIZ ========== */
+  const quizData = [
+    {
+      q: "Tag manakah yang benar untuk membuat kotak input password?",
+      options: ["&lt;input type=\"password\"&gt;", "&lt;password&gt;", "&lt;input type=\"text\" password=\"true\"&gt;", "&lt;input type=\"secure\"&gt;"],
+      answer: 0
+    },
+    {
+      q: "Apa fungsi tag &lt;iframe&gt;?",
+      options: ["Memutar video lokal", "Membuat bingkai gambar", "Menyematkan halaman web lain", "Membuat form"],
+      answer: 2
+    },
+    {
+      q: "Tag semantik yang biasanya berisi menu navigasi adalah?",
+      options: ["&lt;main&gt;", "&lt;nav&gt;", "&lt;section&gt;", "&lt;article&gt;"],
+      answer: 1
+    },
+    {
+      q: "Dalam tabel, tag untuk membuat baris baru adalah?",
+      options: ["&lt;td&gt;", "&lt;th&gt;", "&lt;tr&gt;", "&lt;table-row&gt;"],
+      answer: 2
+    },
+    {
+      q: "Meta tag apa yang wajib ada agar website tampil responsif di HP?",
+      options: ["charset", "description", "author", "viewport"],
+      answer: 3
+    }
+  ];
+
+  const quizContainer = document.getElementById('quizContainer');
+  const quizResult = document.getElementById('quizResult');
+  let userAnswers = new Array(quizData.length).fill(null);
+
+  quizData.forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = 'card p-4 sm:p-5';
+    div.innerHTML = `
+      <div class="flex items-start gap-3 mb-3">
+        <span class="w-7 h-7 rounded-lg grid place-items-center font-bold text-xs flex-shrink-0" style="background:rgba(255,107,53,0.15);color:var(--html)">${idx+1}</span>
+        <p class="font-display font-semibold text-sm md:text-base pt-0.5">${item.q}</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="qOptions-${idx}">
+        ${item.options.map((opt, i) => `
+          <div class="quiz-opt" data-q="${idx}" data-i="${i}">
+            <span class="opt-letter">${String.fromCharCode(65+i)}</span>
+            <span class="text-xs sm:text-sm font-mono">${opt}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    quizContainer.appendChild(div);
+  });
+
+  document.querySelectorAll('.quiz-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const q = parseInt(opt.dataset.q);
+      const i = parseInt(opt.dataset.i);
+      userAnswers[q] = i;
+
+      const options = document.querySelectorAll(`#qOptions-${q} .quiz-opt`);
+      options.forEach((o, idx) => {
+        o.classList.remove('correct', 'wrong');
+        if (idx === quizData[q].answer) o.classList.add('correct');
+        else if (idx === i && i !== quizData[q].answer) o.classList.add('wrong');
+        o.classList.add('disabled');
+      });
+
+      if (userAnswers.every(a => a !== null)) {
+        const score = userAnswers.reduce((acc, a, idx) => acc + (a === quizData[idx].answer ? 1 : 0), 0);
+        document.getElementById('quizScore').textContent = `${score}/${quizData.length}`;
+        const fb = document.getElementById('quizFeedback');
+        if (score === 5) { fb.textContent = 'Sempurna! Kamu menguasai HTML Lanjutan! 🎉'; document.getElementById('quizScore').style.color = '#22c55e'; }
+        else if (score >= 3) { fb.textContent = 'Bagus! Tinggal asah lagi strukturnya.'; document.getElementById('quizScore').style.color = 'var(--html)'; }
+        else { fb.textContent = 'Yuk baca lagi materinya pelan-pelan!'; document.getElementById('quizScore').style.color = 'var(--pink)'; }
+        quizResult.style.display = 'block';
+        showToast(`Quiz selesai! Skor: ${score}/${quizData.length}`);
+      }
+    });
+  });
+
+  /* ========== DRAG DROP (Dengan Fallback Klik untuk Mobile) ========== */
+  const dragItems = [
+    { id: 1, text: "Bagian atas web (logo, judul)", stage: 1 },
+    { id: 2, text: "Menu link berpindah halaman", stage: 2 },
+    { id: 3, text: "Konten utama halaman", stage: 3 },
+    { id: 4, text: "Sidebar / konten samping", stage: 4 },
+    { id: 5, text: "Bagian bawah web (copyright)", stage: 5 }
+  ];
+
+  const pool = document.getElementById('dragItemsPool');
+  const dropZones = document.querySelectorAll('.drop-zone');
+  let selectedItem = null;
+  let isDragging = false;
+
+  function clearSelection() {
+    document.querySelectorAll('.drag-item.selected-mobile').forEach(i => i.classList.remove('selected-mobile'));
+    selectedItem = null;
+  }
+
+  function setupItemClicks(el) {
+    el.addEventListener('click', (e) => {
+      if (isDragging) return; // Jangan aktifkan klik jika baru saja drag (desktop)
+      
+      if (selectedItem === el) {
+        clearSelection(); // Klik yang sama lagi = batal pilih
+      } else {
+        clearSelection();
+        selectedItem = el;
+        el.classList.add('selected-mobile');
+      }
+    });
+  }
+
+  function setupZoneClicks(zone) {
+    zone.addEventListener('click', () => {
+      if (selectedItem && !zone.contains(selectedItem)) {
+        zone.querySelector('.space-y-2').appendChild(selectedItem);
+        clearSelection();
+      }
+    });
+  }
+  
+  pool.addEventListener('click', (e) => {
+    if (e.target === pool && selectedItem) {
+      pool.appendChild(selectedItem);
+      clearSelection();
+    }
+  });
+
+  function shuffleItems() {
+    dropZones.forEach(z => z.querySelector('.space-y-2').innerHTML = '');
+    pool.innerHTML = '<p class="w-full text-xs text-[var(--muted)] mb-1">📌 Kartu yang belum ditempatkan:</p>';
+    const shuffled = [...dragItems].sort(() => Math.random() - 0.5);
+    shuffled.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'drag-item';
+      el.draggable = true;
+      el.dataset.id = item.id;
+      el.dataset.stage = item.stage;
+      el.textContent = item.text;
+      
+      // Desktop Drag Events
+      el.addEventListener('dragstart', e => {
+        isDragging = true;
+        el.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', item.id);
+      });
+      el.addEventListener('dragend', () => {
+        el.classList.remove('dragging');
+        setTimeout(() => isDragging = false, 100); // Reset flag setelah sebentar
+      });
+      
+      // Mobile Click Events
+      setupItemClicks(el);
+      
+      pool.appendChild(el);
+    });
+    clearSelection();
+  }
+  shuffleItems();
+
+  dropZones.forEach(zone => {
+    // Desktop Drag Events
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('over');
+      const id = e.dataTransfer.getData('text/plain');
+      const dragged = document.querySelector(`.drag-item[data-id="${id}"]`);
+      if (dragged) zone.querySelector('.space-y-2').appendChild(dragged);
+    });
+    
+    // Mobile Click Events
+    setupZoneClicks(zone);
+  });
+
+  document.getElementById('checkDragBtn').addEventListener('click', () => {
+    let correct = 0;
+    dropZones.forEach(zone => {
+      const expected = zone.dataset.stage;
+      zone.querySelectorAll('.drag-item').forEach(item => {
+        if (item.dataset.stage === expected) {
+          item.style.borderColor = '#22c55e';
+          item.style.background = 'rgba(34,197,94,0.1)';
+          correct++;
+        } else {
+          item.style.borderColor = '#ef4444';
+          item.style.background = 'rgba(239,68,68,0.1)';
+        }
+      });
+    });
+    const fb = document.getElementById('dragFeedback');
+    if (correct === dragItems.length) {
+      fb.textContent = `🎉 Sempurna! ${correct}/${dragItems.length} benar!`;
+      fb.style.color = '#22c55e';
+      showToast('Kerja bagus! Kamu paham HTML Semantik.');
+    } else if (correct >= 3) {
+      fb.textContent = `Hampir! ${correct}/${dragItems.length} benar.`;
+      fb.style.color = 'var(--js)';
+    } else {
+      fb.textContent = `${correct}/${dragItems.length} benar. Coba lagi!`;
+      fb.style.color = 'var(--html)';
+    }
+  });
+
+  document.getElementById('resetDragBtn').addEventListener('click', () => {
+    shuffleItems();
+    document.getElementById('dragFeedback').textContent = '';
+    document.querySelectorAll('.drag-item').forEach(i => {
+      i.style.borderColor = '';
+      i.style.background = '';
+    });
+  });
+
+  /* ========== TOAST ========== */
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Materi Jaringan Komputer - Network, IP, DNS, HTTP</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg-card: #131826;
+  --bg-elevated: #1c2333;
+  --fg: #e8edf5;
+  --muted: #8b95a8;
+  --accent: #8b5cf6;
+  --accent-2: #4ade80;
+  --accent-3: #fbbf24;
+  --accent-4: #60a5fa;
+  --bg-accent: #ff7849;
+  --border: #2a3344;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(139, 92, 246, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(96, 165, 250, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(74, 222, 128, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(42, 51, 68, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42, 51, 68, 0.25) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+
+.presentation {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+.progress-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(42, 51, 68, 0.5);
+  z-index: 100;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-4), var(--accent-2));
+  width: 7.69%;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.6);
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 4rem 3rem 6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  overflow-y: auto;
+}
+
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.slide.prev {
+  transform: translateX(-60px);
+}
+
+.slide::-webkit-scrollbar { width: 6px; }
+.slide::-webkit-scrollbar-track { background: transparent; }
+.slide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Navigation */
+.navigation {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(19, 24, 38, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  padding: 0.75rem 1.25rem;
+  border-radius: 100px;
+  z-index: 100;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.nav-btn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.slide-info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--muted);
+  min-width: 70px;
+  text-align: center;
+}
+
+.slide-info .current {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Typography */
+.glow-text {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-4) 50%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glow-text-blue {
+  background: linear-gradient(135deg, var(--accent-4) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Slide 1: Cover */
+.cover-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.cover-title {
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  margin-bottom: 1.5rem;
+}
+
+.cover-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  max-width: 520px;
+}
+
+.badge-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.badge {
+  background: rgba(139, 92, 246, 0.12);
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  color: var(--accent);
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.badge.green {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: rgba(74, 222, 128, 0.3);
+  color: var(--accent-2);
+}
+
+.badge.yellow {
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: var(--accent-3);
+}
+
+.badge.blue {
+  background: rgba(96, 165, 250, 0.12);
+  border-color: rgba(96, 165, 250, 0.35);
+  color: var(--accent-4);
+}
+
+.network-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.network-svg {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  filter: drop-shadow(0 0 40px rgba(139, 92, 246, 0.4));
+  animation: floatLogo 6s ease-in-out infinite;
+}
+
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+}
+
+.floating-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: floatParticle 8s ease-in-out infinite;
+}
+
+@keyframes floatParticle {
+  0%, 100% { transform: translate(0, 0); opacity: 0.4; }
+  50% { transform: translate(20px, -30px); opacity: 0.8; }
+}
+
+.start-btn {
+  background: linear-gradient(135deg, var(--accent), #6d28d9);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 100px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
+  font-family: 'Outfit', sans-serif;
+}
+
+.start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(139, 92, 246, 0.6);
+}
+
+/* Slide Headers */
+.slide-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.slide-number {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.slide-tag {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.slide-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.slide-subtitle {
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  max-width: 760px;
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-4));
+}
+
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+/* Analogy box */
+.analogy-box {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(96, 165, 250, 0.05));
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.analogy-label {
+  position: absolute;
+  top: -10px;
+  left: 1.5rem;
+  background: var(--bg);
+  padding: 0 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+/* Terminal */
+.terminal {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+}
+
+.terminal-header {
+  background: var(--bg-elevated);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-title {
+  margin-left: 0.5rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.terminal-body {
+  padding: 1.25rem;
+  line-height: 1.7;
+}
+
+.term-prompt { color: var(--accent-2); }
+.term-command { color: var(--fg); }
+.term-output { color: var(--muted); }
+.term-comment { color: #6b7280; font-style: italic; }
+.term-success { color: var(--accent-2); }
+.term-accent { color: var(--accent); }
+.term-yellow { color: var(--accent-3); }
+.term-blue { color: var(--accent-4); }
+
+/* Step cards */
+.step-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.step-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+}
+
+.step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent), #6d28d9);
+  color: white;
+}
+
+.step-num.blue { background: linear-gradient(135deg, var(--accent-4), #3b82f6); color: white; }
+.step-num.green { background: linear-gradient(135deg, var(--accent-2), #22c55e); color: var(--bg); }
+.step-num.yellow { background: linear-gradient(135deg, var(--accent-3), #f59e0b); color: var(--bg); }
+
+.browser-mock {
+  background: #1e1e2e;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.browser-toolbar {
+  background: #2a2a3a;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.browser-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.browser-url {
+  flex: 1;
+  background: #3a3a4a;
+  color: #cccccc;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.warn-box {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--fg);
+}
+
+/* Animations */
+.slide.active .anim-up {
+  animation: animUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+.slide.active .anim-up:nth-child(1) { animation-delay: 0.1s; }
+.slide.active .anim-up:nth-child(2) { animation-delay: 0.2s; }
+.slide.active .anim-up:nth-child(3) { animation-delay: 0.3s; }
+.slide.active .anim-up:nth-child(4) { animation-delay: 0.4s; }
+.slide.active .anim-up:nth-child(5) { animation-delay: 0.5s; }
+.slide.active .anim-up:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes animUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Code badge inline */
+.code-inline {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.9em;
+  color: var(--accent-4);
+}
+
+.code-inline.green { color: var(--accent-2); }
+.code-inline.yellow { color: var(--accent-3); }
+
+.icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  background: rgba(139, 92, 246, 0.1);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.icon-wrap.green { background: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.2); }
+.icon-wrap.yellow { background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.2); }
+.icon-wrap.blue { background: rgba(96, 165, 250, 0.1); border-color: rgba(96, 165, 250, 0.2); }
+
+.keyboard-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 50;
+}
+
+.kbd {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+@media (max-width: 768px) { .keyboard-hint { display: none; } }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .slide { padding: 3rem 1.5rem 5rem; }
+  .cover-hero { grid-template-columns: 1fr; gap: 1.5rem; }
+  .network-svg { max-width: 260px; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .slide-title { font-size: 2rem; }
+}
+
+@media (max-width: 600px) {
+  .navigation { padding: 0.5rem 0.75rem; gap: 0.5rem; }
+  .nav-btn { width: 38px; height: 38px; }
+  .slide-info { font-size: 0.8rem; min-width: 50px; }
+}
+
+/* Quiz styles */
+.quiz-question {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+.quiz-question.answered { opacity: 0.7; }
+.question-text {
+  font-size: 1.05rem; font-weight: 500; margin-bottom: 1rem;
+  display: flex; gap: 0.75rem;
+}
+.question-num { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: 600; flex-shrink: 0; }
+.options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+@media (max-width: 900px) { .options { grid-template-columns: 1fr; } }
+.option {
+  background: var(--bg-elevated); border: 1px solid var(--border); color: var(--fg);
+  padding: 0.75rem 1rem; border-radius: 10px; cursor: pointer;
+  transition: all 0.25s ease; text-align: left;
+  font-family: 'Outfit', sans-serif; font-size: 0.95rem;
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.option:hover:not(:disabled) { border-color: var(--accent); background: rgba(139, 92, 246, 0.08); transform: translateX(4px); }
+.option.correct { background: rgba(74, 222, 128, 0.15); border-color: var(--accent-2); color: var(--accent-2); }
+.option.wrong { background: rgba(239, 68, 68, 0.15); border-color: #ef4444; color: #fca5a5; }
+.option-letter {
+  width: 24px; height: 24px; border-radius: 6px; background: var(--bg-card);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600; flex-shrink: 0;
+}
+.option.correct .option-letter { background: var(--accent-2); color: var(--bg); }
+.option.wrong .option-letter { background: #ef4444; color: white; }
+.quiz-result {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(74, 222, 128, 0.08));
+  border: 1px solid var(--accent); border-radius: 16px; padding: 2rem; text-align: center;
+  margin-top: 1.5rem; display: none;
+}
+.quiz-result.show { display: block; animation: slideUp 0.5s ease; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.score-display { font-family: 'Space Grotesk', sans-serif; font-size: 3rem; font-weight: 700; margin: 0.5rem 0; }
+.retry-btn {
+  background: var(--accent); color: white; border: none; padding: 0.75rem 1.75rem;
+  border-radius: 100px; font-weight: 600; cursor: pointer; margin-top: 1rem;
+  font-family: 'Outfit', sans-serif; transition: all 0.3s ease;
+}
+.retry-btn:hover { background: #6d28d9; transform: translateY(-2px); }
+</style>
+</head>
+<body>
+
+<div class="presentation">
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Slides -->
+  <div class="slide-container">
+
+    <!-- SLIDE 1: COVER -->
+    <div class="slide active" data-slide="0">
+      <div class="cover-hero">
+        <div>
+          <div class="badge-row anim-up">
+            <span class="badge">MODUL PEMBELAJARAN</span>
+            <span class="badge blue">RPL - KELAS X</span>
+          </div>
+          <h1 class="cover-title anim-up">
+            Jaringan<br>Komputer & <span class="glow-text">Internet</span>
+          </h1>
+          <p class="cover-subtitle anim-up">
+            Mengenal konsep <strong style="color: var(--fg);">network</strong>, sebutan 
+            <strong style="color: var(--fg);">protocol</strong>, <strong style="color: var(--fg);">IP</strong>, 
+            <strong style="color: var(--fg);">DNS</strong>, <strong style="color: var(--fg);">domain</strong>, dan 
+            <strong style="color: var(--fg);">HTTP vs HTTPS</strong>. Semua terjadi di belakang layar setiap kali kamu buka internet!
+          </p>
+          <div class="anim-up">
+            <button class="start-btn" onclick="nextSlide()">
+              Mulai Belajar
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="network-container anim-up">
+          <div class="floating-particle" style="width: 12px; height: 12px; background: var(--accent); top: 10%; left: 10%;"></div>
+          <div class="floating-particle" style="width: 8px; height: 8px; background: var(--accent-2); top: 80%; left: 20%; animation-delay: 2s;"></div>
+          <div class="floating-particle" style="width: 10px; height: 10px; background: var(--accent-4); top: 30%; right: 5%; animation-delay: 4s;"></div>
+
+          <svg class="network-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+            <!-- Globe / network nodes -->
+            <circle cx="200" cy="200" r="150" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="6 6"/>
+            <circle cx="200" cy="200" r="120" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-dasharray="4 4"/>
+            <!-- Nodes -->
+            <circle cx="200" cy="80" r="18" fill="#131826" stroke="#fbbf24" stroke-width="3"/>
+            <text x="200" y="85" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#fbbf24">DNS</text>
+            <circle cx="90" cy="180" r="18" fill="#131826" stroke="#60a5fa" stroke-width="3"/>
+            <text x="90" y="185" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#60a5fa">IP</text>
+            <circle cx="310" cy="180" r="18" fill="#131826" stroke="#4ade80" stroke-width="3"/>
+            <text x="310" y="185" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="#4ade80">HTTP</text>
+            <circle cx="200" cy="320" r="18" fill="#131826" stroke="#ff7849" stroke-width="3"/>
+            <text x="200" y="325" text-anchor="middle" font-family="JetBrains Mono" font-size="7" fill="#ff7849">domain</text>
+            <circle cx="140" cy="110" r="12" fill="#8b5cf6"/>
+            <circle cx="280" cy="300" r="12" fill="#8b5cf6"/>
+            <!-- Lines -->
+            <line x1="200" y1="82" x2="108" y2="170" stroke="#2a3344" stroke-width="2"/>
+            <line x1="200" y1="82" x2="292" y2="170" stroke="#2a3344" stroke-width="2"/>
+            <line x1="200" y1="302" x2="108" y2="170" stroke="#2a3344" stroke-width="2"/>
+            <line x1="200" y1="302" x2="292" y2="170" stroke="#2a3344" stroke-width="2"/>
+            <line x1="90" y1="180" x2="310" y2="180" stroke="#2a3344" stroke-width="2"/>
+            <!-- Center globe -->
+            <circle cx="200" cy="200" r="40" fill="#131826" stroke="#8b5cf6" stroke-width="3"/>
+            <text x="200" y="210" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#8b5cf6">NET</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: APA ITU NETWORK -->
+    <div class="slide" data-slide="1">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">01</span>
+          <span class="slide-tag">// Network</span>
+        </div>
+        <h2 class="slide-title anim-up">Apa itu <span class="glow-text">Jaringan Komputer</span>?</h2>
+        <p class="slide-subtitle anim-up">Jaringan (network) adalah dua atau lebih komputer yang saling terhubung untuk berbagi data dan sumber daya.</p>
+
+        <div class="grid-2 anim-up" style="margin-top: 1rem;">
+          <div class="card card-glow">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div class="icon-wrap" style="margin: 0; width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.5">
+                  <circle cx="5" cy="6" r="3"/>
+                  <circle cx="19" cy="6" r="3"/>
+                  <circle cx="12" cy="18" r="3"/>
+                  <path d="M5 9v1a2 2 0 002 2h10a2 2 0 002-2V9M8 14v1a2 2 0 002 2h4a2 2 0 002-2v-1"/>
+                </svg>
+              </div>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; font-weight: 600;">Kenapa komputer butuh jaringan?</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.95rem; color: var(--muted); line-height: 1.5;">
+              <p>💬 <strong style="color: var(--fg);">Berkomunikasi</strong> — chat, email, video call</p>
+              <p>📂 <strong style="color: var(--fg);">Berbagi file</strong> — antar komputer/printer</p>
+              <p>🌐 <strong style="color: var(--fg);">Akses internet</strong> — masalah data, media, dst.</p>
+              <p>🤝 <strong style="color: var(--fg);">Kolaborasi</strong> — main game online, kerja tim</p>
+            </div>
+          </div>
+
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">Pengertian singkat</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="term-comment"># Network = kumpulan perangkat saling</span></div>
+              <div><span class="term-comment"># terhubung agar bisa bertukar data.</span></div>
+              <div style="height: 0.6rem;"></div>
+              <div><span class="term-command">Komputer A ──┐</span></div>
+              <div><span class="term-command">Komputer B ──┤</span> <span class="term-accent">hub</span> <span class="term-command">─Internet</span></div>
+              <div><span class="term-command">Printer ──┘</span></div>
+              <div style="height: 0.6rem;"></div>
+              <div><span class="term-comment"># Jenis berdasarkan ukuran:</span></div>
+              <div><span class="term-yellow">LAN</span> <span class="term-output">(skala kecil, satu ruangan)</span></div>
+              <div><span class="term-yellow">WAN / Internet</span> <span class="term-output">(skala dunia)</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">💡 ANALOGI</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            <strong style="color: var(--accent);">Jaringan itu seperti gang yang menghubungkan rumah-rumah tetangga.</strong><br>
+            Setiap rumah (komputer) punya nomor sendiri (IP). Ada gang kecil (LAN) dan jalan raya antar kota (Internet). 
+            Supaya surat bisa diterima alamat yang benar, butuh aturan tertentu pula.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: NETWORK PROTOCOL -->
+    <div class="slide" data-slide="2">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">02</span>
+          <span class="slide-tag">// Protocol</span>
+        </div>
+        <h2 class="slide-title anim-up">Apa itu <span class="glow-text-blue">Protocol</span>?</h2>
+        <p class="slide-subtitle anim-up">Protocol adalah aturan dan standar yang menentukan bagaimana data dikirim, diterima, dan diformat di jaringan.</p>
+
+        <div class="grid-3 anim-up" style="margin-top: 1rem;">
+          <div class="card card-glow">
+            <div class="icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <polyline points="16 13 8 13 8 17 16 17 16 13"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Aturan Bahasa Bersama</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Semua perangkat harus "berbahasa sama" agar data bisa dipahami. Protocol inilah kamusnya.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="icon-wrap blue">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+                <path d="M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+                <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Standar Dunia</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Protocol dipakai di seluruh dunia, jadi perangkat brand apa pun bisa saling terhubung.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="icon-wrap green">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"/>
+                <polyline points="1 20 1 14 7 14"/>
+                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Tata Cara Komunikasi</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Mengatur cara mulai, isi, dan mengakhiri komunikasi data antar perangkat.
+            </p>
+          </div>
+        </div>
+
+        <div class="terminals anim-up" style="margin-top: 1.5rem;">
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">protocol yang sering kamu temui</span>
+            </div>
+            <div class="terminal-body" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; font-size: 0.9rem;">
+              <div><span class="term-accent">IP</span> <span class="term-output">(alamat perangkat)</span></div>
+              <div><span class="term-accent">TCP</span> <span class="term-output">(kirim pasti sampai)</span></div>
+              <div><span class="term-accent">UDP</span> <span class="term-output">(kirim cepat, tak dijamin)</span></div>
+              <div><span class="term-accent">HTTP</span> <span class="term-output">(web biasa)</span></div>
+              <div><span class="term-accent">HTTPS</span> <span class="term-output">(web aman)</span></div>
+              <div><span class="term-accent">DNS</span> <span class="term-output">(mengolah nama)</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">📬 ANALOGI</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            <strong style="color: var(--accent);">Protocol = aturan mengirim surat.</strong><br>
+            Ada aturan: tulis alamat tujuan, tulis pengirim, pakai amplop, beri perangko. Semua pengirim & penerima sepakat 
+            dengan aturan ini sehingga surat sampai dengan benar. Protocol jaringan melakukan hal yang sama untuk data.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: IP ADDRESS -->
+    <div class="slide" data-slide="3">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">03</span>
+          <span class="slide-tag">// IP Address</span>
+        </div>
+        <h2 class="slide-title anim-up">Alamat <span class="glow-text">IP Address</span></h2>
+        <p class="slide-subtitle anim-up">IP (Internet Protocol) Address adalah nomor unik yang mengidentifikasi perangkat di jaringan, seperti alamat rumah untuk komputer.</p>
+
+        <div class="grid-2 anim-up" style="margin-top: 1rem;">
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">terminal — cek IP kamu</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="term-comment"># Windows (CMD / PowerShell)</span></div>
+              <div><span class="term-prompt">C:\> </span><span class="term-command">ipconfig</span></div>
+              <div><span class="term-success">IPv4 Address: 192.168.1.5</span></div>
+              <div style="height: 0.5rem;"></div>
+              <div><span class="term-comment"># Mac / Linux</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">ifconfig</span></div>
+              <div><span class="term-output">inet 192.168.1.5 netmask ...</span></div>
+              <div style="height: 0.5rem;"></div>
+              <div><span class="term-comment"># IP publik kamu</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">curl ifconfig.me</span></div>
+              <div><span class="term-blue">203.0.113.45</span></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="grid-2" style="gap: 1rem;">
+              <div class="card">
+                <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">IPv4</h3>
+                <p class="code-inline" style="display: block; margin-bottom: 0.75rem; text-align: center; font-size: 1rem;">192.168.1.5</p>
+                <p style="color: var(--muted); font-size: 0.85rem; line-height: 1.6;">4 kelompok angka (0-255) dipisah titik. Yang paling umum dipakai.</p>
+                <p style="color: var(--accent-3); font-size: 0.85rem; margin-top: 0.5rem;">≈ 4 miliar alamat</p>
+              </div>
+              <div class="card">
+                <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">IPv6</h3>
+                <p class="code-inline" style="display: block; margin-bottom: 0.75rem; text-align: center; font-size: 0.95rem;">2001:0db8:...</p>
+                <p style="color: var(--muted); font-size: 0.85rem; line-height: 1.6;">Format panjang basis hexadesimal. Untuk kebutuhan alamat masif masa depan.</p>
+                <p style="color: var(--accent-3); font-size: 0.85rem; margin-top: 0.5rem;">≈ hampir tak terbatas</p>
+              </div>
+            </div>
+            <div class="warn-box" style="margin-top: 1rem; padding: 0.9rem 1.1rem;">
+              🏠 <strong style="color: var(--accent-4);">IP Private</strong> = di dalam jaringan rumah/kantor (contoh 192.168.x.x).<br>
+              🌍 <strong style="color: var(--accent-4);">IP Public</strong> = identitas perangkat di internet besar (tunggal di dunia).
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">🏠 ANALOGI</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            <strong style="color: var(--accent);">IP = nomor rumah.</strong> Setiap perangkat punya alamat unik. 
+            Pos (data) bisa dikirim ke alamat yang benar. Karena itu, tidak boleh ada dua perangkat dengan IP yang sama di jaringan yang sama.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: DOMAIN -->
+    <div class="slide" data-slide="4">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">04</span>
+          <span class="slide-tag">// Domain</span>
+        </div>
+        <h2 class="slide-title anim-up">Apa itu <span class="glow-text">Domain</span>?</h2>
+        <p class="slide-subtitle anim-up">Domain adalah nama yang mudah diingat untuk sebuah IP address, yang menggantikan deretan angka yang sulit dihafal.</p>
+
+        <div class="grid-2 anim-up" style="margin-top: 1rem;">
+          <div class="browser-mock">
+            <div class="browser-toolbar">
+              <div class="browser-btn" style="background: #ef4444;"></div>
+              <div class="browser-btn" style="background: #fbbf24;"></div>
+              <div class="browser-btn" style="background: #4ade80;"></div>
+              <div class="browser-url">https://www.belanja.com/</div>
+            </div>
+            <div class="terminal-body" style="font-size: 0.85rem;">
+              <div><span class="term-blue">https://</span> <span class="term-output">→ protocol</span></div>
+              <div><span class="term-yellow">www</span> <span class="term-output">→ subdomain (optional)</span></div>
+              <div><span class="term-success">belanja</span> <span class="term-output">→ nama domain</span></div>
+              <div><span class="term-accent">.com</span> <span class="term-output">→ TLD (ekstensi)</span></div>
+            </div>
+          </div>
+
+          <div>
+            <p style="color: var(--muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem;">
+              Bandingkan: lebih mudah mengingat <span class="code-inline">belanja.com</span> daripada 
+              <span class="code-inline">203.0.113.45</span>, bukan? Domain membuat browsing jadi ramah untuk manusia.
+            </p>
+            <div class="grid-3" style="gap: 0.75rem;">
+              <div class="card" style="padding: 1rem; text-align: center;">
+                <div style="font-size: 1.5rem;">🌐</div>
+                <p class="code-inline" style="margin-top: 0.5rem;">.com</p>
+                <p style="font-size: 0.8rem; color: var(--muted);">komersial</p>
+              </div>
+              <div class="card" style="padding: 1rem; text-align: center;">
+                <div style="font-size: 1.5rem;">🌐</div>
+                <p class="code-inline" style="margin-top: 0.5rem;">.id</p>
+                <p style="font-size: 0.8rem; color: var(--muted);">Indonesia</p>
+              </div>
+              <div class="card" style="padding: 1rem; text-align: center;">
+                <div style="font-size: 1.5rem;">🌐</div>
+                <p class="code-inline" style="margin-top: 0.5rem;">.org</p>
+                <p style="font-size: 0.8rem; color: var(--muted);">organisasi</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">📒 ANALOGI</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            <strong style="color: var(--accent);">Domain = nama toko, IP = alamat toko.</strong><br>
+            Kalau kamu bilang "ke Toko Sumber Jaya" (domain), semua orang paham. Tapi sebenarnya kamu perlu 
+            alamat jalan & nomor rumah (IP) untuk menuju kesana. DNS yang menghubungkan keduanya.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: DNS -->
+    <div class="slide" data-slide="5">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">05</span>
+          <span class="slide-tag">// DNS</span>
+        </div>
+        <h2 class="slide-title anim-up">Apa itu <span class="glow-text-blue">DNS</span>?</h2>
+        <p class="slide-subtitle anim-up">DNS (Domain Name System) adalah sistem yang menerjemahkan nama domain menjadi IP address.</p>
+
+        <div class="grid-2 anim-up" style="margin-top: 1rem;">
+          <div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num">1</div>
+                <div>
+                  <strong style="font-size: 1rem;">Kamu ketik domain</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.2rem;">
+                    Contoh: kamu ketik <span class="code-inline">belanja.com</span> di browser.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num blue">2</div>
+                <div>
+                  <strong style="font-size: 1rem;">DNS mencarikan IP</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.2rem;">
+                    DNS server mencari IP address untuk domain itu, contoh <span class="code-inline">203.0.113.45</span>.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num yellow">3</div>
+                <div>
+                  <strong style="font-size: 1rem;">Browser terhubung ke IP</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.2rem;">
+                    Browser menuju server dengan alamat IP itu dan memuat halaman website.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="border-color: rgba(74, 222, 128, 0.3);">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num green">4</div>
+                <div>
+                  <strong style="font-size: 1rem;">Halaman tampil!</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.2rem;">
+                    Semua terjadi dalam hitungan mili-detik tanpa kamu sadari.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="terminal">
+              <div class="terminal-header">
+                <div class="terminal-dot" style="background: #ef4444;"></div>
+                <div class="terminal-dot" style="background: #fbbf24;"></div>
+                <div class="terminal-dot" style="background: #4ade80;"></div>
+                <span class="terminal-title">visual — proses DNS</span>
+              </div>
+              <div class="terminal-body" style="font-size: 0.85rem;">
+                <div><span class="term-command">Browser</span></div>
+                <div><span class="term-output">  │  "belanja.com?"</span></div>
+                <div><span class="term-command">  ▼</span></div>
+                <div><span class="term-blue">DNS Server</span></div>
+                <div><span class="term-output">  │  "IP-nya 203.0.113.45"</span></div>
+                <div><span class="term-command">  ▼</span></div>
+                <div><span class="term-success">Server 203.0.113.45</span></div>
+                <div style="height: 0.5rem;"></div>
+                <div><span class="term-out"></span><span class="term-accent">Belanja.com</span> <span class="term-output">= hasilnya</span></div>
+                <div><span class="term-success">≡ halaman web ditampilkan 👍</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">📞 ANALOGI</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            <strong style="color: var(--accent);">DNS = buku kontak / direktori telepon.</strong><br>
+            Di kontak kamu menyimpan "Ibu" yang terhubung ke nomor <em>0812-3456-7890</em>. Kamu cukup bilang menelepon "Ibu", 
+            dan kontak itu yang mengenal nomor aslinya. DNS bekerja persis seperti itu untuk domain → IP.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: HTTP -->
+    <div class="slide" data-slide="6">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">06</span>
+          <span class="slide-tag">// HTTP</span>
+        </div>
+        <h2 class="slide-title anim-up">HTTP - <span class="glow-text">Bahas Server</span></h2>
+        <p class="slide-subtitle anim-up">HTTP (HyperText Transfer Protocol) adalah protocol untuk memindahkan halaman web antara server dan browser.</p>
+
+        <div class="grid-2 anim-up" style="margin-top: 1rem;">
+          <div class="card card-glow">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div class="icon-wrap" style="margin: 0; width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2.5">
+                  <path d="M17 2l4 4-4 4M3 11v-1a4 4 0 014-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 01-4 4H3"/>
+                </svg>
+              </div>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; font-weight: 600;">Apa yang dilakukan HTTP?</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.95rem; color: var(--muted); line-height: 1.5;">
+              <p>1️⃣ Browser mengirim <strong style="color: var(--fg);">permintaan (request)</strong></p>
+              <p>2️⃣ Server mengirim <strong style="color: var(--fg);">jawaban (response)</strong> berisi halaman</p>
+              <p>3️⃣ Browser menampilkan <strong style="color: var(--fg);">hasil</strong> ke kamu</p>
+            </div>
+            <p style="color: var(--accent-3); font-size: 0.85rem; margin-top: 0.75rem;">
+              ⚠️ Sayangnya, HTTP mengirim data tanpa enkripsi — rawan dibaca orang lain.
+            </p>
+          </div>
+
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">HTTP request & response</span>
+            </div>
+            <div class="terminal-body" style="font-size: 0.85rem;">
+              <div><span class="term-comment">// Permintaan (Request):</span></div>
+              <div><span class="term-accent">GET</span> <span class="term-command">/produk</span> <span class="term-blue">HTTP/1.1</span></div>
+              <div><span class="term-command">Host: belanja.com</span></div>
+              <div style="height: 0.5rem;"></div>
+              <div><span class="term-comment">// Jawaban (Response):</span></div>
+              <div><span class="term-blue">HTTP/1.1</span> <span class="term-success">200 OK</span></div>
+              <div><span class="term-command">Content-Type: text/html</span></div>
+              <div><span class="term-output">[kode HTML halaman...]</span></div>
+            </div>
+            <div class="terminal-body" style="font-size: 0.85rem; border-top: 1px solid var(--border);">
+              <div><span class="term-comment">// Status code populer:</span></div>
+              <div><span class="term-success">200</span> <span class="term-output">OK • </span><span class="term-yellow">404</span> <span class="term-output">Not Found • </span><span class="term-accent">500</span> <span class="term-output">Server Error</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: HTTPS -->
+    <div class="slide" data-slide="7">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">07</span>
+          <span class="slide-tag">// HTTPS</span>
+        </div>
+        <h2 class="slide-title anim-up">HTTPS - <span class="glow-text">Versi Aman</span></h2>
+        <p class="slide-subtitle anim-up">HTTPS (HTTP Secure) adalah versi HTTP yang data-nya dienkripsi, sehingga aman dibaca orang lain yang tidak berhak.</p>
+
+        <div class="grid-2 anim-up" style="margin-top: 1rem;">
+          <div class="card card-glow">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div class="icon-wrap green" style="margin: 0; width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2.5">
+                  <rect x="3" y="11" width="18" height="11" rx="2"/>
+                  <path d="M7 11V7a5 5 0 0110 0v4"/>
+                </svg>
+              </div>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; font-weight: 600;">Mengapa HTTPS lebih aman?</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.95rem; color: var(--muted); line-height: 1.5;">
+              <p>🔒 Data <strong style="color: var(--fg);">dienkripsi</strong>/dikodekan</p>
+              <p>🛡️ Memakai <strong style="color: var(--fg);">TLS/SSL</strong> untuk keamanan</p>
+              <p>✅ Menjaga <strong style="color: var(--fg);">data sensitif</strong> (password, kartu, dll)</p>
+              <p>🔍 Browser menandai <strong style="color: var(--fg);">kunci gembok</strong> di address</p>
+            </div>
+          </div>
+
+          <div class="grid-2" style="gap: 1rem; align-content: start;">
+            <div class="card" style="border-color: rgba(255, 120, 73, 0.4);">
+              <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔓</div>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.05rem; font-weight: 600; color: var(--bg-accent);">http://</h3>
+              <p style="color: var(--muted); font-size: 0.85rem; line-height: 1.6;">
+                Data mengalir <strong style="color: var(--fg);">polos / plaintext</strong>. Rawan dibaca atau diintip pihak lain.
+              </p>
+            </div>
+            <div class="card" style="border-color: rgba(74, 222, 128, 0.4);">
+              <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔒</div>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.05rem; font-weight: 600; color:var(--accent-2);">https://</h3>
+              <p style="color: var(--muted); font-size: 0.85rem; line-height: 1.6;">
+                Data <strong style="color: var(--fg);">dienkripsi</strong>. Aman dari penyusup. Standar wajib website modern.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="warn-box anim-up" style="margin-top: 1.5rem;">
+          <strong style="color: var(--accent-3);">⚠️ TANDA AMAN:</strong> Selalu cek di address browser. 
+          Kalau ada ikn <span class="code-inline">🔒</span> + dimulai dengan <span class="code-inline">https://</span>, berarti tampilan kamu aman. 
+          Jangan memasukkan data pribadi di website yang hanya <span class="code-inline green">http://</span>.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: HTTP VS HTTPS -->
+    <div class="slide" data-slide="8">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">08</span>
+          <span class="slide-tag">// Perbandingan</span>
+        </div>
+        <h2 class="slide-title anim-up">HTTP vs <span class="glow-text">HTTPS</span></h2>
+        <p class="slide-subtitle anim-up">Mari bandingkan langsung perbedaan keduanya secara ringkas.</p>
+
+        <div class="terminal anim-up" style="grid-column: span 2;">
+          <div class="terminal-header">
+            <div class="terminal-dot" style="background: #ef4444;"></div>
+            <div class="terminal-dot" style="background: #fbbf24;"></div>
+            <div class="terminal-dot" style="background: #4ade80;"></div>
+            <span class="terminal-title">tabel perbandingan</span>
+          </div>
+          <div class="terminal-body" style="font-size: 0.9rem; padding-bottom: 0;">
+            <table style="width: 100%; border-collapse: collapse; font-family: 'JetBrains Mono', monospace;">
+              <tr style="color: var(--accent);">
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border);">Aspek</td>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--accent);">HTTP</td>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--accent-2);">HTTPS</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted);">Kependekan</td>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border);">HyperText Transfer Protocol</td>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border);">+ Secure (aman)</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted);">Enkripsi</td>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--bg-accent);">Tidak ada</td>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--accent-2);">Ada (TLS/SSL)</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted);">Port default</td>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border);">80</td>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border);">443</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--muted);">Kecepatan</td>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border);">Tanpa overhead enkripsi</td>
+                <td style="padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border);">Tersikret ringan (sekarang setara)</td>
+              </tr>
+              <tr>
+                <td style="padding: 0.5rem 0.75rem; color: var(--muted);">Kegunaan</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--bg-accent);">❌ Tidak disarankan</td>
+                <td style="padding: 0.5rem 0.75rem; color: var(--accent-2);">✅ Standar semua website</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">💌 ANALOGI</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            <strong style="color: var(--accent);">HTTP = surat biasa di kertas, HTTPS = surat dalam kotak terkunci.</strong><br>
+            Kalau kamu kirim surat HTTP, siapa pun yang mengambil bisa membacanya. Dengan HTTPS, isinya dikunci 
+            dan hanya penerima (server) yang punya kuncinya untuk membuka.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: ALUR KESELURUHAN -->
+    <div class="slide" data-slide="9">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">09</span>
+          <span class="slide-tag">// Alur Lengkap</span>
+        </div>
+        <h2 class="slide-title anim-up">Semua Berjalan <span class="glow-text">Bersama</span></h2>
+        <p class="slide-subtitle anim-up">Inilah perjalanan lengkap ketika kamu membuka sebuah website — semua konsep tadi bekerja terpadu.</p>
+
+        <div class="anim-up" style="margin-top: 1rem;">
+          <svg viewBox="0 0 1000 260" style="width: 100%; height: auto;">
+            <defs>
+              <marker id="arrow-c" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L9,3 z" fill="#8b5cf6"/>
+              </marker>
+            </defs>
+
+            <!-- Browser -->
+            <rect x="20" y="90" width="180" height="90" rx="14" fill="#131826" stroke="#8b5cf6" stroke-width="2"/>
+            <text x="110" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="16" font-weight="600" fill="#8b5cf6">Browser</text>
+            <text x="110" y="145" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8b95a8">ketik "belanja.com"</text>
+
+            <!-- DNS -->
+            <path d="M 210 120 L 290 120" stroke="#fbbf24" stroke-width="3" marker-end="url(#arrow-c)" fill="none"/>
+            <text x="250" y="108" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#fbbf24">1. cek</text>
+
+            <rect x="300" y="70" width="180" height="80" rx="14" fill="#131826" stroke="#fbbf24" stroke-width="2"/>
+            <text x="390" y="105" text-anchor="middle" font-family="Space Grotesk" font-size="16" font-weight="600" fill="#fbbf24">DNS Server</text>
+            <text x="390" y="130" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8b95a8">→IP 203.0.113.45</text>
+
+            <!-- IP -->
+            <path d="M 300 120 L 240 120 M 240 120 L 240 150 L 240 180 L 290 180" stroke="#fbbf24" stroke-width="3" marker-end="url(#arrow-c)" fill="none"/>
+            <!-- or simpler: direct line back -->
+            <path d="M 390 120 L 470 120" stroke="#60a5fa" stroke-width="3" marker-end="url(#arrow-c)" fill="none"/>
+            <text x="430" y="105" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#60a5fa">② IP kembali</text>
+
+            <!-- Server -->
+            <rect x="480" y="90" width="180" height="90" rx="14" fill="#131826" stroke="#60a5fa" stroke-width="2"/>
+            <text x="570" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="16" font-weight="600" fill="#60a5fa">Server Web</text>
+            <text x="570" y="145" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8b95a8">IP 203.0.113.45</text>
+
+            <!-- HTTPS request/response -->
+            <path d="M 660 140 L 750 140" stroke="#4ade80" stroke-width="3" marker-end="url(#arrow-c)" fill="none"/>
+            <text x="710" y="130" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#4ade80">③ request</text>
+            <path d="M 750 175 L 660 175" stroke="#ff7849" stroke-width="3" marker-end="url(#arrow-c)" fill="none"/>
+            <text x="700" y="195" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#ff7849">④ response</text>
+
+            <!-- Hosted site -->
+            <rect x="770" y="80" width="200" height="100" rx="14" fill="#131826" stroke="#4ade80" stroke-width="2"/>
+            <text x="870" y="120" text-anchor="middle" font-family="Space Grotesk" font-size="15" font-weight="600" fill="#4ade80">Website Lagi</text>
+            <text x="870" y="145" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="#8b95a8">LIVE via HTTPS</text>
+
+            <!-- Bottom labels -->
+            <text x="110" y="230" text-anchor="middle" font-family="Outfit" font-size="12" fill="#8b95a8">Kamu</text>
+            <text x="570" y="230" text-anchor="middle" font-family="Outfit" font-size="12" fill="#8b95a8">Komputer tujuan</text>
+          </svg>
+        </div>
+
+        <div class="grid-4 anim-up" style="margin-top: 1rem;">
+          <div class="card" style="padding: 1rem; text-align: center;">
+            <span class="code-inline yellow">Domain</span>
+            <p style="font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem;">nama mudah diingat</p>
+          </div>
+          <div class="card" style="padding: 1rem; text-align: center;">
+            <span class="code-inline">DNS</span>
+            <p style="font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem;">domain → IP</p>
+          </div>
+          <div class="card" style="padding: 1rem; text-align: center;">
+            <span class="code-inline blue">IP</span>
+            <p style="font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem;">alamat tujuan</p>
+          </div>
+          <div class="card" style="padding: 1rem; text-align: center;">
+            <span class="code-inline green">HTTPS</span>
+            <p style="font-size: 0.85rem; color: var(--muted); margin-top: 0.5rem;">kirim data aman</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: TUGAS / QUIZ -->
+    <div class="slide" data-slide="10">
+      <div class="quiz-container">
+        <div class="slide-header anim-up">
+          <span class="slide-number">10</span>
+          <span class="slide-tag">// Uji Pemahaman</span>
+        </div>
+        <h2 class="slide-title anim-up">🎯 Uji Kemampuanmu!</h2>
+        <p class="slide-subtitle anim-up">Jawab 5 soal berikut untuk menguji pemahamanmu tentang materi jaringan ini. Klik jawaban yang benar!</p>
+
+        <div id="quizContainer"></div>
+
+        <div class="quiz-result" id="quizResult">
+          <h3 style="font-family: 'Space Grotesk'; font-size: 1.5rem; margin-bottom: 0.5rem; display: none;">Hasil Tes Kamu</h3>
+          <div class="score-display" id="scoreDisplay">0/5</div>
+          <p id="scoreMessage" style="color: var(--muted); margin-bottom: 1rem;"></p>
+          <button class="retry-btn" onclick="resetQuiz()">Coba Lagi 🔄</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: PENUTUP -->
+    <div class="slide" data-slide="11">
+      <div style="max-width: 1100px; margin: 0 auto; width: 100%; text-align: center;">
+        <div class="anim-up" style="margin-bottom: 2rem;">
+          <svg width="120" height="120" viewBox="0 0 200 200" style="margin: 0 auto;">
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#8b5cf6" stroke-width="3" stroke-dasharray="8 4"/>
+            <circle cx="100" cy="100" r="60" fill="#131826" stroke="#4ade80" stroke-width="2"/>
+            <path d="M 80 100 L 95 115 L 125 85" stroke="#4ade80" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <h2 class="slide-title anim-up" style="font-size: clamp(2.5rem, 5vw, 4rem);">
+          Selamat! Kamu Sudah Mengenal<br><span class="glow-text">Dasar Jaringan</span> 🎉
+        </h2>
+
+        <p class="slide-subtitle anim-up" style="margin: 1rem auto 2rem; max-width: 620px;">
+          Sekarang kamu tahu cara data mengalir di internet: dari perangkat, lewat protocol, 
+          dengan alamat IP dan nama domain, sampai website aman lewat HTTPS.
+        </p>
+
+        <div class="grid-3 anim-up" style="margin-bottom: 2rem;">
+          <div class="card" style="text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔎</div>
+            <h4 style="font-family: 'Space Grotesk'; font-weight: 600; margin-bottom: 0.5rem;">Coba Eksplorasi</h4>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Ketik <span class="code-inline">ipconfig</span> atau <span class="code-inline">ifconfig</span> di laptopmu untuk lihat IP kamu!
+            </p>
+          </div>
+          <div class="card" style="text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔒</div>
+            <h4 style="font-family: 'Space Grotesk'; font-weight: 600; margin-bottom: 0.5rem;">Ingat Keamanan</h4>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Pastikan alamat website selalu dimulai dengan <span class="code-inline green">https</span> sebelum isi data pribadi.
+            </p>
+          </div>
+          <div class="card" style="text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🚀</div>
+            <h4 style="font-family: 'Space Grotesk'; font-weight: 600; margin-bottom: 0.5rem;">Langkah Berikut</h4>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Gunakan materi ini sebagai dasar saat belajar materi membuat server & hosting website.
+            </p>
+          </div>
+        </div>
+
+        <div class="anim-up" style="padding: 1.5rem; background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(96, 165, 250, 0.08)); border-radius: 16px; border: 1px solid var(--accent);">
+          <p style="font-size: 1.1rem; line-height: 1.7;">
+            <strong style="color: var(--accent);">"The Internet is a network where any computer can communicate with any other computer."</strong><br>
+            <span style="color: var(--muted); font-size: 0.95rem;">— Vint Cerf, salah satu "bapak internet"</span>
+          </p>
+        </div>
+
+        <p class="anim-up" style="margin-top: 2rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;">
+          // Terima kasih sudah belajar bersama! Keep exploring! 🚀
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation -->
+  <div class="navigation">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <div class="slide-info">
+      <span class="current" id="currentSlide">1</span> / <span id="totalSlides">12</span>
+    </div>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Keyboard hint -->
+  <div class="keyboard-hint">
+    <span>Gunakan</span>
+    <span class="kbd">←</span>
+    <span class="kbd">→</span>
+    <span>untuk navigasi</span>
+  </div>
+
+</div>
+
+<script>
+let currentSlide = 0;
+const totalSlides = 12;
+const slides = document.querySelectorAll('.slide');
+const progressBar = document.getElementById('progressBar');
+const currentSlideEl = document.getElementById('currentSlide');
+const totalSlidesEl = document.getElementById('totalSlides');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+totalSlidesEl.textContent = totalSlides;
+
+function updateSlide(newIndex) {
+  if (newIndex < 0 || newIndex >= totalSlides) return;
+
+  slides[currentSlide].classList.remove('active');
+  if (newIndex > currentSlide) {
+    slides[currentSlide].classList.add('prev');
+  } else {
+    slides[currentSlide].classList.remove('prev');
+  }
+
+  currentSlide = newIndex;
+  slides[currentSlide].classList.add('active');
+  slides[currentSlide].classList.remove('prev');
+
+  // Update progress
+  const progress = ((currentSlide + 1) / totalSlides) * 100;
+  progressBar.style.width = progress + '%';
+  currentSlideEl.textContent = currentSlide + 1;
+
+  // Update buttons
+  prevBtn.disabled = currentSlide === 0;
+  nextBtn.disabled = currentSlide === totalSlides - 1;
+
+  // Scroll to top of slide
+  slides[currentSlide].scrollTop = 0;
+}
+
+function nextSlide() { updateSlide(currentSlide + 1); }
+function prevSlide() { updateSlide(currentSlide - 1); }
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    nextSlide();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    prevSlide();
+  }
+});
+
+// Quiz Data
+const quizQuestions = [
+  {
+    question: "Apa fungsi utama dari DNS?",
+    options: [
+      "Sebagai alamat unik sebuah perangkat",
+      "Menerjemahkan nama domain menjadi IP address",
+      "Menjaga website agar tetap aman",
+      "Mengirim data dari server ke browser"
+    ],
+    correct: 1
+  },
+  {
+    question: "Alamat unik yang mengidentifikasi sebuah perangkat di jaringan adalah…",
+    options: ["Domain", "Protocol", "IP Address", "HTTPS"],
+    correct: 2
+  },
+  {
+    question: "Apa perbedaan utama HTTP dan HTTPS?",
+    options: [
+      "HTTPS menggunakan enkripsi, HTTP tidak",
+      "HTTP lebih aman daripada HTTPS",
+      "HTTPS tidak butuh server",
+      "HTTP memakai DNS, HTTPS tidak"
+    ],
+    correct: 0
+  },
+  {
+    question: "Manakah yang merupakan contoh nama domain?",
+    options: ["192.168.1.1", "belanja.com", "GET /", "HTTP/1.1"],
+    correct: 1
+  },
+  {
+    question: "Peristiwa apa yang dilakukan browser saat kamu mengetik nama website di address bar?",
+    options: [
+      "Langsung menampilkan tanpa proses",
+      "Menghubungi DNS untuk mencari IP, lalu terhubung ke server via HTTP/HTTPS",
+      "Menghapus semua data di internet",
+      "Mengubah IP menjadi nomor telepon"
+    ],
+    correct: 1
+  }
+];
+
+let userAnswers = new Array(quizQuestions.length).fill(null);
+
+function renderQuiz() {
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = '';
+
+  quizQuestions.forEach((q, qIndex) => {
+    const questionEl = document.createElement('div');
+    questionEl.className = 'quiz-question';
+    if (userAnswers[qIndex] !== null) questionEl.classList.add('answered');
+
+    const optionsHtml = q.options.map((opt, oIndex) => {
+      let classes = 'option';
+      if (userAnswers[qIndex] !== null) {
+        if (oIndex === q.correct) classes += ' correct';
+        else if (oIndex === userAnswers[qIndex]) classes += ' wrong';
+      }
+      const letter = String.fromCharCode(65 + oIndex);
+      return `
+        <button class="${classes}" onclick="selectAnswer(${qIndex}, ${oIndex})" ${userAnswers[qIndex] !== null ? 'disabled' : ''}>
+          <span class="option-letter">${letter}</span>
+          <span>${opt}</span>
+        </button>
+      `;
+    }).join('');
+
+    questionEl.innerHTML = `
+      <div class="question-text">
+        <span class="question-num">Soal ${qIndex + 1}.</span>
+        <span>${q.question}</span>
+      </div>
+      <div class="options">${optionsHtml}</div>
+    `;
+
+    container.appendChild(questionEl);
+  });
+}
+
+function selectAnswer(qIndex, oIndex) {
+  userAnswers[qIndex] = oIndex;
+  renderQuiz();
+  checkQuizComplete();
+}
+
+function checkQuizComplete() {
+  const allAnswered = userAnswers.every(a => a !== null);
+  if (allAnswered) {
+    const score = userAnswers.reduce((acc, ans, i) => acc + (ans === quizQuestions[i].correct ? 1 : 0), 0);
+
+    const result = document.getElementById('quizResult');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const scoreMessage = document.getElementById('scoreMessage');
+
+    scoreDisplay.textContent = `${score}/5`;
+
+    let message = '';
+    if (score === 5) {
+      message = '🏆 SEMPURNA! Kamu siap jadi Network Engineer!';
+      scoreDisplay.style.color = 'var(--accent-2)';
+    } else if (score >= 3) {
+      message = '👍 Bagus! Pemahaman dasarmu sudah baik. Tinggal berlatih lagi!';
+      scoreDisplay.style.color = 'var(--accent-3)';
+    } else {
+      message = '💪 Jangan menyerah! Coba ulangi materi dan coba lagi ya.';
+      scoreDisplay.style.color = 'var(--accent)';
+    }
+
+    scoreMessage.textContent = message;
+    result.classList.add('show');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function resetQuiz() {
+  userAnswers = new Array(quizQuestions.length).fill(null);
+  document.getElementById('quizResult').classList.remove('show');
+  renderQuiz();
+}
+
+// Initialize
+renderQuiz();
+</script>
+
+</body>
+</html>

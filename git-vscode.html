@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutorial Git di VS Code - Login, Commit, dan Push ke GitHub</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg-card: #131826;
+  --bg-elevated: #1c2333;
+  --fg: #e8edf5;
+  --muted: #8b95a8;
+  --accent: #ff7849;
+  --accent-2: #4ade80;
+  --accent-3: #fbbf24;
+  --accent-4: #60a5fa;
+  --border: #2a3344;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(255, 120, 73, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(96, 165, 250, 0.10) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(74, 222, 128, 0.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(42, 51, 68, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42, 51, 68, 0.25) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+
+.presentation {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+.progress-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(42, 51, 68, 0.5);
+  z-index: 100;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-3), var(--accent-2));
+  width: 8.33%;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(255, 120, 73, 0.6);
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 4rem 3rem 6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  overflow-y: auto;
+}
+
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.slide.prev {
+  transform: translateX(-60px);
+}
+
+.slide::-webkit-scrollbar { width: 6px; }
+.slide::-webkit-scrollbar-track { background: transparent; }
+.slide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Navigation */
+.navigation {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(19, 24, 38, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  padding: 0.75rem 1.25rem;
+  border-radius: 100px;
+  z-index: 100;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.nav-btn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(255, 120, 73, 0.5);
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.slide-info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--muted);
+  min-width: 70px;
+  text-align: center;
+}
+
+.slide-info .current {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Typography */
+.heading-display {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.heading-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.glow-text {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-3) 50%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glow-text-blue {
+  background: linear-gradient(135deg, var(--accent-4) 0%, var(--accent-3) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Slide 1: Cover */
+.cover-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.cover-title {
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  margin-bottom: 1.5rem;
+}
+
+.cover-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  max-width: 520px;
+}
+
+.badge-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.badge {
+  background: rgba(255, 120, 73, 0.1);
+  border: 1px solid rgba(255, 120, 73, 0.3);
+  color: var(--accent);
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.badge.green {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: rgba(74, 222, 128, 0.3);
+  color: var(--accent-2);
+}
+
+.badge.yellow {
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: var(--accent-3);
+}
+
+.badge.blue {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: rgba(96, 165, 250, 0.3);
+  color: var(--accent-4);
+}
+
+.vscode-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vscode-svg {
+  width: 100%;
+  max-width: 380px;
+  height: auto;
+  filter: drop-shadow(0 0 40px rgba(96, 165, 250, 0.4));
+  animation: floatLogo 6s ease-in-out infinite;
+}
+
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+}
+
+.floating-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: floatParticle 8s ease-in-out infinite;
+}
+
+@keyframes floatParticle {
+  0%, 100% { transform: translate(0, 0); opacity: 0.4; }
+  50% { transform: translate(20px, -30px); opacity: 0.8; }
+}
+
+.start-btn {
+  background: linear-gradient(135deg, var(--accent), #ff5722);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 100px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(255, 120, 73, 0.4);
+  font-family: 'Outfit', sans-serif;
+}
+
+.start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(255, 120, 73, 0.6);
+}
+
+/* Slide Headers */
+.slide-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.slide-number {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.slide-tag {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.slide-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.slide-subtitle {
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  max-width: 760px;
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-3));
+}
+
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+/* Analogy box */
+.analogy-box {
+  background: linear-gradient(135deg, rgba(255, 120, 73, 0.08), rgba(74, 222, 128, 0.05));
+  border: 1px solid rgba(255, 120, 73, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.analogy-label {
+  position: absolute;
+  top: -10px;
+  left: 1.5rem;
+  background: var(--bg);
+  padding: 0 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+/* Terminal */
+.terminal {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+}
+
+.terminal-header {
+  background: var(--bg-elevated);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-title {
+  margin-left: 0.5rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.terminal-body {
+  padding: 1.25rem;
+  line-height: 1.7;
+}
+
+.term-prompt { color: var(--accent-2); }
+.term-command { color: var(--fg); }
+.term-output { color: var(--muted); }
+.term-comment { color: #6b7280; font-style: italic; }
+.term-success { color: var(--accent-2); }
+.term-accent { color: var(--accent); }
+.term-yellow { color: var(--accent-3); }
+.term-blue { color: var(--accent-4); }
+
+/* Step cards for tutorial */
+.step-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.step-card:hover {
+  border-color: var(--accent-4);
+  transform: translateY(-3px);
+}
+
+.step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent), #ff5722);
+  color: white;
+}
+
+.step-num.blue { background: linear-gradient(135deg, var(--accent-4), #3b82f6); }
+.step-num.green { background: linear-gradient(135deg, var(--accent-2), #22c55e); color: var(--bg); }
+.step-num.yellow { background: linear-gradient(135deg, var(--accent-3), #f59e0b); color: var(--bg); }
+
+/* VS Code mockup */
+.vscode-mock {
+  background: #1e1e1e;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+
+.vscode-titlebar {
+  background: #2d2d2d;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #cccccc;
+  border-bottom: 1px solid #3c3c3c;
+}
+
+.vscode-body {
+  display: grid;
+  grid-template-columns: 44px 220px 1fr;
+  min-height: 280px;
+}
+
+.vscode-activity {
+  background: #333333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 0;
+  gap: 0.4rem;
+}
+
+.vscode-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+}
+
+.vscode-icon.active {
+  background: #0e639c;
+}
+
+.vscode-sidebar {
+  background: #252526;
+  padding: 0.75rem;
+  color: #cccccc;
+  border-right: 1px solid #3c3c3c;
+}
+
+.vscode-sidebar-title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #9d9d9d;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.vscode-sidebar-item {
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.vscode-sidebar-item:hover { background: #2a2d2e; }
+
+.vscode-main {
+  background: #1e1e1e;
+  color: #cccccc;
+  padding: 1rem;
+  font-size: 0.8rem;
+}
+
+.vscode-action {
+  background: #0e639c;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  margin: 0.5rem 0;
+}
+
+.warn-box {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--fg);
+}
+
+/* Animations for slide content */
+.slide.active .anim-up {
+  animation: animUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+.slide.active .anim-up:nth-child(1) { animation-delay: 0.1s; }
+.slide.active .anim-up:nth-child(2) { animation-delay: 0.2s; }
+.slide.active .anim-up:nth-child(3) { animation-delay: 0.3s; }
+.slide.active .anim-up:nth-child(4) { animation-delay: 0.4s; }
+.slide.active .anim-up:nth-child(5) { animation-delay: 0.5s; }
+.slide.active .anim-up:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes animUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Code badge inline */
+.code-inline {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.9em;
+  color: var(--accent-4);
+}
+
+.code-inline.green { color: var(--accent-2); }
+.code-inline.yellow { color: var(--accent-3); }
+
+/* Icon container */
+.icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  background: rgba(255, 120, 73, 0.1);
+  border: 1px solid rgba(255, 120, 73, 0.2);
+}
+
+.icon-wrap.green { background: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.2); }
+.icon-wrap.yellow { background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.2); }
+.icon-wrap.blue { background: rgba(96, 165, 250, 0.1); border-color: rgba(96, 165, 250, 0.2); }
+
+/* Keyboard hint */
+.keyboard-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 50;
+}
+
+.kbd {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+@media (max-width: 768px) { .keyboard-hint { display: none; } }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .slide { padding: 3rem 1.5rem 5rem; }
+  .cover-hero { grid-template-columns: 1fr; gap: 1.5rem; }
+  .vscode-svg { max-width: 220px; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .slide-title { font-size: 2rem; }
+  .vscode-body { grid-template-columns: 44px 1fr; }
+  .vscode-sidebar { display: none; }
+}
+
+@media (max-width: 600px) {
+  .navigation { padding: 0.5rem 0.75rem; gap: 0.5rem; }
+  .nav-btn { width: 38px; height: 38px; }
+  .slide-info { font-size: 0.8rem; min-width: 50px; }
+}
+</style>
+</head>
+<body>
+
+<div class="presentation">
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Slides -->
+  <div class="slide-container">
+
+    <!-- SLIDE 1: COVER -->
+    <div class="slide active" data-slide="0">
+      <div class="cover-hero">
+        <div>
+          <div class="badge-row anim-up">
+            <span class="badge">TUTORIAL PRAKTIK</span>
+            <span class="badge blue">RPL - KELAS X</span>
+          </div>
+          <h1 class="cover-title anim-up">
+            Git di<br>
+            <span class="glow-text-blue">VS Code</span>
+          </h1>
+          <p class="cover-subtitle anim-up">
+            Panduan langkah demi langkah untuk <strong style="color: var(--fg);">login GitHub</strong> dari VS Code, 
+            lalu <strong style="color: var(--fg);">commit</strong> dan <strong style="color: var(--fg);">push</strong> 
+            kode pertamamu ke GitHub. Tidak perlu khawatir — semua bisa lewat klik saja!
+          </p>
+          <div class="anim-up">
+            <button class="start-btn" onclick="nextSlide()">
+              Mulai Tutorial
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="vscode-container anim-up">
+          <div class="floating-particle" style="width: 12px; height: 12px; background: var(--accent-4); top: 10%; left: 10%;"></div>
+          <div class="floating-particle" style="width: 8px; height: 8px; background: var(--accent-2); top: 80%; left: 20%; animation-delay: 2s;"></div>
+          <div class="floating-particle" style="width: 10px; height: 10px; background: var(--accent-3); top: 30%; right: 5%; animation-delay: 4s;"></div>
+
+          <svg class="vscode-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+            <!-- VS Code logo -->
+            <path d="M 110 85 L 280 60 L 240 115 L 150 175 Z" fill="#0065A9"/>
+            <path d="M 280 60 L 110 85 L 150 175 Z" fill="#007ACC"/>
+            <path d="M 110 85 L 100 92 L 135 285 L 150 175 Z" fill="#1F9CF0"/>
+            <path d="M 150 175 L 280 60 L 260 320 L 100 285 Z" fill="#007ACC"/>
+            <path d="M 100 285 L 150 175 Z" fill="#0065A9"/>
+            <!-- GitHub branch lines -->
+            <path d="M 200 100 Q 200 170 200 320" stroke="#4ade80" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+            <path d="M 200 180 Q 270 180 300 180" stroke="#ff7849" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+            <path d="M 300 180 Q 300 230 300 320" stroke="#ff7849" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+            <circle cx="200" cy="100" r="16" fill="#0a0e1a" stroke="#4ade80" stroke-width="4"/>
+            <circle cx="200" cy="180" r="16" fill="#4ade80"/>
+            <circle cx="300" cy="180" r="16" fill="#0a0e1a" stroke="#ff7849" stroke-width="4"/>
+            <circle cx="200" cy="320" r="16" fill="#0a0e1a" stroke="#4ade80" stroke-width="4"/>
+            <circle cx="300" cy="320" r="16" fill="#0a0e1a" stroke="#ff7849" stroke-width="4"/>
+            <text x="200" y="70" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#4ade80">commit</text>
+            <text x="300" y="155" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#ff7849">push</text>
+            <text x="205" y="350" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#8b95a8">GitHub</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: APA YANG KAMU PERLUKAN -->
+    <div class="slide" data-slide="1">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">01</span>
+          <span class="slide-tag">// Persiapan</span>
+        </div>
+        <h2 class="slide-title anim-up">Yang Kamu <span class="glow-text-blue">Perlukan</span></h2>
+        <p class="slide-subtitle anim-up">
+          3 hal wajib sebelum mulai. Kalau belum ada, jangan khawatir — langkah berikutnya akan menjelaskan cara menginstallnya.
+        </p>
+
+        <div class="grid-3 anim-up" style="margin-top: 1rem;">
+          <div class="card card-glow">
+            <div class="icon-wrap blue">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">VS Code</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+              Editor kode gratis dari Microsoft. Tempatmu menulis kode sekaligus mengelola Git.
+            </p>
+            <p style="font-size: 0.85rem; color: var(--accent-4); font-style: italic;">
+              💡 Unduh di code.visualstudio.com
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="icon-wrap green">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v8M8 12h8"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Git</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+              Mesin di balik semua fitur version control. Wajib diinstall di laptop.
+            </p>
+            <p style="font-size: 0.85rem; color: var(--accent-2); font-style: italic;">
+              💡 Unduh di git-scm.com
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="icon-wrap yellow">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Akun GitHub</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+              Tempat kode kamu disimpan di cloud dan bisa dibagikan ke teman.
+            </p>
+            <p style="font-size: 0.85rem; color: var(--accent-3); font-style: italic;">
+              💡 Daftar gratis di github.com
+            </p>
+          </div>
+        </div>
+
+        <div class="warn-box anim-up" style="margin-top: 1.5rem; border-color: rgba(96, 165, 250, 0.4);">
+          <strong style="color: var(--accent-4);">🎯 TARGET TUTORIAL INI:</strong><br>
+          Di akhir tutorial, kamu bisa membuat repository di GitHub dari VS Code dan mengirim (push) kode pertamamu ke sana. Semua tanpa menulis perintah Git di terminal — cukup klik-klik!
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: INSTALL GIT -->
+    <div class="slide" data-slide="2">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">02</span>
+          <span class="slide-tag">// Persiapan</span>
+        </div>
+        <h2 class="slide-title anim-up">Install <span class="glow-text-blue">Git</span></h2>
+        <p class="slide-subtitle anim-up">Buka <span class="code-inline">git-scm.com</span>, klik tombol Download, lalu install seperti biasa (cukup klik Next terus sampai selesai).</p>
+
+        <div class="grid-2 anim-up">
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">terminal — cek versi git</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="term-comment"># Setelah install, cek apakah Git sudah terpasang</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git --version</span></div>
+              <div><span class="term-success">git version 2.43.0</span></div>
+              <div style="height: 0.6rem;"></div>
+              <div><span class="term-comment"># Kalau muncul versi seperti di atas, berarti Git siap! ✅</span></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num">1</div>
+                <div>
+                  <strong style="font-size: 1rem;">Buka Git Bash / Terminal</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Di Windows: klik kanan desktop → "Git Bash Here". Di Mac: buka app Terminal.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num blue">2</div>
+                <div>
+                  <strong style="font-size: 1rem;">Setel nama & email kamu</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Git mencatat siapa pembuat commit. Isi dengan nama dan email akun GitHub-mu.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="border-color: rgba(251, 191, 36, 0.3);">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num yellow">3</div>
+                <div>
+                  <strong style="font-size: 1rem;">Selesai! Cek versi</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Jalankan <span class="code-inline green">git --version</span> untuk memastikan semua berjalan.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="terminal anim-up" style="margin-top: 1.5rem;">
+          <div class="terminal-header">
+            <div class="terminal-dot" style="background: #ef4444;"></div>
+            <div class="terminal-dot" style="background: #fbbf24;"></div>
+            <div class="terminal-dot" style="background: #4ade80;"></div>
+            <span class="terminal-title">terminal — set identitas</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="term-prompt">$ </span><span class="term-command">git config --global user.name </span><span class="term-yellow">"NamaKamu"</span></div>
+            <div><span class="term-prompt">$ </span><span class="term-command">git config --global user.email </span><span class="term-yellow">"emailkamu@gmail.com"</span></div>
+            <div style="height: 0.5rem;"></div>
+            <div><span class="term-comment"># Ganti NamaKamu dan email dengan data akun GitHub-mu!</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: BUKA VS CODE -->
+    <div class="slide" data-slide="3">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">03</span>
+          <span class="slide-tag">// Persiapan</span>
+        </div>
+        <h2 class="slide-title anim-up">Buka <span class="glow-text-blue">VS Code</span></h2>
+        <p class="slide-subtitle anim-up">Buat folder proyek baru dan buka dari VS Code. Semua pekerjaan kita mulai dari sini.</p>
+
+        <div class="grid-2 anim-up">
+          <div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num">1</div>
+                <div>
+                  <strong style="font-size: 1rem;">Buat folder proyek</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Buat folder baru di desktop, misalnya <span class="code-inline">proyek-pertamaku</span>.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num blue">2</div>
+                <div>
+                  <strong style="font-size: 1rem;">Buka di VS Code</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Buka VS Code → menu <span class="code-inline">File</span> → <span class="code-inline">Open Folder…</span> → pilih folder tadi.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num yellow">3</div>
+                <div>
+                  <strong style="font-size: 1rem;">Buat file baru</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Klik ikon file baru (📄) di sidebar, beri nama <span class="code-inline">index.html</span>, lalu tulis kode apa saja.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="vscode-mock">
+            <div class="vscode-titlebar">
+              <span style="color: #60a5fa;">▬</span> File Edit Selection View Go Run Terminal Help
+            </div>
+            <div class="vscode-body">
+              <div class="vscode-activity">
+                <div class="vscode-icon">🗂️</div>
+                <div class="vscode-icon">🔍</div>
+                <div class="vscode-icon active">⎇</div>
+                <div class="vscode-icon">🐞</div>
+                <div class="vscode-icon">🔎</div>
+              </div>
+              <div class="vscode-sidebar">
+                <div class="vscode-sidebar-title">Explorer</div>
+                <div style="font-size: 0.78rem; margin-bottom: 0.5rem;">📁 PROYEK-PERTAMAKU</div>
+                <div class="vscode-sidebar-item" style="margin-left: 0.75rem;">📄 index.html</div>
+              </div>
+              <div class="vscode-main">
+                <div style="color: #6a9955; margin-bottom: 0.5rem;">index.html</div>
+                <div>&lt;!DOCTYPE html&gt;</div>
+                <div>&lt;html&gt;</div>
+                <div style="margin-left: 1rem;">&lt;body&gt;</div>
+                <div style="margin-left: 2rem;">&lt;h1&gt;Halo Git!&lt;/h1&gt;</div>
+                <div style="margin-left: 1rem;">&lt;/body&gt;</div>
+                <div>&lt;/html&gt;</div>
+                <div style="color: #6a9955; margin-top: 1rem;">✓ File tersimpan</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: IKLON SOURCE CONTROL -->
+    <div class="slide" data-slide="4">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">04</span>
+          <span class="slide-tag">// Git di VS Code</span>
+        </div>
+        <h2 class="slide-title anim-up">Kenali Ikon <span class="glow-text-blue">Source Control</span></h2>
+        <p class="slide-subtitle anim-up">Ini "rumahnya" Git di dalam VS Code. Semua aktivitas commit dan push dilakukan dari sini.</p>
+
+        <div class="grid-2 anim-up">
+          <div class="vscode-mock">
+            <div class="vscode-titlebar">
+              <span style="color: #60a5fa;">▬</span> Source Control — Ctrl+Shift+G
+            </div>
+            <div class="vscode-body">
+              <div class="vscode-activity">
+                <div class="vscode-icon">🗂️</div>
+                <div class="vscode-icon">🔍</div>
+                <div class="vscode-icon active">⎇</div>
+                <div class="vscode-icon">🐞</div>
+                <div class="vscode-icon">🔎</div>
+              </div>
+              <div class="vscode-sidebar" style="display: block;">
+                <div class="vscode-sidebar-title">Source Control</div>
+                <div style="color: #9d9d9d; font-size: 0.78rem; margin-bottom: 0.75rem;">
+                  Folder ini belum diinisialisasi sebagai repository Git.
+                </div>
+                <div class="vscode-action">
+                  ▶ Initialize Repository
+                </div>
+              </div>
+              <div class="vscode-main">
+                <div style="color: #cccccc; margin-bottom: 0.5rem;">Belum ada repository.</div>
+                <div style="color: #9d9d9d; font-size: 0.78rem; line-height: 1.6;">
+                  Klik tombol <strong style="color: #60a5fa;">Initialize Repository</strong> untuk mulai melacak perubahan file-mu dengan Git.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num">1</div>
+                <div>
+                  <strong style="font-size: 1rem;">Klik ikon Source Control</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Ikon bercabang (⎇) di sidebar kiri, atau tekan <span class="code-inline">Ctrl+Shift+G</span>.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num blue">2</div>
+                <div>
+                  <strong style="font-size: 1rem;">Initialize Repository</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Klik tombol <span class="code-inline">Initialize Repository</span> untuk mengaktifkan Git di folder ini.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num yellow">3</div>
+                <div>
+                  <strong style="font-size: 1rem;">Repository aktif! 🎉</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Sekarang semua file di folder kamu mulai "dipantau" oleh Git.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">💡 ANALOGI</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            <strong style="color: var(--accent-4);">Source Control = "pusat kendali" Git.</strong><br>
+            Ibarat panel instrumen pesawat: dari sini kamu bisa melihat semua perubahan, menandai yang siap 
+            (staging), menyimpan (commit), dan terbang mengirim kode ke GitHub (push).
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: LOGIN GITHUB DI VS CODE -->
+    <div class="slide" data-slide="5">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">05</span>
+          <span class="slide-tag">// Login</span>
+        </div>
+        <h2 class="slide-title anim-up">Login <span class="glow-text-blue">GitHub</span> di VS Code</h2>
+        <p class="slide-subtitle anim-up">Inilah langkah pentingnya: hubungkan VS Code dengan akun GitHub kamu agar bisa push kode.</p>
+
+        <div class="grid-2 anim-up">
+          <div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num">1</div>
+                <div>
+                  <strong style="font-size: 1rem;">Klik ikon akun di pojok kiri bawah</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Ikon lingkaran/avatar di kiri bawah VS Code (di bawah ikon ⚙️ pengaturan).
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num blue">2</div>
+                <div>
+                  <strong style="font-size: 1rem;">Klik "Sign in to GitHub"</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Dari menu itu pilih <span class="code-inline">Sign in to GitHub</span>. Browser akan terbuka otomatis.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num yellow">3</div>
+                <div>
+                  <strong style="font-size: 1rem;">Authorize di browser</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Login ke GitHub di browser (kalau belum) lalu klik <span class="code-inline">Authorize Visual Studio Code</span>.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="border-color: rgba(74, 222, 128, 0.3);">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num green">4</div>
+                <div>
+                  <strong style="font-size: 1rem;">Kembali ke VS Code — selesai! ✅</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    VS Code akan otomatis selesai login. Nama/avatar GitHub-mu muncul di pojok kiri bawah.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">VS Code — notifikasi login</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="term-comment"># Cara lain: dari panel Source Control</span></div>
+              <div><span class="term-accent">●</span> <span class="term-command">Sign in to GitHub</span></div>
+              <div style="height: 0.5rem;"></div>
+              <div><span class="term-comment"># VS Code akan meminta izin:</span></div>
+              <div><span class="term-blue">→</span> <span class="term-command">Open GitHub website</span></div>
+              <div><span class="term-blue">→</span> <span class="term-command">Login & click Authorize</span></div>
+              <div style="height: 0.5rem;"></div>
+              <div><span class="term-success">✓ You have successfully signed in to GitHub!</span></div>
+              <div style="height: 0.5rem;"></div>
+              <div><span class="term-comment"># Alternatif (bukan via browser):</span></div>
+              <div><span class="term-command">Sign in with a Personal Access Token</span></div>
+              <div style="color: var(--muted); font-size: 0.8rem;">di github.com → Settings → Developer settings → Personal access tokens</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="warn-box anim-up" style="margin-top: 1.5rem;">
+          <strong style="color: var(--accent-3);">⚠️ PERHATIAN:</strong><br>
+          Kalau muncul pilihan <span class="code-inline">Personal Access Token</span>, pilih opsi browser yang lebih mudah. 
+          Token hanya untuk yang sudah mahir — untuk pemula, login lewat browser jauh lebih simpel dan aman.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: COMMIT PERTAMA -->
+    <div class="slide" data-slide="6">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">06</span>
+          <span class="slide-tag">// Commit</span>
+        </div>
+        <h2 class="slide-title anim-up">Buat <span class="glow-text-blue">Commit Pertama</span></h2>
+        <p class="slide-subtitle anim-up">Sekarang kode kamu sudah "dipantau". Mari simpan perubahan pertama dengan commit.</p>
+
+        <div class="grid-2 anim-up">
+          <div class="vscode-mock">
+            <div class="vscode-titlebar">
+              <span style="color: #60a5fa;">▬</span> Source Control
+            </div>
+            <div class="vscode-body">
+              <div class="vscode-activity">
+                <div class="vscode-icon">🗂️</div>
+                <div class="vscode-icon">🔍</div>
+                <div class="vscode-icon active">⎇</div>
+                <div class="vscode-icon">🐞</div>
+                <div class="vscode-icon">🔎</div>
+              </div>
+              <div class="vscode-sidebar" style="display: block;">
+                <div class="vscode-sidebar-title">Source Control</div>
+                <div style="color: #cccccc; font-size: 0.78rem; margin-bottom: 0.4rem;">Changes (1)</div>
+                <div class="vscode-sidebar-item" style="background: #2a2d2e;">
+                  <span style="color: #fbbf24;">U</span> index.html
+                </div>
+                <div style="color: #6a9955; font-size: 0.75rem; margin: 0.6rem 0;">Stage All Changes +</div>
+                <div style="background: #3c3c3c; border-radius: 6px; padding: 0.5rem; color: #9d9d9d; font-size: 0.78rem;">Message (Ctrl+Enter to commit)</div>
+              </div>
+              <div class="vscode-main">
+                <div style="color: #cccccc; margin-bottom: 0.5rem;">Langkah-langkah:</div>
+                <div style="color: #9d9d9d; font-size: 0.8rem; line-height: 1.8;">
+                  <div>1️⃣ Klik <strong style="color: #fbbf24;">+</strong> pada file → staging</div>
+                  <div>2️⃣ Ketik pesan di kotak Message</div>
+                  <div>3️⃣ Klik tombol <strong style="color: #4ade80;">Commit</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num">1</div>
+                <div>
+                  <strong style="font-size: 1rem;">Stage perubahan (klik tanda +)</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Di panel Source Control, klik ikon <span class="code-inline">+</span> pada file untuk menandainya siap disimpan.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num blue">2</div>
+                <div>
+                  <strong style="font-size: 1rem;">Tulis pesan commit</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Misalnya: <span class="code-inline">"membuat halaman pertama"</span>. Pesan yang jelas membantu kita ingat apa yang berubah.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="border-color: rgba(74, 222, 128, 0.3);">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num green">3</div>
+                <div>
+                  <strong style="font-size: 1rem;">Klik Commit ✓</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Perubahan tersimpan di repository lokal. Kalau ada dialog "Always sign commits" → klik <span class="code-inline">Yes</span> saja.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">🎯 INGAT</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            Commit = <strong style="color: var(--accent-4);">save game</strong>. Masih di laptop sendiri dan belum sampai ke GitHub. 
+            Untuk mengirim ke GitHub, kita lanjut ke langkah <strong style="color: var(--accent-2);">push</strong> berikutnya!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: PUBLISH / PUSH -->
+    <div class="slide" data-slide="7">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">07</span>
+          <span class="slide-tag">// Push ke GitHub</span>
+        </div>
+        <h2 class="slide-title anim-up">Push ke <span class="glow-text-blue">GitHub</span></h2>
+        <p class="slide-subtitle anim-up">Commit pertama sudah jadi. Sekarang saatnya mengirim kode ke GitHub agar tersimpan di cloud dan bisa dibagikan.</p>
+
+        <div class="grid-2 anim-up">
+          <div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num">1</div>
+                <div>
+                  <strong style="font-size: 1rem;">Klik "Publish Branch"</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Setelah commit pertama, muncul tombol biru <span class="code-inline">Publish Branch</span> di panel Source Control.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num blue">2</div>
+                <div>
+                  <strong style="font-size: 1rem;">Pilih nama repository</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    VS Code menyarankan nama sesuai nama folder. Boleh diganti lalu tekan Enter.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num yellow">3</div>
+                <div>
+                  <strong style="font-size: 1rem;">Pilih Private atau Public</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    <span class="code-inline">Public</span> = siapa saja bisa lihat. <span class="code-inline">Private</span> = hanya kamu. Untuk tugas, Public boleh.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="border-color: rgba(74, 222, 128, 0.3);">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num green">4</div>
+                <div>
+                  <strong style="font-size: 1rem;">Selesai! 🎉</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Repository tercipta di GitHub dan kode berhasil ter-push. Cek di github.com → profilmu → tab Repositories.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">Git — yang terjadi di belakang layar</span>
+            </div>
+            <div class="terminal-body" style="font-size: 0.85rem;">
+              <div><span class="term-comment"># Ketika kamu klik Publish Branch,</span></div>
+              <div><span class="term-comment"># VS Code menjalankan ini:</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git remote add origin https://github.com/kamu/proyek-pertamaku.git</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git push -u origin main</span></div>
+              <div><span class="term-success">✓ Branch 'main' set up to track 'origin/main'.</span></div>
+              <div><span class="term-success">✓ Everything up-to-date</span></div>
+              <div style="height: 0.5rem;"></div>
+              <div><span class="term-comment"># Untuk commit berikutnya, cukup:</span></div>
+              <div><span class="term-blue">+</span> stage file → tulis pesan → <span class="term-command">Commit</span></div>
+              <div><span class="term-blue">→</span> lalu klik <span class="term-command">Sync Changes</span> (ikon 🔄 bawah) = push + pull sekaligus</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: COMMIT & PUSH BERIKUTNYA -->
+    <div class="slide" data-slide="8">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">08</span>
+          <span class="slide-tag">// Alur Kerja</span>
+        </div>
+        <h2 class="slide-title anim-up">Commit & Push <span class="glow-text-blue">Berikutnya</span></h2>
+        <p class="slide-subtitle anim-up">Setelah repository pertama tercipta, alur kerja selanjutnya selalu sama. Cukup 3 langkah:</p>
+
+        <div class="grid-3 anim-up" style="margin-top: 1rem;">
+          <div class="card card-glow" style="text-align: center;">
+            <div class="step-num" style="margin: 0 auto 1rem;">1</div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Edit Kode</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Ubah atau tambah file seperti biasa. VS Code akan otomatis mendeteksi perubahannya.
+            </p>
+          </div>
+
+          <div class="card" style="text-align: center;">
+            <div class="step-num blue" style="margin: 0 auto 1rem;">2</div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Stage + Commit</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Klik <span class="code-inline">+</span>, tulis pesan, klik <span class="code-inline">Commit</span>.
+            </p>
+          </div>
+
+          <div class="card" style="text-align: center;">
+            <div class="step-num green" style="margin: 0 auto 1rem;">3</div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Push / Sync</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Klik ikon <span class="code-inline">Sync Changes</span> (🔄) untuk mengirim ke GitHub.
+            </p>
+          </div>
+        </div>
+
+        <div class="anim-up" style="margin-top: 2rem;">
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">alur-kerja — 3 langkah sakti</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="term-comment"># Kalau kamu mau pakai terminal, perintahnya:</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git add .</span> <span class="term-comment"># tandai semua perubahan</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git commit -m </span><span class="term-yellow">"perbaiki tampilan"</span> <span class="term-comment"># simpan</span></div>
+              <div><span class="term-prompt">$ </span><span class="term-command">git push</span> <span class="term-comment"># kirim ke GitHub</span></div>
+              <div style="height: 0.5rem;"></div>
+              <div><span class="term-success">✓ 1 file changed, 3 insertions</span></div>
+              <div><span class="term-success">✓ To github.com:kamu/proyek-pertamaku.git</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">🔁 SIKLUS</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            Edit → Stage → Commit → Push, lalu ulangi lagi! Ini adalah <strong style="color: var(--accent-4);">ritual harian</strong> 
+            seorang programmer. Semakin sering commit, semakin rapi riwayat kerjamu.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: Cek di GitHub -->
+    <div class="slide" data-slide="9">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">09</span>
+          <span class="slide-tag">// Verifikasi</span>
+        </div>
+        <h2 class="slide-title anim-up">Cek Hasil di <span class="glow-text-blue">GitHub</span></h2>
+        <p class="slide-subtitle anim-up">Setelah push, buka browser dan lihat kode-mu sudah hidup di GitHub!</p>
+
+        <div class="grid-2 anim-up">
+          <div class="card card-glow">
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+              🐙 Di github.com
+            </h3>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 2;">
+              <div><span class="term-yellow">📁 github.com/kamu</span></div>
+              <div style="margin-left: 1rem;">└── <span class="term-accent">proyek-pertamaku</span></div>
+              <div style="margin-left: 2rem;">├── 📄 <span class="term-success">index.html</span></div>
+              <div style="margin-left: 2rem;">├── 🕐 <span class="term-output">"membuat halaman pertama"</span></div>
+              <div style="margin-left: 2rem;">└── 🔀 <span class="term-output">branch: main</span></div>
+            </div>
+            <div class="warn-box" style="margin-top: 1rem;">
+              <strong style="color: var(--accent-2);">🎉 Kalau file index.html muncul di GitHub, berarti kamu sudah berhasil!</strong>
+            </div>
+          </div>
+
+          <div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num">1</div>
+                <div>
+                  <strong style="font-size: 1rem;">Buka github.com dan login</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Klik avatar kamu (pojok kanan atas) → <span class="code-inline">Your repositories</span>.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num blue">2</div>
+                <div>
+                  <strong style="font-size: 1rem;">Klik nama repository-mu</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Misalnya <span class="code-inline">proyek-pertamaku</span>. Semua file kamu ada di sini.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num yellow">3</div>
+                <div>
+                  <strong style="font-size: 1rem;">Lihat riwayat commit</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Klik ikon <span class="code-inline">⏱️ (clock)</span> untuk melihat semua commit-mu, lengkap dengan pesannya.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: MASALAH UMUM -->
+    <div class="slide" data-slide="10">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">10</span>
+          <span class="slide-tag">// Solusi</span>
+        </div>
+        <h2 class="slide-title anim-up">Masalah yang <span class="glow-text-blue">Sering Terjadi</span></h2>
+        <p class="slide-subtitle anim-up">Tenang, kalau ada yang error — ini solusi untuk masalah paling umum.</p>
+
+        <div class="grid-2 anim-up">
+          <div class="card">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 1.5rem;">❌</span>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600;">"Please tell me who you are"</h3>
+            </div>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+              Kamu belum mengisi nama & email di Git.
+            </p>
+            <div style="font-family: 'JetBrains Mono'; font-size: 0.8rem; color: var(--accent-2);">
+              git config --global user.name "Nama"<br>
+              git config --global user.email "email"
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 1.5rem;">🔒</span>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600;">"Authentication failed"</h3>
+            </div>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+              Login GitHub belum selesai atau token salah. Ulangi proses login di VS Code: ikon akun → Sign in to GitHub.
+            </p>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 1.5rem;">🌳</span>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600;">"Repository not found"</h3>
+            </div>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+              Repository di GitHub tidak ditemukan. Pastikan sudah pernah di-publish, atau nama remote benar.
+            </p>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 1.5rem;">↩️</span>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600;">"Rejected / non-fast-forward"</h3>
+            </div>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 0.75rem;">
+              Ada perubahan dari teman yang belum kamu ambil. Klik <span class="code-inline">Sync Changes</span> atau <span class="code-inline">git pull</span> dulu, baru push lagi.
+            </p>
+          </div>
+        </div>
+
+        <div class="warn-box anim-up" style="margin-top: 1.5rem;">
+          <strong style="color: var(--accent-4);">💡 GOLDEN RULE:</strong> Kalau bingung dengan pesan error di terminal, 
+          salin teks errornya lalu cari di Google / chat AI. Jangan menyerah — semua programmer pernah ngalamin error yang sama!
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: PENUTUP -->
+    <div class="slide" data-slide="11">
+      <div style="max-width: 1100px; margin: 0 auto; width: 100%; text-align: center;">
+        <div class="anim-up" style="margin-bottom: 2rem;">
+          <svg width="120" height="120" viewBox="0 0 200 200" style="margin: 0 auto;">
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#60a5fa" stroke-width="3" stroke-dasharray="8 4"/>
+            <circle cx="100" cy="100" r="60" fill="#131826" stroke="#4ade80" stroke-width="2"/>
+            <path d="M 80 100 L 95 115 L 125 85" stroke="#4ade80" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <h2 class="slide-title anim-up" style="font-size: clamp(2.5rem, 5vw, 4rem);">
+          Selamat! Kamu Sudah Bisa<br><span class="glow-text-blue">Commit & Push</span> 🎉
+        </h2>
+
+        <p class="slide-subtitle anim-up" style="margin: 1rem auto 2rem; max-width: 600px;">
+          Kamu sudah bisa login GitHub dari VS Code, membuat commit, dan mengirim kode ke GitHub. 
+          Ini keterampilan yang dipakai programmer profesional setiap hari!
+        </p>
+
+        <div class="grid-3 anim-up" style="margin-bottom: 2rem;">
+          <div class="card" style="text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🔁</div>
+            <h4 style="font-family: 'Space Grotesk'; font-weight: 600; margin-bottom: 0.5rem;">Alur Kerja Kamu</h4>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Edit → Stage (+) → Commit → Push (Sync). Ulangi terus!
+            </p>
+          </div>
+          <div class="card" style="text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🧪</div>
+            <h4 style="font-family: 'Space Grotesk'; font-weight: 600; margin-bottom: 0.5rem;">Tantangan</h4>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Buat 3 commit berbeda di proyekmu. Lalu undang teman untuk berkolaborasi!
+            </p>
+          </div>
+          <div class="card" style="text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📚</div>
+            <h4 style="font-family: 'Space Grotesk'; font-weight: 600; margin-bottom: 0.5rem;">Belajar Lagi</h4>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Buka kembali materi <span class="code-inline">Git & GitHub</span> untuk paham konsepnya lebih dalam.
+            </p>
+          </div>
+        </div>
+
+        <div class="anim-up" style="padding: 1.5rem; background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(74, 222, 128, 0.08)); border-radius: 16px; border: 1px solid var(--accent-4);">
+          <p style="font-size: 1.1rem; line-height: 1.7;">
+            <strong style="color: var(--accent-4);">"Talk is cheap. Show me the code."</strong><br>
+            <span style="color: var(--muted); font-size: 0.95rem;">— Linus Torvalds, pencipta Git</span>
+          </p>
+        </div>
+
+        <p class="anim-up" style="margin-top: 2rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;">
+          // Kode pertamamu sudah di GitHub. Keep coding! 🚀
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation -->
+  <div class="navigation">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <div class="slide-info">
+      <span class="current" id="currentSlide">1</span> / <span id="totalSlides">12</span>
+    </div>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Keyboard hint -->
+  <div class="keyboard-hint">
+    <span>Gunakan</span>
+    <span class="kbd">←</span>
+    <span class="kbd">→</span>
+    <span>untuk navigasi</span>
+  </div>
+
+</div>
+
+<script>
+let currentSlide = 0;
+const totalSlides = 12;
+const slides = document.querySelectorAll('.slide');
+const progressBar = document.getElementById('progressBar');
+const currentSlideEl = document.getElementById('currentSlide');
+const totalSlidesEl = document.getElementById('totalSlides');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+totalSlidesEl.textContent = totalSlides;
+
+function updateSlide(newIndex) {
+  if (newIndex < 0 || newIndex >= totalSlides) return;
+
+  slides[currentSlide].classList.remove('active');
+  if (newIndex > currentSlide) {
+    slides[currentSlide].classList.add('prev');
+  } else {
+    slides[currentSlide].classList.remove('prev');
+  }
+
+  currentSlide = newIndex;
+  slides[currentSlide].classList.add('active');
+  slides[currentSlide].classList.remove('prev');
+
+  // Update progress
+  const progress = ((currentSlide + 1) / totalSlides) * 100;
+  progressBar.style.width = progress + '%';
+  currentSlideEl.textContent = currentSlide + 1;
+
+  // Update buttons
+  prevBtn.disabled = currentSlide === 0;
+  nextBtn.disabled = currentSlide === totalSlides - 1;
+
+  // Scroll to top of slide
+  slides[currentSlide].scrollTop = 0;
+}
+
+function nextSlide() { updateSlide(currentSlide + 1); }
+function prevSlide() { updateSlide(currentSlide - 1); }
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    nextSlide();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    prevSlide();
+  }
+});
+</script>
+
+</body>
+</html>

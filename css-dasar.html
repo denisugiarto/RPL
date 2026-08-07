@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Dasar — Presentasi Kelas X RPL</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+<style>
+  :root{
+    --blob-opacity: 0.35;
+    --slide-padding: 70px 40px 60px;
+    --slide-display: grid;
+    --slide-align: center;
+    --slide-justify: center;
+    --slide-inner-max-height: 100%;
+    --slide-inner-margin: auto;
+    --dot-active-bg: var(--css);
+    --hover-border: var(--css);
+    --hover-bg: rgba(0,217,192,0.06);
+    --drag-hover-border: var(--css);
+    --pulse-border-color: var(--css);
+  }
+  .slide{ display:grid; place-items:center; }
+  .bg-mesh{
+    position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(circle at 15% 15%, rgba(0,217,192,0.18), transparent 45%),
+      radial-gradient(circle at 85% 15%, rgba(139,92,246,0.14), transparent 45%),
+      radial-gradient(circle at 75% 85%, rgba(255,210,63,0.10), transparent 45%),
+      radial-gradient(circle at 20% 80%, rgba(255,77,141,0.10), transparent 45%),
+      var(--bg);
+  }
+  .slide::-webkit-scrollbar { width: 6px; }
+  .slide::-webkit-scrollbar-track { background: transparent; }
+  .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+  .slide::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+  .progress-fill{ background:linear-gradient(90deg,var(--css),var(--purple)); }
+  .logo-mark{ background:linear-gradient(135deg,var(--css),var(--purple)); }
+  .font-mono{ font-family: 'Consolas', 'Monaco', monospace; }
+  .code-block{
+    background:#0b0e12; border:1px solid var(--border);
+    border-radius:12px; padding:16px;
+    font-family:'Consolas', monospace; font-size:13px;
+    line-height:1.6; white-space:pre; overflow-x:auto;
+  }
+  .tag-css{ color:var(--css); }
+  .tag-attr{ color:var(--css); }
+  .tag-val{ color:var(--js); }
+  .code-text{ color:#9AA5B1; }
+  .code-comment{ color:#4b5563; font-style:italic; }
+
+  /* Demo interaktif: hover */
+  .demo-btn{
+    background:var(--card); border:1.5px solid var(--border);
+    color:var(--fg); padding:10px 24px; border-radius:10px;
+    cursor:pointer; transition:all .3s;
+  }
+  .demo-btn:hover{
+    background:var(--css); border-color:var(--css); color:#0F1419;
+    transform:translateY(-3px); box-shadow:0 12px 25px -8px var(--css);
+  }
+  /* Demo interaktif: position badge */
+  .pos-card{
+    position:relative; background:var(--card); border:1px solid var(--border);
+    border-radius:16px; padding:24px;
+  }
+  .pos-badge{
+    position:absolute; top:-12px; right:-12px;
+    background:linear-gradient(135deg,var(--css),var(--purple));
+    color:#0F1419; font-weight:700; font-size:11px;
+    padding:4px 12px; border-radius:99px;
+    font-family:'Space Grotesk',sans-serif;
+  }
+  /* Demo interaktif: flexbox value visualisasi */
+  .fbox{
+    display:flex; gap:6px; justify-content:center; align-items:center;
+    background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.15);
+    border-radius:10px; padding:10px; height:74px;
+  }
+  .fbox i{
+    display:grid; place-items:center; width:16px; height:16px; flex-shrink:0;
+    border-radius:4px; background:linear-gradient(135deg,var(--css),var(--purple));
+    font-size:9px; font-weight:700; color:#0F1419; font-style:normal;
+    font-family:'Consolas',monospace;
+  }
+  .fbox b{
+    display:block; width:16px; border-radius:4px;
+    background:linear-gradient(135deg,var(--css),var(--purple));
+  }
+  .val-card{ border:1px solid var(--border); border-radius:12px; padding:10px; background:#0b0e12; }
+  .val-card .vlabel{
+    display:block; text-align:center; font-family:'Consolas',monospace;
+    font-size:11px; font-weight:700; color:var(--css); margin-bottom:8px;
+  }
+  .val-card .vnote{
+    display:block; text-align:center; font-family:'Consolas',monospace;
+    font-size:9px; color:var(--muted); margin-top:6px;
+  }
+  /* Demo interaktif: grid value visualisasi */
+  .gbox{
+    display:grid; gap:6px;
+    background:rgba(255,255,255,0.03); border:1px dashed rgba(255,255,255,0.15);
+    border-radius:10px; padding:10px;
+  }
+  .gbox i{
+    display:block; border-radius:4px; min-height:26px;
+    background:linear-gradient(135deg,var(--purple),var(--pink));
+  }
+  .gbox.grid-fit{ grid-template-columns:repeat(auto-fit,minmax(40px,1fr)); }
+  @media (max-width:1024px){
+    .slide{ padding:70px 40px 60px; }
+  }
+  @media (max-width:640px){
+    .grid-3, .grid-4{ grid-template-columns:1fr; }
+    .slide{ padding:70px 18px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="grain"></div>
+<div class="blob" style="width:380px;height:380px;background:var(--css);top:-100px;left:-100px;"></div>
+<div class="blob" style="width:300px;height:300px;background:var(--purple);bottom:-80px;right:-80px;animation-delay:-4s;"></div>
+
+<div class="top-bar">
+  <div class="logo">
+    <div class="logo-mark"><i class="fa-solid fa-palette text-white text-xs"></i></div>
+    <div>
+      <p class="logo-text">CSS Dasar</p>
+      <p class="logo-sub">Kelas X RPL</p>
+    </div>
+  </div>
+  <div class="hint-keys hidden md:flex">
+    <span class="key">←</span><span class="key">→</span>
+    <span>untuk navigasi</span>
+  </div>
+</div>
+
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="deck">
+  <div class="slides" id="slides">
+
+    <!-- SLIDE 1: COVER -->
+    <section class="slide active" data-stage="cover">
+      <div class="slide-inner grid-2">
+        <div>
+          <div class="stage-pill mb-5 anim">
+            <span class="w-2 h-2 rounded-full bg-[var(--css)] pulse-dot"></span>
+            Modul Pembelajaran Web Front-End
+          </div>
+          <h1 class="font-display font-bold text-5xl md:text-7xl leading-[0.95] mb-6 anim-2">
+            <span style="color:var(--css)">CSS</span> Dasar
+          </h1>
+          <p class="text-base md:text-lg text-[var(--muted)] max-w-xl mb-8 anim-3">
+            HTML menyusun kerangka, CSS yang membuat website terlihat keren. Di sini kamu akan belajar cara mewarnai, mengatur font, dan menyusun tata letak halaman web.
+          </p>
+          <div class="flex flex-wrap gap-3 anim-4">
+            <button onclick="nextSlide()" class="px-6 py-3 rounded-xl font-semibold text-white text-sm" style="background:linear-gradient(135deg,var(--css),var(--purple))">
+              <i class="fa-solid fa-rocket mr-2"></i>Mulai Belajar
+            </button>
+            <button onclick="goToSlide(24)" class="px-6 py-3 rounded-xl font-semibold text-sm border border-[var(--border)] hover:bg-white/5">
+              Langsung ke Tugas
+            </button>
+          </div>
+        </div>
+        <div class="flex justify-center anim-3">
+          <!-- SVG Code Editor Illustration -->
+          <svg viewBox="0 0 400 480" class="w-full max-w-md">
+            <g transform="translate(50, 60)">
+              <!-- Editor Window -->
+              <rect width="300" height="360" rx="16" fill="var(--card)" stroke="var(--border)" stroke-width="2"/>
+              <!-- Top Bar -->
+              <rect width="300" height="40" rx="16 16 0 0" fill="#161C24"/>
+              <circle cx="20" cy="20" r="5" fill="#FF5F56"/>
+              <circle cx="40" cy="20" r="5" fill="#FFBD2E"/>
+              <circle cx="60" cy="20" r="5" fill="#27C93F"/>
+              <rect x="100" y="10" width="180" height="20" rx="5" fill="#0F1419"/>
+              <text x="190" y="24" text-anchor="middle" fill="var(--muted)" font-family="monospace" font-size="10">style.css</text>
+
+              <!-- Code Lines -->
+              <text x="20" y="80" fill="#4b5563" font-family="monospace" font-size="12" font-style="italic">/* style.css */</text>
+              <text x="20" y="110" fill="var(--css)" font-family="monospace" font-size="12">body</text>
+              <text x="40" y="140" fill="var(--css)" font-family="monospace" font-size="12">background</text>
+              <text x="150" y="140" fill="#9AA5B1" font-family="monospace" font-size="12">: </text>
+              <text x="165" y="140" fill="#FFD23F" font-family="monospace" font-size="12">#0F1419</text>
+              <text x="220" y="140" fill="#9AA5B1" font-family="monospace" font-size="12">;</text>
+              <text x="20" y="175" fill="var(--css)" font-family="monospace" font-size="12">h1</text>
+              <text x="40" y="205" fill="var(--css)" font-family="monospace" font-size="12">color</text>
+              <text x="150" y="205" fill="#9AA5B1" font-family="monospace" font-size="12">: </text>
+              <text x="165" y="205" fill="#FFD23F" font-family="monospace" font-size="12">#00D9C0</text>
+              <text x="220" y="205" fill="#9AA5B1" font-family="monospace" font-size="12">;</text>
+              <text x="40" y="235" fill="var(--css)" font-family="monospace" font-size="12">font-size</text>
+              <text x="150" y="235" fill="#9AA5B1" font-family="monospace" font-size="12">: </text>
+              <text x="165" y="235" fill="#FFD23F" font-family="monospace" font-size="12">42px</text>
+              <text x="220" y="235" fill="#9AA5B1" font-family="monospace" font-size="12">;</text>
+              <text x="20" y="265" fill="var(--css)" font-family="monospace" font-size="12">.kartu</text>
+              <text x="40" y="295" fill="var(--css)" font-family="monospace" font-size="12">border-radius</text>
+              <text x="150" y="295" fill="#9AA5B1" font-family="monospace" font-size="12">: </text>
+              <text x="165" y="295" fill="#FFD23F" font-family="monospace" font-size="12">16px</text>
+              <text x="220" y="295" fill="#9AA5B1" font-family="monospace" font-size="12">;</text>
+
+              <!-- Cursor -->
+              <rect x="20" y="300" width="2" height="14" fill="var(--css)" class="float-y">
+                <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+              </rect>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: APA ITU CSS -->
+    <section class="slide" data-stage="intro">
+      <div class="slide-inner">
+        <div class="text-center mb-10 anim">
+          <span class="stage-pill mb-4"><i class="fa-solid fa-palette" style="color:var(--css)"></i> Definisi</span>
+          <h2 class="font-display font-bold text-4xl md:text-6xl leading-tight">
+            Mengatur <span style="color:var(--css)">Tampilan</span>,<br>bukan struktur.
+          </h2>
+        </div>
+        <div class="grid-3 mt-10">
+          <div class="card p-6 anim-2" style="border-color:rgba(0,217,192,0.3)">
+            <div class="w-14 h-14 rounded-xl grid place-items-center mb-4" style="background:rgba(0,217,192,0.15);color:var(--css)">
+              <i class="fa-solid fa-paintbrush text-2xl"></i>
+            </div>
+            <h3 class="font-display font-bold text-xl mb-2">Cascading Style Sheets</h3>
+            <p class="text-sm text-[var(--muted)]">Kumpulan "aturan gaya" (style) yang menentukan bagaimana elemen HTML ditampilkan di browser.</p>
+          </div>
+          <div class="card p-6 anim-3" style="border-color:rgba(139,92,246,0.3)">
+            <div class="w-14 h-14 rounded-xl grid place-items-center mb-4" style="background:rgba(139,92,246,0.15);color:#c4b5fd">
+              <i class="fa-solid fa-ruler-combined text-2xl"></i>
+            </div>
+            <h3 class="font-display font-bold text-xl mb-2">Fokus Visual</h3>
+            <p class="text-sm text-[var(--muted)]">Mengatur warna, ukuran huruf, jarak antar elemen, border, dan tata letak (layout) halaman.</p>
+          </div>
+          <div class="card p-6 anim-4" style="border-color:rgba(255,210,63,0.3)">
+            <div class="w-14 h-14 rounded-xl grid place-items-center mb-4" style="background:rgba(255,210,63,0.15);color:var(--js)">
+              <i class="fa-solid fa-layer-group text-2xl"></i>
+            </div>
+            <h3 class="font-display font-bold text-xl mb-2">Berlapis (Cascading)</h3>
+            <p class="text-sm text-[var(--muted)]">Aturan bisa saling menimpa dan diwariskan dari induk ke anak — membuat styling lebih fleksibel.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: CARA MENAMBAHKAN CSS -->
+    <section class="slide" data-stage="metode">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-plug" style="color:var(--css)"></i> Cara Menambahkan</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            3 Cara <span style="color:var(--css)">Menghubungkan</span> CSS
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Kamu bisa menulis CSS langsung di elemen, di dalam file HTML, atau di file terpisah. Masing-masing punya kegunaannya sendiri.</p>
+
+          <div class="space-y-4 anim-4">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1.5 rounded-lg text-sm flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">Inline</span>
+              <span class="text-sm text-white/80">Langsung lewat atribut <span class="font-mono text-[var(--pink)]">style=""</span> di satu elemen.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1.5 rounded-lg text-sm flex-shrink-0" style="background:rgba(255,210,63,0.15);color:var(--js)">&lt;style&gt;</span>
+              <span class="text-sm text-white/80">Internal — ditulis di dalam tag <span class="font-mono text-[var(--js)]">&lt;style&gt;</span> di bagian &lt;head&gt;.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1.5 rounded-lg text-sm flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">&lt;link&gt;</span>
+              <span class="text-sm text-white/80">External — file <span class="font-mono text-[var(--css)]">.css</span> terpisah. Paling rapi &amp; bisa dipakai di banyak halaman. <b style="color:var(--css)">★ Dianjurkan</b></span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3">
+          <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css + index.html</p>
+          <div class="code-block text-xs">
+<span class="code-comment">/* style.css (external) */</span>
+<span class="tag-css">h1</span> <span class="code-text">{</span>
+  <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">#00D9C0</span><span class="code-text">;</span>
+  <span class="tag-attr">font-size</span><span class="code-text">: </span><span class="tag-val">40px</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+
+<span class="code-comment">&lt;!-- index.html --&gt;</span>
+<span class="tag-html">&lt;link</span> <span class="tag-attr">rel</span><span class="code-text">=</span><span class="tag-val">"stylesheet"</span> <span class="tag-attr">href</span><span class="code-text">=</span><span class="tag-val">"style.css"</span><span class="tag-html">&gt;</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: ANATOMI ATURAN CSS -->
+    <section class="slide" data-stage="anatomi">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-magnifying-glass" style="color:var(--css)"></i> Anatomi Aturan</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Bentuk dasar <span style="color:var(--css)">aturan CSS</span>
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Setiap aturan CSS terdiri dari tiga bagian: siapa yang dihias (selector), mau diubah apa (property), dan jadi seperti apa (value).</p>
+
+          <div class="space-y-4 anim-4">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1.5 rounded-lg text-sm" style="background:rgba(0,217,192,0.15);color:var(--css)">h1</span>
+              <span class="text-sm text-white/80">Selector — elemen HTML yang ingin diubah</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1.5 rounded-lg text-sm" style="background:rgba(255,210,63,0.15);color:var(--js)">color</span>
+              <span class="text-sm text-white/80">Property — bagian yang diubah (mis. warna)</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1.5 rounded-lg text-sm" style="background:rgba(255,77,141,0.15);color:var(--pink)">#00D9C0</span>
+              <span class="text-sm text-white/80">Value — nilai yang diberikan pada property</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 flex justify-center">
+          <div class="text-center">
+            <div class="text-center font-mono text-xl mb-4 leading-relaxed">
+              <span style="color:var(--css)">h1</span>
+              <span style="color:#9AA5B1"> { </span>
+              <span style="color:var(--css)">color</span>
+              <span style="color:#9AA5B1">: </span>
+              <span style="color:var(--js)">#00D9C0</span>
+              <span style="color:#9AA5B1">; }</span>
+            </div>
+            <svg viewBox="0 0 400 260" class="w-full max-w-sm mx-auto">
+              <!-- Rule Box -->
+              <rect x="20" y="70" width="360" height="60" rx="8" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2" stroke-dasharray="4 4"/>
+              <text x="200" y="110" text-anchor="middle" fill="var(--muted)" font-family="monospace" font-size="13">Aturan / Rule CSS</text>
+
+              <!-- Arrows -->
+              <path d="M 60 60 L 60 40 L 110 40" stroke="var(--css)" stroke-width="2" fill="none" marker-end="url(#arrC)"/>
+              <text x="70" y="32" text-anchor="middle" fill="var(--css)" font-size="11" font-family="monospace">Selector</text>
+
+              <path d="M 180 60 L 180 40 L 215 40" stroke="var(--js)" stroke-width="2" fill="none" marker-end="url(#arrJ)"/>
+              <text x="178" y="32" text-anchor="middle" fill="var(--js)" font-size="11" font-family="monospace">Property</text>
+
+              <path d="M 290 60 L 290 40 L 245 40" stroke="var(--pink)" stroke-width="2" fill="none" marker-end="url(#arrP)"/>
+              <text x="292" y="32" text-anchor="middle" fill="var(--pink)" font-size="11" font-family="monospace">Value</text>
+
+              <!-- Bottom note -->
+              <path d="M 200 140 L 200 170 L 60 170 L 60 190" stroke="var(--muted)" stroke-width="1.5" fill="none" marker-end="url(#arrM)"/>
+              <text x="60" y="210" fill="var(--muted)" font-size="11" font-family="monospace">pilih elemen</text>
+              <path d="M 200 140 L 200 170 L 330 170 L 330 190" stroke="var(--muted)" stroke-width="1.5" fill="none" marker-end="url(#arrM)"/>
+              <text x="285" y="212" fill="var(--muted)" font-size="11" font-family="monospace">ubah tampilannya</text>
+
+              <defs>
+                <marker id="arrC" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 z" fill="var(--css)"/></marker>
+                <marker id="arrJ" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 z" fill="var(--js)"/></marker>
+                <marker id="arrP" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 z" fill="var(--pink)"/></marker>
+                <marker id="arrM" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 z" fill="var(--muted)"/></marker>
+              </defs>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: SELEKTOR -->
+    <section class="slide" data-stage="selektor">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-crosshairs" style="color:var(--css)"></i> Selektor</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Memilih <span style="color:var(--css)">elemen yang dihias</span>
+          </h2>
+        </div>
+        <div class="grid-3 gap-8">
+          <div class="card p-6 anim-2" style="border-color:rgba(0,217,192,0.3)">
+            <h3 class="font-display font-bold text-lg mb-3"><span class="font-mono text-[var(--css)]">p</span> — Elemen</h3>
+            <p class="text-sm text-[var(--muted)] mb-4">Menargetkan semua tag dengan nama yang sama, misalnya semua <span class="font-mono">&lt;p&gt;</span>.</p>
+            <div class="code-block text-xs">
+<span class="tag-css">p</span> <span class="code-text">{</span>
+  <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">#9AA5B1</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+            <p class="text-xs text-[var(--muted)] mt-3">Memengaruhi <b class="text-white/80">semua</b> paragraf.</p>
+          </div>
+          <div class="card p-6 anim-3" style="border-color:rgba(139,92,246,0.3)">
+            <h3 class="font-display font-bold text-lg mb-3"><span class="font-mono text-[#c4b5fd]">.judul</span> — Class</h3>
+            <p class="text-sm text-[var(--muted)] mb-4">Menargetkan elemen dengan atribut <span class="font-mono">class="judul"</span>. Diawali <b>titik (.)</b>. Bisa dipakai banyak elemen.</p>
+            <div class="code-block text-xs">
+<span class="tag-css">.judul</span> <span class="code-text">{</span>
+  <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">#00D9C0</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+            <p class="text-xs text-[var(--muted)] mt-3">Dipakai berulang-ulang. <b class="text-white/80">Paling sering dipakai.</b></p>
+          </div>
+          <div class="card p-6 anim-4" style="border-color:rgba(255,210,63,0.3)">
+            <h3 class="font-display font-bold text-lg mb-3"><span class="font-mono text-[var(--js)]">#logo</span> — ID</h3>
+            <p class="text-sm text-[var(--muted)] mb-4">Menargetkan elemen dengan <span class="font-mono">id="logo"</span>. Diawali <b>pagar (#)</b>. Harus unik, hanya satu elemen.</p>
+            <div class="code-block text-xs">
+<span class="tag-css">#logo</span> <span class="code-text">{</span>
+  <span class="tag-attr">width</span><span class="code-text">: </span><span class="tag-val">80px</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+            <p class="text-xs text-[var(--muted)] mt-3">Hanya boleh 1 dalam satu halaman.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: CSS UNITS -->
+    <section class="slide" data-stage="unit">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-weight-hanging" style="color:var(--css)"></i> Satuan Ukuran</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Satuan <span style="color:var(--css)">panjang</span> di CSS
+          </h2>
+        </div>
+        <div class="grid-4">
+          <div class="card p-6 anim-2">
+            <div class="text-3xl font-display font-bold mb-2" style="color:var(--css)">px</div>
+            <h3 class="font-display font-bold text-lg mb-2">Pixel</h3>
+            <p class="text-sm text-[var(--muted)]">Satuan paling pasti. 1px = 1 titik di layar. Cocok untuk ukuran kecil &amp; border.</p>
+            <p class="text-xs mt-3 font-mono" style="color:var(--css)">font-size: 16px;</p>
+          </div>
+          <div class="card p-6 anim-3">
+            <div class="text-3xl font-display font-bold mb-2" style="color:#c4b5fd">%</div>
+            <h3 class="font-display font-bold text-lg mb-2">Persen</h3>
+            <p class="text-sm text-[var(--muted)]">Relatif terhadap elemen induknya. Serbaguna untuk lebar yang fleksibel.</p>
+            <p class="text-xs mt-3 font-mono" style="color:#c4b5fd">width: 50%;</p>
+          </div>
+          <div class="card p-6 anim-4">
+            <div class="text-3xl font-display font-bold mb-2" style="color:var(--js)">rem</div>
+            <h3 class="font-display font-bold text-lg mb-2">Rem</h3>
+            <p class="text-sm text-[var(--muted)]">Relatif terhadap ukuran font di root (&lt;html&gt;). Mudah diubah ukurannya sekaligus.</p>
+            <p class="text-xs mt-3 font-mono" style="color:var(--js)">font-size: 2rem;</p>
+          </div>
+          <div class="card p-6 anim-2" style="border-color:rgba(255,77,141,0.3)">
+            <div class="text-3xl font-display font-bold mb-2" style="color:var(--pink)">vw / vh</div>
+            <h3 class="font-display font-bold text-lg mb-2">Viewport</h3>
+            <p class="text-sm text-[var(--muted)]">Relatif terhadap lebar (vw) &amp; tinggi (vh) layar. Bagus untuk halaman penuh.</p>
+            <p class="text-xs mt-3 font-mono" style="color:var(--pink)">height: 100vh;</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: WARNA & BACKGROUND -->
+    <section class="slide" data-stage="warna">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-fill-drip" style="color:var(--css)"></i> Warna &amp; Latar</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Memberi <span style="color:var(--css)">warna</span> halaman
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">CSS bisa mewarnai teks, latar belakang elemen, bahkan menampilkan gambar sebagai background.</p>
+
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">color</span>
+              <span class="text-white/80">Warna teks</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">background-color</span>
+              <span class="text-white/80">Warna latar belakang</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">background-image</span>
+              <span class="text-white/80">Gambar sebagai latar</span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2 mt-6 anim-4">
+            <span class="px-3 py-1.5 rounded-lg text-xs font-mono" style="background:rgba(0,217,192,0.15);color:var(--css)">red</span>
+            <span class="px-3 py-1.5 rounded-lg text-xs font-mono" style="background:rgba(0,217,192,0.15);color:var(--css)">#00D9C0</span>
+            <span class="px-3 py-1.5 rounded-lg text-xs font-mono" style="background:rgba(0,217,192,0.15);color:var(--css)">rgb(0, 217, 192)</span>
+            <span class="text-xs text-[var(--muted)] self-center">→ nama, hex, rgb</span>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css</p>
+            <div class="code-block text-xs">
+<span class="tag-css">h1</span> <span class="code-text">{</span>
+  <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">#FFD23F</span><span class="code-text">;</span>
+  <span class="tag-attr">background-color</span><span class="code-text">: </span><span class="tag-val">#161C24</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="card p-5" style="background:#0b0e12">
+            <p class="text-xs text-[var(--muted)] mb-3 font-mono">Hasil di Browser:</p>
+            <h1 class="font-display font-bold text-2xl px-4 py-3 rounded-lg inline-block mb-3" style="color:#FFD23F;background:#161C24">Judul Berwarna</h1>
+            <div class="flex gap-3">
+              <span class="w-12 h-12 rounded-lg" style="background:#FF6B35"></span>
+              <span class="w-12 h-12 rounded-lg" style="background:#00D9C0"></span>
+              <span class="w-12 h-12 rounded-lg" style="background:#8B5CF6"></span>
+              <span class="w-12 h-12 rounded-lg" style="background:#FF4D8D"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: TEKS & FONT -->
+    <section class="slide" data-stage="font">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-font" style="color:var(--css)"></i> Tipografi</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Mengatur <span style="color:var(--css)">teks &amp; huruf</span>
+          </h2>
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">font-family</span>
+              <span class="text-white/80">Jenis huruf (Arial, Times, dsb.)</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">font-size</span>
+              <span class="text-white/80">Ukuran huruf</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">font-weight</span>
+              <span class="text-white/80">Ketebalan huruf (normal / bold)</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">text-align</span>
+              <span class="text-white/80">Rata teks (kiri, tengah, kanan)</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">line-height</span>
+              <span class="text-white/80">Jarak antar baris</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css</p>
+            <div class="code-block text-xs">
+<span class="tag-css">p</span> <span class="code-text">{</span>
+  <span class="tag-attr">font-family</span><span class="code-text">: </span><span class="tag-val">'Plus Jakarta Sans'</span><span class="code-text">;</span>
+  <span class="tag-attr">font-size</span><span class="code-text">: </span><span class="tag-val">18px</span><span class="code-text">;</span>
+  <span class="tag-attr">text-align</span><span class="code-text">: </span><span class="tag-val">center</span><span class="code-text">;</span>
+  <span class="tag-attr">line-height</span><span class="code-text">: </span><span class="tag-val">1.7</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="card p-5" style="background:#0b0e12">
+            <p class="text-xs text-[var(--muted)] mb-3 font-mono">Hasil di Browser:</p>
+            <p class="text-center text-[15px] leading-relaxed" style="font-family:'Plus Jakarta Sans'">
+              <span class="font-bold text-white">Teks ini di-tengah,</span><br>
+              dengan jarak antar baris yang nyaman dibaca.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: BOX MODEL -->
+    <section class="slide" data-stage="boxmodel">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-cube" style="color:var(--css)"></i> Konsep Kotak</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Semua elemen itu <span style="color:var(--css)">kotak</span>
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Setiap elemen HTML dianggap sebagai kotak dengan 4 lapisan. Ini fondasi untuk memahami jarak dan tata letak.</p>
+
+          <div class="space-y-4 anim-4">
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-lg grid place-items-center font-bold text-xs flex-shrink-0" style="background:rgba(255,107,53,0.2);color:var(--html)">1</span>
+              <div>
+                <b class="text-sm text-white">Content</b>
+                <p class="text-xs text-[var(--muted)]">Isi elemen — teks atau gambar.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-lg grid place-items-center font-bold text-xs flex-shrink-0" style="background:rgba(0,217,192,0.2);color:var(--css)">2</span>
+              <div>
+                <b class="text-sm text-white">Padding</b>
+                <p class="text-xs text-[var(--muted)]">Jarak antara isi dan border (ruang napas dalam).</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-lg grid place-items-center font-bold text-xs flex-shrink-0" style="background:rgba(255,210,63,0.2);color:var(--js)">3</span>
+              <div>
+                <b class="text-sm text-white">Border</b>
+                <p class="text-xs text-[var(--muted)]">Garis pembatas elemen.</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-10 h-10 rounded-lg grid place-items-center font-bold text-xs flex-shrink-0" style="background:rgba(139,92,246,0.2);color:#c4b5fd">4</span>
+              <div>
+                <b class="text-sm text-white">Margin</b>
+                <p class="text-xs text-[var(--muted)]">Jarak antara elemen ini dengan elemen lain (ruang napas luar).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 flex justify-center">
+          <svg viewBox="0 0 380 380" class="w-full max-w-sm">
+            <!-- Margin (outer) -->
+            <rect x="20" y="20" width="340" height="340" rx="12" fill="rgba(139,92,246,0.10)" stroke="#8B5CF6" stroke-width="2" stroke-dasharray="6 4"/>
+            <!-- Border -->
+            <rect x="70" y="70" width="240" height="240" rx="12" fill="rgba(255,210,63,0.10)" stroke="#FFD23F" stroke-width="3"/>
+            <!-- Padding -->
+            <rect x="110" y="110" width="160" height="160" rx="10" fill="rgba(0,217,192,0.10)" stroke="#00D9C0" stroke-width="3"/>
+            <!-- Content -->
+            <rect x="150" y="150" width="80" height="80" rx="8" fill="rgba(255,107,53,0.20)" stroke="#FF6B35" stroke-width="3"/>
+            <text x="190" y="183" text-anchor="middle" fill="#FF6B35" font-size="11" font-weight="700" font-family="monospace">content</text>
+
+            <!-- Labels -->
+            <text x="200" y="52" text-anchor="middle" fill="#8B5CF6" font-size="11" font-family="monospace" font-weight="700">margin</text>
+            <text x="200" y="335" text-anchor="middle" fill="#8B5CF6" font-size="11" font-family="monospace" font-weight="700">margin</text>
+            <text x="350" y="195" text-anchor="middle" fill="#FFD23F" font-size="11" font-family="monospace" font-weight="700">border</text>
+            <text x="32" y="195" text-anchor="middle" fill="#FFD23F" font-size="11" font-family="monospace" font-weight="700">border</text>
+            <text x="200" y="130" text-anchor="middle" fill="#00D9C0" font-size="11" font-family="monospace" font-weight="700">padding</text>
+            <text x="200" y="260" text-anchor="middle" fill="#00D9C0" font-size="11" font-family="monospace" font-weight="700">padding</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10: PADDING VS MARGIN -->
+    <section class="slide" data-stage="padmargin">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-arrows-left-right-to-line" style="color:var(--css)"></i> Jarak</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            <span style="color:var(--css)">Padding</span> vs <span style="color:#c4b5fd">Margin</span>
+          </h2>
+        </div>
+        <div class="grid-2 gap-8">
+          <div class="card p-6 anim-2">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-11 h-11 rounded-xl grid place-items-center" style="background:rgba(0,217,192,0.15);color:var(--css)">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i>
+              </div>
+              <h3 class="font-display font-bold text-xl">Padding — Jarak Dalam</h3>
+            </div>
+            <p class="text-sm text-[var(--muted)] mb-4">Ruang di <b class="text-white">dalam</b> elemen, antara konten dan border. Membuat teks tidak "menempel" pada tepi kotak.</p>
+            <div class="code-block text-xs mb-4">
+<span class="tag-css">.kartu</span> <span class="code-text">{</span>
+  <span class="tag-attr">padding</span><span class="code-text">: </span><span class="tag-val">20px</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+            <div class="p-4 rounded-lg border-2 border-dashed" style="border-color:rgba(0,217,192,0.5);background:rgba(0,217,192,0.08)">
+              <p class="text-sm">Teks punya ruang di dalam kotak.</p>
+            </div>
+          </div>
+          <div class="card p-6 anim-3">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-11 h-11 rounded-xl grid place-items-center" style="background:rgba(139,92,246,0.15);color:#c4b5fd">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              </div>
+              <h3 class="font-display font-bold text-xl">Margin — Jarak Luar</h3>
+            </div>
+            <p class="text-sm text-[var(--muted)] mb-4">Ruang di <b class="text-white">luar</b> elemen, antara elemen satu dengan yang lain. Menciptakan celah antar kartu.</p>
+            <div class="code-block text-xs mb-4">
+<span class="tag-css">.kartu</span> <span class="code-text">{</span>
+  <span class="tag-attr">margin</span><span class="code-text">: </span><span class="tag-val">20px</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+            <div class="flex gap-4 justify-between">
+              <div class="flex-1 p-3 rounded-lg text-center text-xs font-semibold" style="background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.4)">Kartu 1</div>
+              <div class="flex-1 p-3 rounded-lg text-center text-xs font-semibold" style="background:rgba(139,92,246,0.15);color:#c4b5fd;border:1px solid rgba(139,92,246,0.4)">Kartu 2</div>
+            </div>
+            <p class="text-[10px] text-[var(--muted)] mt-2 text-center">↑ margin memberi celah antar kartu</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11: BORDER & BORDER-RADIUS -->
+    <section class="slide" data-stage="border">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-border-all" style="color:var(--css)"></i> Garis Tepi</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Border &amp; sudut <span style="color:var(--css)">membulat</span>
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Border adalah garis pembatas elemen. Border-radius bisa membuat sudutnya membulat — dari kotak kaku jadi tampilan modern.</p>
+
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">border</span>
+              <span class="text-white/80">Ketebalan, gaya (solid/dashed/dotted), warna.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">border-radius</span>
+              <span class="text-white/80">Seberapa bulat sudutnya. 50% = lingkaran penuh.</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css</p>
+            <div class="code-block text-xs">
+<span class="tag-css">button</span> <span class="code-text">{</span>
+  <span class="tag-attr">border</span><span class="code-text">: </span><span class="tag-val">2px solid</span> <span class="tag-val">#00D9C0</span><span class="code-text">;</span>
+  <span class="tag-attr">border-radius</span><span class="code-text">: </span><span class="tag-val">12px</span><span class="code-text">;</span>
+  <span class="tag-attr">background</span><span class="code-text">: </span><span class="tag-val">transparent</span><span class="code-text">;</span>
+  <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">#00D9C0</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="card p-5 flex flex-wrap gap-3 items-center justify-center" style="background:#0b0e12">
+            <p class="text-xs text-[var(--muted)] w-full font-mono mb-1">Hasil di Browser:</p>
+            <button class="px-5 py-2 rounded font-semibold text-sm border-2" style="border-color:var(--css);background:transparent;color:var(--css)">Border 2px</button>
+            <button class="px-5 py-2 rounded-full font-semibold text-sm border-2" style="border-color:var(--css);background:transparent;color:var(--css)">Radius 99px</button>
+            <span class="w-12 h-12 rounded-full grid place-items-center font-bold" style="background:linear-gradient(135deg,var(--css),var(--purple));color:#0F1419">50%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12: POSITIONING -->
+    <section class="slide" data-stage="position">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-location-crosshairs" style="color:var(--css)"></i> Posisi Elemen</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Menggeser <span style="color:var(--css)">posisi</span> elemen
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Properti <span class="font-mono text-[var(--css)]">position</span> menentukan bagaimana elemen ditempatkan — termasuk yang bisa "menimpa" elemen lain.</p>
+
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">static</span>
+              <span class="text-white/80">Default. Mengikuti alur halaman biasa.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">relative</span>
+              <span class="text-white/80">Bergeser dari posisi aslinya dengan top/left.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">absolute</span>
+              <span class="text-white/80">Diposisikan relatif terhadap induknya. Bisa menimpa.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">fixed</span>
+              <span class="text-white/80">Menempel di layar, tidak ikut scroll (mis. navbar).</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 flex justify-center">
+          <div class="pos-card w-full max-w-xs">
+            <div class="pos-badge">BARU</div>
+            <p class="text-xs text-[var(--muted)] mb-1">Kartu Produk</p>
+            <div class="w-full h-24 rounded-lg grid place-items-center mb-3" style="background:rgba(0,217,192,0.15);color:var(--css)">
+              <i class="fa-solid fa-shirt text-3xl"></i>
+            </div>
+            <h3 class="font-display font-bold text-white">Kaos RPL</h3>
+            <p class="text-sm" style="color:var(--css)">Rp 75.000</p>
+            <p class="text-[11px] text-[var(--muted)] mt-3">Badge "BARU" memakai <span class="font-mono" style="color:var(--css)">position:absolute</span> agar menempel di sudut kartu.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 13: PSEUDO-CLASS & HOVER -->
+    <section class="slide" data-stage="pseudo">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-mouse-pointer" style="color:var(--css)"></i> Pseudo-class</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Gaya khusus saat <span style="color:var(--css)">berinteraksi</span>
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Pseudo-class menandai elemen dalam <b class="text-white">kondisi tertentu</b>. Paling populer: <span class="font-mono text-[var(--css)]">:hover</span> — gaya saat kursor di atas elemen.</p>
+
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">a:hover</span>
+              <span class="text-white/80">Saat kursor menyentuh elemen.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">li:first-child</span>
+              <span class="text-white/80">Elemen pertama dari induknya.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">li:nth-child(2)</span>
+              <span class="text-white/80">Elemen ke-2, ke-3, dst. (untuk baris tabel genap/ganjil).</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css</p>
+            <div class="code-block text-xs">
+<span class="tag-css">.demo-btn</span> <span class="code-text">{</span>
+  <span class="tag-attr">background</span><span class="code-text">: </span><span class="tag-val">#1A2229</span><span class="code-text">;</span>
+  <span class="tag-attr">transition</span><span class="code-text">: </span><span class="tag-val">all .3s</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+<span class="tag-css">.demo-btn:hover</span> <span class="code-text">{</span>
+  <span class="tag-attr">background</span><span class="code-text">: </span><span class="tag-val">#00D9C0</span><span class="code-text">;</span>
+  <span class="tag-attr">transform</span><span class="code-text">: </span><span class="tag-val">translateY(-3px)</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="card p-5 text-center" style="background:#0b0e12">
+            <p class="text-xs text-[var(--muted)] mb-3 font-mono">Coba arahkan kursor ke tombol ↓</p>
+            <button class="demo-btn">Tombol Ajaib ✨</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 14: FLEXBOX DASAR & SUMBU -->
+    <section class="slide" data-stage="flex-axis">
+      <div class="slide-inner">
+        <div class="mb-8">
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-bars" style="color:var(--css)"></i> Layout 1</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-4 anim-2">
+            Mengenal <span style="color:var(--css)">sumbu Flexbox</span>
+          </h2>
+          <p class="text-[var(--muted)] mb-5 anim-3">Flexbox menyusun elemen anak sepanjang <b class="text-white">satu arah</b>. Arah itu diatur <span class="font-mono text-[var(--css)]">flex-direction</span> — default <b class="text-white">row</b> (mendatar). Perhatikan urutan angka di tiap contoh di bawah:</p>
+
+          <div class="flex flex-wrap gap-3 anim-4 text-sm">
+            <span class="font-mono px-3 py-1.5 rounded-lg flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">display:flex</span>
+            <span class="font-mono px-3 py-1.5 rounded-lg flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">row → kiri ke kanan</span>
+            <span class="font-mono px-3 py-1.5 rounded-lg flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">row-reverse → kanan ke kiri</span>
+            <span class="font-mono px-3 py-1.5 rounded-lg flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">column → atas ke bawah</span>
+            <span class="font-mono px-3 py-1.5 rounded-lg flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">column-reverse → bawah ke atas</span>
+          </div>
+        </div>
+
+        <div class="anim-3">
+          <p class="text-xs text-[var(--muted)] mb-2 font-mono">Perbandingan flex-direction (urutan 1 → 2 → 3):</p>
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="val-card">
+              <span class="vlabel">row</span>
+              <div class="fbox" style="height:96px">
+                <i style="width:40px;height:40px;font-size:16px">1</i><i style="width:40px;height:40px;font-size:16px">2</i><i style="width:40px;height:40px;font-size:16px">3</i>
+              </div>
+              <span class="vnote">kiri → kanan (default)</span>
+            </div>
+            <div class="val-card">
+              <span class="vlabel">row-reverse</span>
+              <div class="fbox" style="flex-direction:row-reverse;height:96px">
+                <i style="width:40px;height:40px;font-size:16px">1</i><i style="width:40px;height:40px;font-size:16px">2</i><i style="width:40px;height:40px;font-size:16px">3</i>
+              </div>
+              <span class="vnote">kanan → kiri (terbalik)</span>
+            </div>
+            <div class="val-card">
+              <span class="vlabel">column</span>
+              <div class="fbox" style="flex-direction:column;height:132px">
+                <i style="width:40px;height:40px;font-size:16px">1</i><i style="width:40px;height:40px;font-size:16px">2</i><i style="width:40px;height:40px;font-size:16px">3</i>
+              </div>
+              <span class="vnote">atas → bawah (menumpuk)</span>
+            </div>
+            <div class="val-card">
+              <span class="vlabel">column-reverse</span>
+              <div class="fbox" style="flex-direction:column-reverse;height:132px">
+                <i style="width:40px;height:40px;font-size:16px">1</i><i style="width:40px;height:40px;font-size:16px">2</i><i style="width:40px;height:40px;font-size:16px">3</i>
+              </div>
+              <span class="vnote">bawah → atas (terbalik)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 15: JUSTIFY-CONTENT -->
+    <section class="slide" data-stage="justify">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-arrows-left-right" style="color:var(--css)"></i> Flexbox 2</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            justify-content — posisi <span style="color:var(--css)">sepanjang sumbu utama</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3">Mengatur posisi horizontal (jika <span class="font-mono" style="color:var(--css)">flex-direction:row</span>). Perhatikan 6 nilainya:</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 anim-2">
+          <div class="val-card">
+            <span class="vlabel">flex-start</span>
+            <div class="fbox" style="justify-content:flex-start;height:88px"><i style="width:28px;height:28px;font-size:12px">1</i><i style="width:28px;height:28px;font-size:12px">2</i><i style="width:28px;height:28px;font-size:12px">3</i></div>
+            <span class="vnote">rata kiri (default)</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">center</span>
+            <div class="fbox" style="justify-content:center;height:88px"><i style="width:28px;height:28px;font-size:12px">1</i><i style="width:28px;height:28px;font-size:12px">2</i><i style="width:28px;height:28px;font-size:12px">3</i></div>
+            <span class="vnote">di tengah</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">flex-end</span>
+            <div class="fbox" style="justify-content:flex-end;height:88px"><i style="width:28px;height:28px;font-size:12px">1</i><i style="width:28px;height:28px;font-size:12px">2</i><i style="width:28px;height:28px;font-size:12px">3</i></div>
+            <span class="vnote">rata kanan</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">space-between</span>
+            <div class="fbox" style="justify-content:space-between;height:88px"><i style="width:28px;height:28px;font-size:12px">1</i><i style="width:28px;height:28px;font-size:12px">2</i><i style="width:28px;height:28px;font-size:12px">3</i></div>
+            <span class="vnote">ujung kiri &amp; kanan</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">space-around</span>
+            <div class="fbox" style="justify-content:space-around;height:88px"><i style="width:28px;height:28px;font-size:12px">1</i><i style="width:28px;height:28px;font-size:12px">2</i><i style="width:28px;height:28px;font-size:12px">3</i></div>
+            <span class="vnote">jarak sama di tiap sisi</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">space-evenly</span>
+            <div class="fbox" style="justify-content:space-evenly;height:88px"><i style="width:28px;height:28px;font-size:12px">1</i><i style="width:28px;height:28px;font-size:12px">2</i><i style="width:28px;height:28px;font-size:12px">3</i></div>
+            <span class="vnote">jarak antar semua sama</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 16: ALIGN-ITEMS -->
+    <section class="slide" data-stage="align">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-arrows-up-down" style="color:var(--css)"></i> Flexbox 3</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            align-items — posisi <span style="color:var(--css)">sepanjang sumbu silang</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3">Mengatur posisi vertikal (jika <span class="font-mono" style="color:var(--css)">flex-direction:row</span>). Blok sengaja dibuat tinggi berbeda agar terlihat:</p>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 anim-2">
+          <div class="val-card">
+            <span class="vlabel">stretch</span>
+            <div class="fbox" style="align-items:stretch"><b style="width:10px"></b><b style="width:10px"></b><b style="width:10px"></b></div>
+            <span class="vnote">mengikuti tinggi wadah (default)</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">flex-start</span>
+            <div class="fbox" style="align-items:flex-start"><b style="height:12px"></b><b style="height:24px"></b><b style="height:36px"></b></div>
+            <span class="vnote">menempel di atas</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">center</span>
+            <div class="fbox" style="align-items:center"><b style="height:12px"></b><b style="height:24px"></b><b style="height:36px"></b></div>
+            <span class="vnote">di tengah vertikal</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">flex-end</span>
+            <div class="fbox" style="align-items:flex-end"><b style="height:12px"></b><b style="height:24px"></b><b style="height:36px"></b></div>
+            <span class="vnote">menempel di bawah</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">baseline</span>
+            <div class="fbox" style="align-items:baseline">
+              <b style="font-size:10px;line-height:1;padding:3px 5px;width:22px;height:auto">a</b>
+              <b style="font-size:19px;line-height:1;padding:5px 5px;width:22px;height:auto">x</b>
+              <b style="font-size:13px;line-height:1;padding:4px 5px;width:22px;height:auto">g</b>
+            </div>
+            <span class="vnote">rata dengan garis dasar huruf</span>
+          </div>
+          <div class="val-card flex items-center justify-center" style="min-height:104px">
+            <p class="text-xs text-[var(--muted)] text-center">💡 <span class="font-mono" style="color:var(--css)">align-items:center</span> paling sering dipakai untuk menengahkan ikon &amp; teks.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 17: FLEX-WRAP & GAP -->
+    <section class="slide" data-stage="flexwrap">
+      <div class="slide-inner">
+        <div class="mb-8">
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-arrows-turn-to-dots" style="color:var(--css)"></i> Flexbox 4</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-4 anim-2">
+            flex-wrap &amp; <span style="color:var(--css)">gap</span>
+          </h2>
+          <p class="text-[var(--muted)] mb-5 anim-3">Kalau isi terlalu banyak, <span class="font-mono text-[var(--css)]">flex-wrap</span> memutuskan apakah item turun ke baris baru. <span class="font-mono text-[var(--css)]">gap</span> mengatur jarak antar item.</p>
+
+          <div class="flex flex-wrap gap-3 anim-4 text-sm">
+            <span class="font-mono px-3 py-1.5 rounded-lg flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">nowrap → satu baris, bisa menyesak</span>
+            <span class="font-mono px-3 py-1.5 rounded-lg flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">wrap → pindah baris saat penuh</span>
+            <span class="font-mono px-3 py-1.5 rounded-lg flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">gap → jarak antar item</span>
+          </div>
+        </div>
+
+        <div class="anim-3">
+          <div class="flex flex-col md:flex-row gap-3">
+            <div class="val-card md:flex-1">
+              <span class="vlabel">flex-wrap: nowrap</span>
+              <div class="fbox" style="justify-content:flex-start;flex-wrap:nowrap;overflow:hidden;height:96px">
+                <i style="width:100px;height:32px;font-size:12px">1</i><i style="width:100px;height:32px;font-size:12px">2</i><i style="width:100px;height:32px;font-size:12px">3</i><i style="width:100px;height:32px;font-size:12px">4</i><i style="width:100px;height:32px;font-size:12px">5</i><i style="width:100px;height:32px;font-size:12px">6</i><i style="width:100px;height:32px;font-size:12px">7</i><i style="width:100px;height:32px;font-size:12px">8</i>
+              </div>
+              <span class="vnote">8 blok dipaksa satu baris, jadi terpotong/menyesak.</span>
+            </div>
+            <div class="val-card md:flex-1">
+              <span class="vlabel">flex-wrap: wrap</span>
+              <div class="fbox" style="justify-content:flex-start;flex-wrap:wrap;height:auto;min-height:76px">
+                <i style="width:100px;height:32px;font-size:12px">1</i><i style="width:100px;height:32px;font-size:12px">2</i><i style="width:100px;height:32px;font-size:12px">3</i><i style="width:100px;height:32px;font-size:12px">4</i><i style="width:100px;height:32px;font-size:12px">5</i><i style="width:100px;height:32px;font-size:12px">6</i><i style="width:100px;height:32px;font-size:12px">7</i><i style="width:100px;height:32px;font-size:12px">8</i>
+              </div>
+              <span class="vnote">8 blok turun ke baris baru saat penuh.</span>
+            </div>
+          </div>
+          <div class="val-card mt-3">
+            <span class="vlabel">gap: 16px</span>
+            <div class="fbox" style="justify-content:flex-start;gap:16px;height:96px">
+              <i style="width:100px;height:32px;font-size:12px">1</i><i style="width:100px;height:32px;font-size:12px">2</i><i style="width:100px;height:32px;font-size:12px">3</i>
+            </div>
+            <span class="vnote">jarak antar item melebar.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 18: GRID DASAR & KOLOM -->
+    <section class="slide" data-stage="gridcols">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-table-cells" style="color:var(--css)"></i> Layout 2</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Grid — <span style="color:var(--css)">baris &amp; kolom</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3">Kalau Flexbox menyusun satu baris, Grid menyusun dalam <b class="text-white">baris &amp; kolom sekaligus</b>. Ukuran kolom diatur <span class="font-mono" style="color:var(--css)">grid-template-columns</span>:</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4 anim-2">
+          <div class="val-card">
+            <span class="vlabel">grid-template-columns: 100px 100px 100px</span>
+            <div class="gbox" style="grid-template-columns:100px 100px 100px"><i></i><i></i><i></i></div>
+            <span class="vnote">ukuran tetap per kolom</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">grid-template-columns: 1fr 1fr 1fr</span>
+            <div class="gbox" style="grid-template-columns:1fr 1fr 1fr"><i></i><i></i><i></i></div>
+            <span class="vnote">1fr = bagi rata sisa ruang</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">grid-template-columns: repeat(3, 1fr)</span>
+            <div class="gbox" style="grid-template-columns:repeat(3,1fr)"><i></i><i></i><i></i></div>
+            <span class="vnote">repeat() = tanpa menulis ulang</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">grid-template-columns: 1fr 2fr 1fr</span>
+            <div class="gbox" style="grid-template-columns:1fr 2fr 1fr"><i></i><i></i><i></i></div>
+            <span class="vnote">fr bisa beda rasio (kolom tengah 2x)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 19: GRID BARIS & GAP -->
+    <section class="slide" data-stage="gridrows">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-table-columns" style="color:var(--css)"></i> Grid 2</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Baris &amp; <span style="color:var(--css)">gap</span> Grid
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Selain kolom, kamu juga bisa mengatur tinggi baris dengan <span class="font-mono text-[var(--css)]">grid-template-rows</span>, dan jarak antar sel dengan <span class="font-mono text-[var(--css)]">gap</span>.</p>
+
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">grid-template-rows</span>
+              <span class="text-white/80">Tinggi tiap baris.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">gap: 10px 20px</span>
+              <span class="text-white/80">Shorthand — (baris) (kolom).</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-3">
+          <div class="val-card">
+            <span class="vlabel">grid-template-rows: 34px 34px</span>
+            <div class="gbox" style="grid-template-columns:repeat(3,1fr);grid-template-rows:34px 34px"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <span class="vnote">2 baris dengan tinggi 34px</span>
+          </div>
+          <div class="val-card">
+            <span class="vlabel">gap: 12px 24px</span>
+            <div class="gbox" style="grid-template-columns:repeat(3,1fr);gap:12px 24px"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <span class="vnote">jarak antar baris 12px, antar kolom 24px</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 20: GRID AUTO-FIT -->
+    <section class="slide" data-stage="gridfit">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-expand" style="color:var(--css)"></i> Grid 3</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Galeri <span style="color:var(--css)">auto-fit</span> responsif
+          </h2>
+          <p class="text-[var(--muted)] mt-3 max-w-2xl mx-auto">Kombinasi <span class="font-mono" style="color:var(--css)">repeat(auto-fit, minmax(150px, 1fr))</span> membuat kolom otomatis menyesuaikan saat layar mengecil — tanpa perlu media query!</p>
+        </div>
+        <div class="grid-2 gap-6">
+          <div>
+            <div class="card p-5 anim-2">
+              <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css</p>
+              <div class="code-block text-xs">
+<span class="tag-css">.galeri</span> <span class="code-text">{</span>
+  <span class="tag-attr">display</span><span class="code-text">: </span><span class="tag-val">grid</span><span class="code-text">;</span>
+  <span class="tag-attr">grid-template-columns</span><span class="code-text">: </span><span class="tag-val">repeat(auto-fit, minmax(150px, 1fr))</span><span class="code-text">;</span>
+  <span class="tag-attr">gap</span><span class="code-text">: </span><span class="tag-val">10px</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+              </div>
+            </div>
+            <p class="text-xs text-[var(--muted)] mt-3 anim-3">Perhatikan beda jumlah kolom saat wadah lebar vs sempit:</p>
+          </div>
+          <div class="space-y-3 anim-3">
+            <div class="val-card">
+              <span class="vlabel">Wadah lebar → banyak kolom</span>
+              <div class="gbox grid-fit"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="val-card">
+              <span class="vlabel">Wadah sempit → kolom menyusut &amp; turun</span>
+              <div class="gbox grid-fit" style="max-width:150px"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 21: RESPONSIF & MEDIA QUERY -->
+    <section class="slide" data-stage="responsif">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-mobile-screen" style="color:var(--css)"></i> Responsif</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Website menyesuaikan <span style="color:var(--css)">semua layar</span>
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Media query mengubah gaya saat lebar layar tertentu tercapai — jadi di HP layout menumpuk, di desktop jadi kolom.</p>
+
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">@media (max-width: 640px)</span>
+              <span class="text-white/80">Aturan aktif saat layar ≤ 640px (HP).</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">@media (min-width: 1024px)</span>
+              <span class="text-white/80">Aturan aktif saat layar ≥ 1024px (desktop).</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css</p>
+            <div class="code-block text-xs">
+<span class="tag-css">.galeri</span> <span class="code-text">{</span>
+  <span class="tag-attr">display</span><span class="code-text">: </span><span class="tag-val">grid</span><span class="code-text">;</span>
+  <span class="tag-attr">grid-template-columns</span><span class="code-text">: </span><span class="tag-val">repeat(3, 1fr)</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+
+<span class="tag-css">@media (max-width: 640px)</span> <span class="code-text">{</span>
+  <span class="tag-css">.galeri</span> <span class="code-text">{</span>
+    <span class="tag-attr">grid-template-columns</span><span class="code-text">: </span><span class="tag-val">1fr</span><span class="code-text">;</span>
+  <span class="code-text">}</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="card p-4 flex items-center justify-around" style="background:#0b0e12">
+            <div class="text-center">
+              <p class="text-[10px] text-[var(--muted)] mb-2">Desktop ≥ 1024px</p>
+              <div class="grid grid-cols-3 gap-1 w-28">
+                <span class="h-6 rounded" style="background:rgba(0,217,192,0.5)"></span>
+                <span class="h-6 rounded" style="background:rgba(0,217,192,0.5)"></span>
+                <span class="h-6 rounded" style="background:rgba(0,217,192,0.5)"></span>
+              </div>
+            </div>
+            <i class="fa-solid fa-arrow-right text-[var(--muted)]"></i>
+            <div class="text-center">
+              <p class="text-[10px] text-[var(--muted)] mb-2">HP ≤ 640px</p>
+              <div class="grid grid-cols-1 gap-1 w-16">
+                <span class="h-6 rounded" style="background:rgba(0,217,192,0.5)"></span>
+                <span class="h-6 rounded" style="background:rgba(0,217,192,0.5)"></span>
+                <span class="h-6 rounded" style="background:rgba(0,217,192,0.5)"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 22: SEBELUM VS SESUDAH CSS -->
+    <section class="slide" data-stage="beforeafter">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--css)"></i> Perbandingan</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Kekuatan <span style="color:var(--css)">CSS</span> dalam sekejap
+          </h2>
+        </div>
+        <div class="grid-2 gap-8 items-stretch">
+          <div class="card p-6 anim-2" style="background:#0b0e12;border-color:rgba(255,107,53,0.3)">
+            <div class="flex items-center justify-between mb-4">
+              <p class="font-display font-bold text-lg" style="color:var(--html)">Sebelum CSS</p>
+              <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:rgba(255,107,53,0.15);color:var(--html)">HTML saja</span>
+            </div>
+            <div class="text-center py-4">
+              <p class="text-3xl mb-2">👤</p>
+              <h3 class="text-lg text-white">Budi</h3>
+              <p class="text-sm text-white/70">Pelajar RPL</p>
+              <div class="mt-3 space-y-1">
+                <p class="text-xs text-white/50">Home</p>
+                <p class="text-xs text-white/50">Tentang</p>
+                <p class="text-xs text-white/50">Kontak</p>
+              </div>
+            </div>
+          </div>
+          <div class="card p-6 anim-3" style="background:var(--card);border-color:rgba(0,217,192,0.3)">
+            <div class="flex items-center justify-between mb-4">
+              <p class="font-display font-bold text-lg" style="color:var(--css)">Sesudah CSS</p>
+              <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:rgba(0,217,192,0.15);color:var(--css)">HTML + CSS</span>
+            </div>
+            <div class="text-center py-4">
+              <div class="w-20 h-20 mx-auto rounded-full grid place-items-center text-3xl mb-3" style="background:linear-gradient(135deg,var(--css),var(--purple));color:#0F1419">B</div>
+              <h3 class="font-display font-bold text-xl text-white">Budi</h3>
+              <p class="text-sm" style="color:var(--css)">Pelajar RPL</p>
+              <div class="mt-3 flex justify-center gap-2">
+                <span class="text-[11px] px-3 py-1 rounded-full" style="background:rgba(0,217,192,0.15);color:var(--css);border:1px solid rgba(0,217,192,0.3)">Home</span>
+                <span class="text-[11px] px-3 py-1 rounded-full" style="background:rgba(255,255,255,0.06);border:1px solid var(--border)">Tentang</span>
+                <span class="text-[11px] px-3 py-1 rounded-full" style="background:rgba(255,255,255,0.06);border:1px solid var(--border)">Kontak</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 23: QUIZ -->
+    <section class="slide" data-stage="quiz">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-circle-question" style="color:var(--css)"></i> Quiz Singkat</span>
+          <h2 class="font-display font-bold text-3xl md:text-4xl">Coba kamu jawab! 🎯</h2>
+        </div>
+        <div id="quizContainer" class="max-w-3xl mx-auto space-y-4"></div>
+        <div id="quizResult" class="text-center mt-5 anim" style="display:none">
+          <div class="card p-5 inline-block">
+            <p class="font-display text-2xl font-bold mb-1" id="quizScore" style="color:var(--css)">0/5</p>
+            <p class="text-sm text-[var(--muted)]" id="quizFeedback">Kerja bagus!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 24: DRAG DROP -->
+    <section class="slide" data-stage="drag">
+      <div class="slide-inner">
+        <div class="text-center mb-5 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-hand-pointer" style="color:var(--css)"></i> Aktivitas 1</span>
+          <h2 class="font-display font-bold text-3xl md:text-4xl">Cocokkan Properti CSS dengan Fungsinya!</h2>
+          <p class="text-sm text-[var(--muted)] mt-2">Seret kartu fungsi ke properti CSS yang sesuai</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mb-4 anim-2" id="dragDropGrid">
+          <div class="drop-zone" data-stage="1">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--css)">padding</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="2">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--css)">margin</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="3">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--css)">border-radius</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="4">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--css)">color</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="5">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--css)">background-color</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+          <div class="drop-zone" data-stage="6">
+            <p class="text-[10px] font-bold mb-2 text-center" style="color:var(--css)">display:flex</p>
+            <div class="space-y-2 min-h-[70px]"></div>
+          </div>
+        </div>
+        <div class="p-3 rounded-xl flex flex-wrap gap-2 anim-3" id="dragItemsPool" style="background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1)">
+          <p class="w-full text-xs text-[var(--muted)] mb-1">📌 Seret kartu:</p>
+        </div>
+        <div class="mt-4 flex flex-wrap items-center gap-3 anim-4">
+          <button id="checkDragBtn" class="px-5 py-2 rounded-lg font-semibold text-white text-sm" style="background:linear-gradient(135deg,var(--css),var(--purple))">
+            <i class="fa-solid fa-check mr-1"></i>Cek Jawaban
+          </button>
+          <button id="resetDragBtn" class="px-5 py-2 rounded-lg font-semibold text-sm border border-[var(--border)] hover:bg-white/5">
+            <i class="fa-solid fa-rotate-left mr-1"></i>Reset
+          </button>
+          <span id="dragFeedback" class="text-sm font-medium"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 25: TUGAS -->
+    <section class="slide" data-stage="tugas">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3" style="border-color:rgba(0,217,192,0.3)"><i class="fa-solid fa-flag-checkered" style="color:var(--css)"></i> Tugas Akhir • Bobot 30%</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Misimu: <span style="color:var(--css)">Hiasi Halaman "Tentang Saya"</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3 max-w-2xl mx-auto">Gunakan halaman HTML yang sudah kamu buat sebelumnya, lalu percantik dengan semua kemampuan CSS yang sudah dipelajari.</p>
+        </div>
+        <div class="card p-6 mb-5 anim-2">
+          <p class="font-display font-bold text-lg mb-4">Syarat Wajib:</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-1 mt-1" style="color:var(--css)"></i>
+              <div>
+                <b class="text-sm">CSS External</b>
+                <p class="text-xs text-[var(--muted)]">Buat file <span class="font-mono">style.css</span> dan hubungkan dengan <span class="font-mono">&lt;link&gt;</span>.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-2 mt-1" style="color:var(--css)"></i>
+              <div>
+                <b class="text-sm">Warna &amp; Font</b>
+                <p class="text-xs text-[var(--muted)]">Set <span class="font-mono">color</span>, <span class="font-mono">background-color</span>, dan ganti <span class="font-mono">font-family</span>.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-3 mt-1" style="color:var(--css)"></i>
+              <div>
+                <b class="text-sm">Box Model</b>
+                <p class="text-xs text-[var(--muted)]">Terapkan <span class="font-mono">padding</span>, <span class="font-mono">margin</span>, dan <span class="font-mono">border</span> pada kartu profil.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-4 mt-1" style="color:var(--css)"></i>
+              <div>
+                <b class="text-sm">Layout</b>
+                <p class="text-xs text-[var(--muted)]">Susun bagian halaman pakai <span class="font-mono">flexbox</span> atau <span class="font-mono">grid</span>.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-5 mt-1" style="color:var(--css)"></i>
+              <div>
+                <b class="text-sm">Hover</b>
+                <p class="text-xs text-[var(--muted)]">Tombol atau link berubah gaya saat di-hover.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-6 mt-1" style="color:var(--css)"></i>
+              <div>
+                <b class="text-sm">Responsif</b>
+                <p class="text-xs text-[var(--muted)]">Halaman tetap rapi saat dibuka di HP (pakai <span class="font-mono">@media</span>).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card p-4 anim-4" style="background:rgba(0,217,192,0.05);border-color:rgba(0,217,192,0.2)">
+          <p class="text-xs font-semibold mb-2 flex items-center gap-2"><i class="fa-solid fa-circle-info" style="color:var(--css)"></i>Tugas dikumpulkan dalam format:</p>
+          <p class="text-sm text-white/90">2 file: <span class="font-mono text-[var(--css)]">tugas_css_nama.html</span> dan <span class="font-mono text-[var(--css)]">tugas_css_nama.css</span>. Pastikan keduanya di folder yang sama dan halaman tampil rapi di browser.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 26: CLOSING -->
+    <section class="slide" data-stage="closing">
+      <div class="slide-inner text-center">
+        <div class="inline-block mb-6 anim">
+          <div class="w-16 h-16 rounded-2xl grid place-items-center mx-auto" style="background:linear-gradient(135deg,var(--css),var(--purple))">
+            <i class="fa-solid fa-palette text-2xl text-white"></i>
+          </div>
+        </div>
+        <h2 class="font-display font-bold text-4xl md:text-6xl leading-tight mb-5 anim-2">
+          Website yang keren<br>dimulai dari <span style="color:var(--css)">selektor kecil</span>.
+        </h2>
+        <p class="text-lg text-[var(--muted)] max-w-2xl mx-auto mb-10 anim-3">
+          Cobalah mengubah-ubah warna, ukuran, dan jarak secara bebas. Semakin sering bereksperimen, semakin cepat kamu menguasai CSS!
+        </p>
+        <div class="flex flex-wrap gap-3 justify-center mb-12 anim-4">
+          <button onclick="goToSlide(0)" class="px-6 py-3 rounded-xl font-semibold text-white text-sm" style="background:linear-gradient(135deg,var(--css),var(--purple))">
+            <i class="fa-solid fa-arrow-up mr-2"></i>Ulang dari Awal
+          </button>
+        </div>
+        <p class="text-xs text-[var(--muted)] mt-8">Modul Pembelajaran CSS Dasar — Kelas X RPL • Dibuat dengan ❤️</p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" title="Slide sebelumnya">
+    <i class="fa-solid fa-chevron-left text-xs"></i>
+  </button>
+  <div class="dots" id="dots"></div>
+  <span class="slide-counter"><b id="curSlide">1</b> / <span id="totalSlides">26</span></span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" title="Slide berikutnya">
+    <i class="fa-solid fa-chevron-right text-xs"></i>
+  </button>
+  <button class="nav-btn" onclick="toggleFullscreen()" title="Fullscreen">
+    <i class="fa-solid fa-expand text-xs"></i>
+  </button>
+</div>
+
+<div class="toast" id="toast"><span id="toastText"></span></div>
+
+<script>
+  /* ========== SLIDE NAVIGATION ========== */
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let curSlide = 0;
+
+  document.getElementById('totalSlides').textContent = totalSlides;
+
+  const dotsContainer = document.getElementById('dots');
+  slides.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    dotsContainer.appendChild(dot);
+  });
+
+  function updateSlide() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === curSlide));
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === curSlide));
+    document.getElementById('curSlide').textContent = curSlide + 1;
+    document.getElementById('progressFill').style.width = ((curSlide + 1) / totalSlides * 100) + '%';
+    document.getElementById('prevBtn').disabled = curSlide === 0;
+    document.getElementById('nextBtn').disabled = curSlide === totalSlides - 1;
+
+    // Reset scroll position ke atas setiap kali pindah slide
+    if (slides[curSlide]) {
+      slides[curSlide].scrollTop = 0;
+    }
+  }
+
+  function goToSlide(i) {
+    curSlide = Math.max(0, Math.min(totalSlides - 1, i));
+    updateSlide();
+  }
+  function nextSlide() { goToSlide(curSlide + 1); }
+  function prevSlide() { goToSlide(curSlide - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+    else if (e.key === 'Home') goToSlide(0);
+    else if (e.key === 'End') goToSlide(totalSlides - 1);
+    else if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  });
+
+  // Swipe navigasi untuk mobile
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+  document.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(diff) > 60) {
+      if (diff < 0) nextSlide(); else prevSlide();
+    }
+  });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  updateSlide();
+
+  function adjustSlidePadding() {
+    const navBar = document.querySelector('.nav-bar');
+    if (navBar) {
+      const h = navBar.offsetHeight;
+      document.querySelectorAll('.slide-inner').forEach(s => s.style.paddingBottom = (h + 12) + 'px');
+    }
+  }
+  adjustSlidePadding();
+  window.addEventListener('resize', adjustSlidePadding);
+
+  /* ========== QUIZ ========== */
+  const quizData = [
+    {
+      q: "CSS adalah singkatan dari...",
+      options: ["Cascading Style Sheets", "Creative Style System", "Computer Styling Software", "Cascading Super Sheets"],
+      answer: 0
+    },
+    {
+      q: "Selektor manakah yang memilih semua elemen <p>?",
+      options: ["#p", ".p", "p", "&lt;p&gt;"],
+      answer: 2
+    },
+    {
+      q: "Properti untuk mengubah warna TEKS adalah...",
+      options: ["background-color", "text-style", "font-color", "color"],
+      answer: 3
+    },
+    {
+      q: "padding mengatur jarak...",
+      options: ["di luar elemen (antar elemen)", "di dalam elemen (antara isi & border)", "antara baris teks", "antar huruf"],
+      answer: 1
+    },
+    {
+      q: "display:flex digunakan untuk...",
+      options: ["menyusun elemen sejajar", "membulatkan sudut", "mengubah ukuran font", "menambah bayangan"],
+      answer: 0
+    }
+  ];
+
+  const quizContainer = document.getElementById('quizContainer');
+  const quizResult = document.getElementById('quizResult');
+  let userAnswers = new Array(quizData.length).fill(null);
+
+  quizData.forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = 'card p-5';
+    div.innerHTML = `
+      <div class="flex items-start gap-3 mb-3">
+        <span class="w-7 h-7 rounded-lg grid place-items-center font-bold text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">${idx+1}</span>
+        <p class="font-display font-semibold text-sm md:text-base pt-0.5">${item.q}</p>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-2" id="qOptions-${idx}">
+        ${item.options.map((opt, i) => `
+          <div class="quiz-opt" data-q="${idx}" data-i="${i}">
+            <span class="opt-letter">${String.fromCharCode(65+i)}</span>
+            <span class="text-sm font-mono">${opt}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    quizContainer.appendChild(div);
+  });
+
+  document.querySelectorAll('.quiz-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const q = parseInt(opt.dataset.q);
+      const i = parseInt(opt.dataset.i);
+      userAnswers[q] = i;
+
+      const options = document.querySelectorAll(`#qOptions-${q} .quiz-opt`);
+      options.forEach((o, idx) => {
+        o.classList.remove('correct', 'wrong');
+        if (idx === quizData[q].answer) o.classList.add('correct');
+        else if (idx === i && i !== quizData[q].answer) o.classList.add('wrong');
+        o.classList.add('disabled');
+      });
+
+      if (userAnswers.every(a => a !== null)) {
+        const score = userAnswers.reduce((acc, a, idx) => acc + (a === quizData[idx].answer ? 1 : 0), 0);
+        document.getElementById('quizScore').textContent = `${score}/${quizData.length}`;
+        const fb = document.getElementById('quizFeedback');
+        if (score === 5) { fb.textContent = 'Sempurna! Kamu menguasai CSS Dasar! 🎉'; document.getElementById('quizScore').style.color = '#22c55e'; }
+        else if (score >= 3) { fb.textContent = 'Bagus! Tinggal asah lagi properti CSS.'; document.getElementById('quizScore').style.color = 'var(--css)'; }
+        else { fb.textContent = 'Yuk baca lagi materinya pelan-pelan!'; document.getElementById('quizScore').style.color = 'var(--pink)'; }
+        quizResult.style.display = 'block';
+        showToast(`Quiz selesai! Skor: ${score}/${quizData.length}`);
+      }
+    });
+  });
+
+  /* ========== DRAG DROP ========== */
+  const dragItems = [
+    { id: 1, text: "Jarak di dalam elemen (isi & border)", stage: 1 },
+    { id: 2, text: "Jarak di luar elemen (antar elemen)", stage: 2 },
+    { id: 3, text: "Membulatkan sudut elemen", stage: 3 },
+    { id: 4, text: "Mengubah warna teks", stage: 4 },
+    { id: 5, text: "Mengubah warna latar belakang", stage: 5 },
+    { id: 6, text: "Menyusun elemen sejajar", stage: 6 }
+  ];
+
+  const pool = document.getElementById('dragItemsPool');
+  const dropZones = document.querySelectorAll('.drop-zone');
+
+  function shuffleItems() {
+    dropZones.forEach(z => z.querySelector('.space-y-2').innerHTML = '');
+    pool.innerHTML = '<p class="w-full text-xs text-[var(--muted)] mb-1">📌 Seret kartu:</p>';
+    const shuffled = [...dragItems].sort(() => Math.random() - 0.5);
+    shuffled.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'drag-item';
+      el.draggable = true;
+      el.dataset.id = item.id;
+      el.dataset.stage = item.stage;
+      el.textContent = item.text;
+      el.addEventListener('dragstart', e => {
+        el.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', item.id);
+      });
+      el.addEventListener('dragend', () => el.classList.remove('dragging'));
+      pool.appendChild(el);
+    });
+  }
+  shuffleItems();
+
+  dropZones.forEach(zone => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('over');
+      const id = e.dataTransfer.getData('text/plain');
+      const dragged = document.querySelector(`.drag-item[data-id="${id}"]`);
+      if (dragged) zone.querySelector('.space-y-2').appendChild(dragged);
+    });
+  });
+
+  pool.addEventListener('dragover', e => e.preventDefault());
+  pool.addEventListener('drop', e => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text/plain');
+    const dragged = document.querySelector(`.drag-item[data-id="${id}"]`);
+    if (dragged && !pool.contains(dragged)) pool.appendChild(dragged);
+  });
+
+  document.getElementById('checkDragBtn').addEventListener('click', () => {
+    let correct = 0;
+    dropZones.forEach(zone => {
+      const expected = zone.dataset.stage;
+      zone.querySelectorAll('.drag-item').forEach(item => {
+        if (item.dataset.stage === expected) {
+          item.style.borderColor = '#22c55e';
+          item.style.background = 'rgba(34,197,94,0.1)';
+          correct++;
+        } else {
+          item.style.borderColor = '#ef4444';
+          item.style.background = 'rgba(239,68,68,0.1)';
+        }
+      });
+    });
+    const fb = document.getElementById('dragFeedback');
+    if (correct === dragItems.length) {
+      fb.textContent = `🎉 Sempurna! ${correct}/${dragItems.length} benar!`;
+      fb.style.color = '#22c55e';
+      showToast('Kerja bagus! Kamu paham properti CSS.');
+    } else if (correct >= 3) {
+      fb.textContent = `Hampir! ${correct}/${dragItems.length} benar.`;
+      fb.style.color = 'var(--js)';
+    } else {
+      fb.textContent = `${correct}/${dragItems.length} benar. Coba lagi!`;
+      fb.style.color = 'var(--html)';
+    }
+  });
+
+  document.getElementById('resetDragBtn').addEventListener('click', () => {
+    shuffleItems();
+    document.getElementById('dragFeedback').textContent = '';
+  });
+
+  /* ========== TOAST ========== */
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+</script>
+</body>
+</html>

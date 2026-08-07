@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deploy Website dengan GitHub Pages</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg-card: #131826;
+  --bg-elevated: #1c2333;
+  --fg: #e8edf5;
+  --muted: #8b95a8;
+  --accent: #00d9c0;
+  --accent-2: #4ade80;
+  --accent-3: #fbbf24;
+  --accent-4: #60a5fa;
+  --border: #2a3344;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(0, 217, 192, 0.14) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(96, 165, 250, 0.12) 0%, transparent 45%),
+    radial-gradient(circle at 50% 50%, rgba(74, 222, 128, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(42, 51, 68, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42, 51, 68, 0.25) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+}
+
+.presentation {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+.progress-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: rgba(42, 51, 68, 0.5);
+  z-index: 100;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-4));
+  width: 10%;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(0, 217, 192, 0.6);
+}
+
+.slide-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 4rem 3rem 6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  overflow-y: auto;
+}
+
+.slide.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.slide.prev {
+  transform: translateX(-60px);
+}
+
+.slide::-webkit-scrollbar { width: 6px; }
+.slide::-webkit-scrollbar-track { background: transparent; }
+.slide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Navigation */
+.navigation {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: rgba(19, 24, 38, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  padding: 0.75rem 1.25rem;
+  border-radius: 100px;
+  z-index: 100;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.nav-btn {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--fg);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(0, 217, 192, 0.5);
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.slide-info {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--muted);
+  min-width: 70px;
+  text-align: center;
+}
+
+.slide-info .current {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Typography */
+.heading-display {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.glow-text {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 50%, var(--accent-4) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.glow-text-blue {
+  background: linear-gradient(135deg, var(--accent-4) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Slide 1: Cover */
+.cover-hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.cover-title {
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  margin-bottom: 1.5rem;
+}
+
+.cover-subtitle {
+  font-size: 1.15rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  max-width: 520px;
+}
+
+.badge-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.badge {
+  background: rgba(0, 217, 192, 0.1);
+  border: 1px solid rgba(0, 217, 192, 0.3);
+  color: var(--accent);
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.badge.green {
+  background: rgba(74, 222, 128, 0.1);
+  border-color: rgba(74, 222, 128, 0.3);
+  color: var(--accent-2);
+}
+
+.badge.yellow {
+  background: rgba(251, 191, 36, 0.1);
+  border-color: rgba(251, 191, 36, 0.3);
+  color: var(--accent-3);
+}
+
+.badge.blue {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: rgba(96, 165, 250, 0.3);
+  color: var(--accent-4);
+}
+
+.deploy-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deploy-svg {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  filter: drop-shadow(0 0 40px rgba(0, 217, 192, 0.4));
+  animation: floatLogo 6s ease-in-out infinite;
+}
+
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+}
+
+.floating-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: floatParticle 8s ease-in-out infinite;
+}
+
+@keyframes floatParticle {
+  0%, 100% { transform: translate(0, 0); opacity: 0.4; }
+  50% { transform: translate(20px, -30px); opacity: 0.8; }
+}
+
+.start-btn {
+  background: linear-gradient(135deg, var(--accent), #00a892);
+  color: #06201b;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 100px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 30px rgba(0, 217, 192, 0.4);
+  font-family: 'Outfit', sans-serif;
+}
+
+.start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 217, 192, 0.6);
+}
+
+/* Slide Headers */
+.slide-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.slide-number {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.slide-tag {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.slide-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.slide-subtitle {
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  max-width: 760px;
+}
+
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  border-color: var(--accent);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-4));
+}
+
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+/* Analogy box */
+.analogy-box {
+  background: linear-gradient(135deg, rgba(0, 217, 192, 0.08), rgba(74, 222, 128, 0.05));
+  border: 1px solid rgba(0, 217, 192, 0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.analogy-label {
+  position: absolute;
+  top: -10px;
+  left: 1.5rem;
+  background: var(--bg);
+  padding: 0 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+/* Terminal */
+.terminal {
+  background: #0d1117;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+}
+
+.terminal-header {
+  background: var(--bg-elevated);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.terminal-title {
+  margin-left: 0.5rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.terminal-body {
+  padding: 1.25rem;
+  line-height: 1.7;
+}
+
+.term-prompt { color: var(--accent-2); }
+.term-command { color: var(--fg); }
+.term-output { color: var(--muted); }
+.term-comment { color: #6b7280; font-style: italic; }
+.term-success { color: var(--accent-2); }
+.term-accent { color: var(--accent); }
+.term-yellow { color: var(--accent-3); }
+.term-blue { color: var(--accent-4); }
+
+/* Step cards */
+.step-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.step-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-3px);
+}
+
+.step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent), #00a892);
+  color: #06201b;
+}
+
+.step-num.blue { background: linear-gradient(135deg, var(--accent-4), #3b82f6); color: white; }
+.step-num.green { background: linear-gradient(135deg, var(--accent-2), #22c55e); color: var(--bg); }
+.step-num.yellow { background: linear-gradient(135deg, var(--accent-3), #f59e0b); color: var(--bg); }
+
+/* URL bar mockup */
+.browser-mock {
+  background: #1e1e2e;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.browser-toolbar {
+  background: #2a2a3a;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.browser-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.browser-url {
+  flex: 1;
+  background: #3a3a4a;
+  color: #cccccc;
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.browser-body {
+  padding: 2rem;
+  text-align: center;
+  color: var(--fg);
+}
+
+.warn-box {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--fg);
+}
+
+/* Animations */
+.slide.active .anim-up {
+  animation: animUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) backwards;
+}
+
+.slide.active .anim-up:nth-child(1) { animation-delay: 0.1s; }
+.slide.active .anim-up:nth-child(2) { animation-delay: 0.2s; }
+.slide.active .anim-up:nth-child(3) { animation-delay: 0.3s; }
+.slide.active .anim-up:nth-child(4) { animation-delay: 0.4s; }
+.slide.active .anim-up:nth-child(5) { animation-delay: 0.5s; }
+.slide.active .anim-up:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes animUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Code badge inline */
+.code-inline {
+  font-family: 'JetBrains Mono', monospace;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.9em;
+  color: var(--accent);
+}
+
+.code-inline.green { color: var(--accent-2); }
+.code-inline.yellow { color: var(--accent-3); }
+.code-inline.blue { color: var(--accent-4); }
+
+/* Icon container */
+.icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  background: rgba(0, 217, 192, 0.1);
+  border: 1px solid rgba(0, 217, 192, 0.2);
+}
+
+.icon-wrap.green { background: rgba(74, 222, 128, 0.1); border-color: rgba(74, 222, 128, 0.2); }
+.icon-wrap.yellow { background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.2); }
+.icon-wrap.blue { background: rgba(96, 165, 250, 0.1); border-color: rgba(96, 165, 250, 0.2); }
+
+/* Keyboard hint */
+.keyboard-hint {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 50;
+}
+
+.kbd {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+@media (max-width: 768px) { .keyboard-hint { display: none; } }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .slide { padding: 3rem 1.5rem 5rem; }
+  .cover-hero { grid-template-columns: 1fr; gap: 1.5rem; }
+  .deploy-svg { max-width: 240px; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .slide-title { font-size: 2rem; }
+}
+
+@media (max-width: 600px) {
+  .navigation { padding: 0.5rem 0.75rem; gap: 0.5rem; }
+  .nav-btn { width: 38px; height: 38px; }
+  .slide-info { font-size: 0.8rem; min-width: 50px; }
+}
+</style>
+</head>
+<body>
+
+<div class="presentation">
+  <!-- Progress Bar -->
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <!-- Slides -->
+  <div class="slide-container">
+
+    <!-- SLIDE 1: COVER -->
+    <div class="slide active" data-slide="0">
+      <div class="cover-hero">
+        <div>
+          <div class="badge-row anim-up">
+            <span class="badge">TUTORIAL PRAKTIK</span>
+            <span class="badge blue">RPL - KELAS X</span>
+            <span class="badge green">Lanjutan Git</span>
+          </div>
+          <h1 class="cover-title anim-up">
+            Deploy Website<br>
+            dengan <span class="glow-text">GitHub Pages</span>
+          </h1>
+          <p class="cover-subtitle anim-up">
+            Ubah repository Git kamu menjadi <strong style="color: var(--fg);">website gratis</strong> 
+            yang bisa diakses semua orang lewat internet. Tanpa server, tanpa biaya, cukup beberapa klik!
+          </p>
+          <div class="anim-up">
+            <button class="start-btn" onclick="nextSlide()">
+              Mulai Deploy
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="deploy-container anim-up">
+          <div class="floating-particle" style="width: 12px; height: 12px; background: var(--accent); top: 10%; left: 10%;"></div>
+          <div class="floating-particle" style="width: 8px; height: 8px; background: var(--accent-2); top: 80%; left: 20%; animation-delay: 2s;"></div>
+          <div class="floating-particle" style="width: 10px; height: 10px; background: var(--accent-4); top: 30%; right: 5%; animation-delay: 4s;"></div>
+
+          <svg class="deploy-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+            <!-- Laptop screen -->
+            <rect x="90" y="70" width="220" height="150" rx="14" fill="#131826" stroke="#00d9c0" stroke-width="3"/>
+            <rect x="100" y="80" width="200" height="130" rx="8" fill="#0d1117"/>
+            <circle cx="120" cy="100" r="6" fill="#ef4444"/>
+            <circle cx="136" cy="100" r="6" fill="#fbbf24"/>
+            <circle cx="152" cy="100" r="6" fill="#4ade80"/>
+            <rect x="110" y="118" width="90" height="12" rx="3" fill="#00d9c0" opacity="0.8"/>
+            <rect x="110" y="138" width="70" height="8" rx="4" fill="#2a3344"/>
+            <rect x="110" y="152" width="120" height="8" rx="4" fill="#2a3344"/>
+            <rect x="110" y="166" width="55" height="8" rx="4" fill="#2a3344"/>
+            <text x="200" y="195" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#8b95a8">your-website.com</text>
+            <!-- Laptop base -->
+            <rect x="90" y="225" width="240" height="12" rx="6" fill="#1c2333"/>
+            <path d="M 90 232 Q 200 245 320 232" stroke="#2a3344" stroke-width="4" fill="none"/>
+            <!-- GitHub marks / rockets -->
+            <path d="M 60 120 L 90 100 M 340 100 L 310 100" stroke="#60a5fa" stroke-width="3" stroke-dasharray="4 4" fill="none" opacity="0.7"/>
+            <circle cx="55" cy="120" r="6" fill="#0a0e1a" stroke="#60a5fa" stroke-width="3"/>
+            <circle cx="345" cy="100" r="6" fill="#0a0e1a" stroke="#60a5fa" stroke-width="3"/>
+            <text x="45" y="100" text-anchor="middle" font-family="JetBrains Mono" font-size="12" fill="#60a5fa">git push</text>
+            <text x="340" y="80" text-anchor="middle" font-family="JetBrains Mono" font-size="12" fill="#4ade80">deploy</text>
+            <!-- Earth -->
+            <circle cx="200" cy="330" r="40" fill="none" stroke="#00d9c0" stroke-width="3" stroke-dasharray="6 6"/>
+            <circle cx="200" cy="330" r="18" fill="#131826" stroke="#00d9c0" stroke-width="2"/>
+            <path d="M 190 325 L 210 335" stroke="#fbbf24" stroke-width="3" stroke-width="2"/>
+            <text x="200" y="296" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#8b95a8">🌍 semua orang bisa akses</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: APA ITU GITHUB PAGES -->
+    <div class="slide" data-slide="1">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">01</span>
+          <span class="slide-tag">// Pengenalan</span>
+        </div>
+        <h2 class="slide-title anim-up">Apa itu <span class="glow-text">GitHub Pages</span>?</h2>
+        <p class="slide-subtitle anim-up">Layanan gratis dari GitHub untuk mengubah repository menjadi website yang bisa diakses di internet.</p>
+
+        <div class="grid-2 anim-up" style="margin-top: 1rem;">
+          <div class="card card-glow">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div class="icon-wrap" style="margin: 0; width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d9c0" stroke-width="2.5">
+                  <path d="M12 2l7 4v6c0 4.7-3 8.5-7 10-4-1.5-7-5.3-7-10V6l7-4z"/>
+                  <path d="M9 12l2 2 4-4"/>
+                </svg>
+              </div>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; font-weight: 600;">Apa yang bisa dibuat?</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.95rem; color: var(--muted); line-height: 1.5;">
+              <div>📄 Halaman statis (HTML, CSS, JS)</div>
+              <div>👤 Website portofolio pribadi</div>
+              <div>📚 Dokumentasi proyek</div>
+              <div>🎨 Landing page / blog sederhana</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div class="icon-wrap blue" style="margin: 0; width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5">
+                  <path d="M5 3l14 9-14 9V3z"/>
+                </svg>
+              </div>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.2rem; font-weight: 600;">Kelebihan utama</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.6rem; font-size: 0.9rem; color: var(--muted); line-height: 1.5;">
+              <p>✅ <strong style="color: var(--fg);">100% gratis</strong> dan tanpa biaya server</p>
+              <p>✅ <strong style="color: var(--fg);">Deploy otomatis</strong> saat kamu push</p>
+              <p>✅ <strong style="color: var(--fg);">HTTPS</strong> (aman) otomatis aktif</p>
+              <p>✅ <strong style="color: var(--fg);">Domain gratis</strong>: username.github.io</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">💡 ANALOGI</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            <strong style="color: var(--accent);">GitHub Pages itu seperti pura-pura "memajang hasil kerajinanmu di etalase toko".</strong><br>
+            Kode yang tadinya cuma tersimpan di repository (di gudang), sekarang dipajang di etalase (internet) 
+            agar siapa saja bisa datang melihat dan mengaksesnya.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: PERSIAPAN -->
+    <div class="slide" data-slide="2">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">02</span>
+          <span class="slide-tag">// Prasyarat</span>
+        </div>
+        <h2 class="slide-title anim-up">Yang Harus <span class="glow-text-blue">Disiapkan</span></h2>
+        <p class="slide-subtitle anim-up">Sebelum deploy, pastikan 3 hal ini sudah ada. Kalau belum, selesaikan dulu ya!</p>
+
+        <div class="grid-3 anim-up" style="margin-top: 1rem;">
+          <div class="card card-glow">
+            <div class="icon-wrap">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00d9c0" stroke-width="2">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Repository di GitHub</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Proyek yang sudah kamu push ke GitHub (dari materi Git di VS Code).
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="icon-wrap blue">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">File index.html</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              File utama website. GitHub Pages secara otomatis menampilkan file yang bernama <span class="code-inline green">index.html</span> ini.
+            </p>
+          </div>
+
+          <div class="card">
+            <div class="icon-wrap green">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+            </div>
+            <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem;">Perubahan Sudah di-commit</h3>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Pastikan semua file sudah kamu commit dan push ke branch <span class="code-inline yellow">main</span>.
+            </p>
+          </div>
+        </div>
+
+        <div class="warn-box anim-up" style="margin-top: 1.5rem;">
+          <strong style="color: var(--accent-3);">⚠️ PERHATIAN:</strong> Nama file utama HARUS <span class="code-inline">index.html</span>. 
+          Kalau namanya beda (misal <span class="code-inline">index2.html</span> atau <span class="code-inline">beranda.html</span>), 
+          website tidak akan tampil otomatis saat dibuka.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: CARA AKTIFKAN (SETTINGS) -->
+    <div class="slide" data-slide="3">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">03</span>
+          <span class="slide-tag">// Cara 1 - Manual</span>
+        </div>
+        <h2 class="slide-title anim-up">Aktifkan lewat <span class="glow-text-blue">Settings</span></h2>
+        <p class="slide-subtitle anim-up">Cara paling mudah dan cukup dilakukan sekali. Mari aktifkan GitHub Pages dari menu Settings repository.</p>
+
+        <div class="grid-2 anim-up" style="margin-top: 1rem;">
+          <div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num">1</div>
+                <div>
+                  <strong style="font-size: 1rem;">Buka repository di GitHub</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Masuk ke github.com → buka repository proyekmu.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num blue">2</div>
+                <div>
+                  <strong style="font-size: 1rem;">Klik menu Settings</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Tab <span class="code-inline">Settings</span> paling kanan di baris menu repository.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num yellow">3</div>
+                <div>
+                  <strong style="font-size: 1rem;">Klik menu Pages</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Di sidebar kiri, cari dan klik <span class="code-inline blue">Pages</span> (bagian "Code and automation").
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="border-color: rgba(74, 222, 128, 0.3);">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num green">4</div>
+                <div>
+                  <strong style="font-size: 1rem;">Pilih branch lalu Save</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Atur "Source" ke <span class="code-inline">Deploy from a branch</span>, pilih branch <span class="code-inline">main</span>, folder <span class="code-inline">/ (root)</span>, lalu klik <span class="code-inline">Save</span>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="terminal">
+              <div class="terminal-header">
+                <div class="terminal-dot" style="background: #ef4444;"></div>
+                <div class="terminal-dot" style="background: #fbbf24;"></div>
+                <div class="terminal-dot" style="background: #4ade80;"></div>
+                <span class="terminal-title">github.com/kamu/proyek-pertamaku → Settings → Pages</span>
+              </div>
+              <div class="terminal-body" style="font-size: 0.85rem;">
+                <div><span class="term-blue">Build and deployment</span></div>
+                <div><span class="term-comment">Source:</span></div>
+                <div><span class="term-yellow">●</span> Deploy from a branch</div>
+                <div style="height: 0.4rem;"></div>
+                <div><span class="term-comment">Branch:</span></div>
+                <div><span class="term-success">main</span> <span class="term-output">/ (root)</span></div>
+                <div style="height: 0.6rem;"></div>
+                <div><span class="term-command">[ Save ]</span></div>
+                <div style="height: 1rem;"></div>
+                <div><span class="term-comment"># Setelah save, tunggu 1-2 menit.</span></div>
+                <div><span class="term-comment"># Pesan sukses muncul:</span></div>
+                <div><span class="term-success">✓ Your site is published at</span></div>
+                <div><span class="term-blue">https://username.github.io/proyek-pertamaku/</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: ALAMAT WEBSITE -->
+    <div class="slide" data-slide="4">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">04</span>
+          <span class="slide-tag">// URL</span>
+        </div>
+        <h2 class="slide-title anim-up">Format <span class="glow-text-blue">Alamat Website</span></h2>
+        <p class="slide-subtitle anim-up">Setiap repository mendapat alamat unik. Pahami pola-nya supaya bisa menebak dan membaginya.</p>
+
+        <div class="grid-2 anim-up" style="margin-top: 1rem;">
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">Rumus URL GitHub Pages</span>
+            </div>
+            <div class="terminal-body">
+              <div><span class="term-comment"># Website biasa:</span></div>
+              <div><span class="term-accent">https://</span><span class="term-command">username</span><span class="term-yellow">.github.io</span><span class="term-command">/nama-repositori/</span></div>
+              <div style="height: 0.6rem;"></div>
+              <div><span class="term-comment"># Contoh nyata:</span></div>
+              <div><span class="term-blue">https://andra</span><span class="term-yellow">.github.io</span><span class="term-command">/portofolio/</span></div>
+              <div style="height: 0.6rem;"></div>
+              <div><span class="term-comment"># Repository khusus username.github.io:</span></div>
+              <div><span class="term-blue">https://</span><span class="term-command">username</span><span class="term-yellow">.github.io</span></div>
+              <div style="height: 0.6rem;"></div>
+              <div><span class="term-comment"># (repo pertama itu = website utama, tanpa nama repositori)</span></div>
+            </div>
+          </div>
+
+          <div class="browser-mock">
+            <div class="browser-toolbar">
+              <div class="browser-btn" style="background: #ef4444;"></div>
+              <div class="browser-btn" style="background: #fbbf24;"></div>
+              <div class="browser-btn" style="background: #4ade80;"></div>
+              <div class="browser-url">https://username.github.io/proyek-pertamaku/</div>
+            </div>
+            <div class="browser-body">
+              <div style="font-size: 2rem; margin-bottom: 0.5rem;">🌐</div>
+              <div style="font-size: 1.2rem; font-weight: 600; color: var(--accent); font-family: 'Space Grotesk';">Halo Git!</div>
+              <div style="color: var(--muted); font-size: 0.9rem; margin-top: 0.5rem;">
+                Ini halaman <span class="code-inline">index.html</span>-mu yang sudah live di internet! 🎉
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-box anim-up" style="margin-top: 1.5rem;">
+          <span class="analogy-label">🧠 INGAT</span>
+          <p style="margin-top: 0.5rem; line-height: 1.7; font-size: 1.05rem;">
+            <strong style="color: var(--accent);">Alamat website = alamat rumah rumahmu.</strong><br>
+            Kalau rumah (repository) bernama <span class="code-inline">portofolio</span>, alamatnya 
+            <span class="code-inline">username.github.io/portofolio/</span>. Ganti bagian 'portofolio' dengan nama repository-mu!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: CARA UPDATE -->
+    <div class="slide" data-slide="5">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">05</span>
+          <span class="slide-tag">// Update</span>
+        </div>
+        <h2 class="slide-title anim-up">Updates Website Setiap <span class="glow-text-blue">Push</span></h2>
+        <p class="slide-subtitle anim-up">Inilah bagian terbaiknya — setiap kamu push perubahan, website akan update otomatis tanpa perlu konfigurasi ulang!</p>
+
+        <div class="anim-up" style="margin-top: 1rem; margin-bottom: 1.5rem;">
+          <svg viewBox="0 0 900 220" style="width: 100%; height: auto;">
+            <!-- Flow -->
+            <rect x="20" y="60" width="200" height="100" rx="14" fill="#131826" stroke="#60a5fa" stroke-width="2"/>
+            <text x="120" y="90" text-anchor="middle" font-family="Space Grotesk" font-size="16" font-weight="600" fill="#60a5fa">Edit Kode</text>
+            <text x="120" y="112" text-anchor="middle" font-family="Outfit" font-size="12" fill="#8b95a8">di VS Code</text>
+
+            <path d="M 250 80 L 330 80" stroke="#fbbf24" stroke-width="3" marker-end="url(#arrow-a)" fill="none"/>
+            <text x="290" y="68" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#fbbf24">commit + push</text>
+
+            <rect x="340" y="40" width="220" height="80" rx="14" fill="#131826" stroke="#fbbf24" stroke-width="2"/>
+            <text x="450" y="90" text-anchor="middle" font-family="Space Grotesk" font-size="16" font-weight="600" fill="#fbbf24">GitHub</text>
+            <text x="450" y="112" text-anchor="middle" font-family="Outfit" font-size="11" fill="#8b95a8">file terbaru masuk</text>
+
+            <path d="M 570 80 L 650 80" stroke="#4ade80" stroke-width="3" marker-end="url(#arrow-b)" fill="none"/>
+            <text x="610" y="68" text-anchor="middle" font-family="JetBrains Mono" font-size="11" fill="#4ade80">otomatis</text>
+
+            <rect x="660" y="40" width="220" height="80" rx="14" fill="#131826" stroke="#4ade80" stroke-width="2"/>
+            <text x="770" y="90" text-anchor="middle" font-family="Space Grotesk" font-size="16" font-weight="600" fill="#4ade80">Website Live</text>
+            <text x="770" y="112" text-anchor="middle" font-family="Outfit" font-size="11" fill="#8b95a8">deploy berjalan</text>
+
+            <defs>
+              <marker id="arrow-a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L9,3 z" fill="#fbbf24"/>
+              </marker>
+              <marker id="arrow-b" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                <path d="M0,0 L0,6 L9,3 z" fill="#4ade80"/>
+              </marker>
+            </defs>
+
+            <text x="450" y="175" text-anchor="middle" font-family="Outfit" font-size="13" fill="#8b95a8">Tunggu 1-2 menit, lalu muat ulang (refresh) halaman website untuk melihat perubahan.</text>
+          </svg>
+        </div>
+
+        <div class="terminal anim-up">
+          <div class="terminal-header">
+            <div class="terminal-dot" style="background: #ef4444;"></div>
+            <div class="terminal-dot" style="background: #fbbf24;"></div>
+            <div class="terminal-dot" style="background: #4ade80;"></div>
+            <span class="terminal-title">workflow — update rutin</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="term-comment"># 1. Edit kode di VS Code, lalu commit & push seperti biasa:</span></div>
+            <div><span class="term-prompt">$ </span><span class="term-command">git add .</span></div>
+            <div><span class="term-prompt">$ </span><span class="term-command">git commit -m </span><span class="term-yellow">"ganti warna header"</span></div>
+            <div><span class="term-prompt">$ </span><span class="term-command">git push</span></div>
+            <div style="height: 0.5rem;"></div>
+            <div><span class="term-comment"># 2. Atau lewat VS Code: klik Sync Changes (🔄).</span></div>
+            <div><span class="term-success">✓ Pushed to GitHub — website sedang deploy…</span></div>
+            <div><span class="term-success">✓ Your site is up to date!</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: CHECK DEPLOY STATUS -->
+    <div class="slide" data-slide="6">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">06</span>
+          <span class="slide-tag">// Verifikasi</span>
+        </div>
+        <h2 class="slide-title anim-up">Lihat Status <span class="glow-text-blue">Deployment</span></h2>
+        <p class="slide-subtitle anim-up">Bagaimana tahu proses deploy sukses atau masih berjalan? Cek dari tab Actions di GitHub.</p>
+
+        <div class="grid-2 anim-up" style="margin-top: 1rem;">
+          <div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num">1</div>
+                <div>
+                  <strong style="font-size: 1rem;">Buka tab Actions</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Di repository, klik tab <span class="code-inline blue">Actions</span> untuk melihat perjalanan deploy.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card" style="margin-bottom: 1rem;">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num blue">2</div>
+                <div>
+                  <strong style="font-size: 1rem;">Cari status symbol</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    ✅ hijau = sukses • 🟠 kuning = proses • ❌ merah = gagal.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="step-card">
+              <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                <div class="step-num green">3</div>
+                <div>
+                  <strong style="font-size: 1rem;">Klik detail untuk melihat log</strong>
+                  <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6; margin-top: 0.35rem;">
+                    Bisa melihat detail langkah deploy. Kalau ada error, informasi di sini bisa membantu memperbaiki.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">Actions - pages build and deployment</span>
+            </div>
+            <div class="terminal-body" style="font-size: 0.85rem;">
+              <div><span class="term-success">✅ Build with Jekyll</span> <span class="term-output">· 25s</span></div>
+              <div><span class="term-success">✅ Configure Pages</span> <span class="term-output">· 15s</span></div>
+              <div><span class="term-success">✅ Upload Pages artifact</span> <span class="term-output">· 8s</span></div>
+              <div><span class="term-success">✅ Deploy to GitHub Pages</span> <span class="term-output">· 20s</span></div>
+              <div style="height: 0.6rem;"></div>
+              <div><span class="term-yellow">🟡 Pending</span> <span class="term-output">· waiting to deploy</span></div>
+              <div><span class="term-yellow">🟠️ In progress</span> <span class="term-output">· building site</span></div>
+              <div><span class="term-success">✅ Success</span> <span class="term-output">· deployment complete 🎉</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: CARA PEMROGRAfan (WORKFLOW) -->
+    <div class="slide" data-slide="7">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">07</span>
+          <span class="slide-tag">// Otomatis</span>
+        </div>
+        <h2 class="slide-title anim-up">Deploy Otomatis Dengan <span class="glow-text-blue">Workflow</span></h2>
+        <p class="slide-subtitle anim-up">Di materi lanjut, kamu bisa mengotomatiskan deploy hingga auto setiap push. Cara di atas (Settings) sudah cukup untuk pemula — ini sebagai informasi bonus.</p>
+
+        <div class="grid-2 anim-up">
+          <div class="card card-glow">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
+              <div class="icon-wrap blue" style="margin: 0; width: 44px; height: 44px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5">
+                  <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+              </div>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600;">Kenapa memakai Workflow?</h3>
+            </div>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.7;">
+              Dengan <span class="code-inline blue">GitHub Actions</span>, kamu bisa menjalankan perintah build (misalnya mengcompile 
+              proyek JavaScript) otomatis sebelum website di-publish. Cocok untuk proyek yang lebih kompleks.
+            </p>
+          </div>
+
+          <div class="terminal">
+            <div class="terminal-header">
+              <div class="terminal-dot" style="background: #ef4444;"></div>
+              <div class="terminal-dot" style="background: #fbbf24;"></div>
+              <div class="terminal-dot" style="background: #4ade80;"></div>
+              <span class="terminal-title">.github/workflows/static.yml (contoh)</span>
+            </div>
+            <div class="terminal-body" style="font-size: 0.78rem;">
+              <div><span class="term-comment"># Cara alternatif & sering dipakai projek</span></div>
+              <div><span class="term-comment"># kompleks. Untuk pemula, gunakan cara</span></div>
+              <div><span class="term-comment"># "Settings → Pages" di slide sebelumnya.</span></div>
+              <div style="height: 0.4rem;"></div>
+              <div><span class="term-yellow">- uses</span>: actions/checkout@v4</div>
+              <div><span class="term-yellow">- uses</span>: actions/upload-pages-artifact@v3</div>
+              <div><span class="term-yellow">- uses</span>: actions/deploy-pages@v4</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="warn-box anim-up" style="margin-top: 1.5rem;">
+          <strong style="color: var(--accent-3);">🔧 SARAN:</strong> Untuk mata pelajaran ini, cukup gunakan cara pertama 
+          (<span class="code-inline">Settings → Pages</span>) yang jauh lebih simpel. Materi otomatis ini hanya untuk menambah wawasan 
+          bahwa GitHub Pages bisa diprogram dengan GitHub Actions.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: MASALAH UMUM -->
+    <div class="slide" data-slide="8">
+      <div style="max-width: 1300px; margin: 0 auto; width: 100%;">
+        <div class="slide-header anim-up">
+          <span class="slide-number">08</span>
+          <span class="slide-tag">// Solusi</span>
+        </div>
+        <h2 class="slide-title anim-up">Masalah yang <span class="glow-text-blue">Sering Terjadi</span></h2>
+        <p class="slide-subtitle anim-up">Website tidak muncul? Tenang, berikut solusinya dalam sebagian besar kasus.</p>
+
+        <div class="grid-2 anim-up">
+          <div class="card">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 1.5rem;">🔎</span>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600;">Website kosong / 404</h3>
+            </div>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Belum ada <span class="code-inline">index.html</span>, atau nama file beda. Atau deploy masih butuh waktu 1-2 menit. Cek di tab Actions.
+            </p>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 1.5rem;">🔗</span>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600;">Alamat salah / tidak bisa dibuka</h3>
+            </div>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Cek kembali format <span class="code-inline">username.github.io/nama-repo/</span>. Username = nama akun GitHubmu (huruf kecil).
+            </p>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 1.5rem;">📁</span>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600;">Lokasi folder salah</h3>
+            </div>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Kalau file website ada di subfolder, atur "Folder" di setting Pages ke nama folder tersebut, bukan <span class="code-inline">/ (root)</span>.
+            </p>
+          </div>
+
+          <div class="card">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+              <span style="font-size: 1.5rem;">⏳</span>
+              <h3 style="font-family: 'Space Grotesk'; font-size: 1.1rem; font-weight: 600;">Perubahan belum muncul</h3>
+            </div>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Pastikan kamu <strong>benar-benar push</strong> (bukan cuma commit lokal), lalu refresh halaman dengan paksa <span class="code-inline">Ctrl+Shift+R</span>.
+            </p>
+          </div>
+        </div>
+
+        <div class="warn-box anim-up" style="margin-top: 1.5rem;">
+          <strong style="color: var(--accent-4);">💡 GOLDEN RULE:</strong> Kalau bingung, selalu bawal ke tab <span class="code-inline">Actions</span> 
+          di repository. Di situlah tanda sukses/gagalnya deploy. Salin pesan errornya lalu cari solusinya.
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: PENUTUP -->
+    <div class="slide" data-slide="9">
+      <div style="max-width: 1100px; margin: 0 auto; width: 100%; text-align: center;">
+        <div class="anim-up" style="margin-bottom: 2rem;">
+          <svg width="120" height="120" viewBox="0 0 200 200" style="margin: 0 auto;">
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#00d9c0" stroke-width="3" stroke-dasharray="8 4"/>
+            <circle cx="100" cy="100" r="60" fill="#131826" stroke="#4ade80" stroke-width="2"/>
+            <path d="M 80 80 L 120 120 M 120 80 L 80 120" stroke="#00d9c0" stroke-width="7" fill="none" stroke-linecap="round"/>
+            <text x="100" y="135" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="#4ade80">LIVE</text>
+          </svg>
+        </div>
+
+        <h2 class="slide-title anim-up" style="font-size: clamp(2.5rem, 5vw, 4rem);">
+          Website-mu Sudah <span class="glow-text">Live!</span> 🎉
+        </h2>
+
+        <p class="slide-subtitle anim-up" style="margin: 1rem auto 2rem; max-width: 620px;">
+          Kamu sudah bisa mengubah sebuah repository Git menjadi website publik yang siap dibagikan 
+          ke siapa saja lewat browser. Ini langkah pertamamu jadi developer sungguhan!
+        </p>
+
+        <div class="grid-3 anim-up" style="margin-bottom: 2rem;">
+          <div class="card" style="text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🚀</div>
+            <h4 style="font-family: 'Space Grotesk'; font-weight: 600; margin-bottom: 0.5rem;">Ringkasan</h4>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Push kode → Settings → Pages → atur branch → Save → tunggu → buka alamat website.
+            </p>
+          </div>
+          <div class="card" style="text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🧪</div>
+            <h4 style="font-family: 'Space Grotesk'; font-weight: 600; margin-bottom: 0.5rem;">Tantangan</h4>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Deploy portofolio pribadimu, lalu bagikan link-nya ke teman di grup kelas!
+            </p>
+          </div>
+          <div class="card" style="text-align: left;">
+            <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">📚</div>
+            <h4 style="font-family: 'Space Grotesk'; font-weight: 600; margin-bottom: 0.5rem;">Lakukan Lagi</h4>
+            <p style="color: var(--muted); font-size: 0.9rem; line-height: 1.6;">
+              Coba buat website kustom domain di <span class="code-inline green">github.io</span> milikmu.
+            </p>
+          </div>
+        </div>
+
+        <div class="anim-up" style="padding: 1.5rem; background: linear-gradient(135deg, rgba(0, 217, 192, 0.12), rgba(96, 165, 250, 0.08)); border-radius: 16px; border: 1px solid var(--accent);">
+          <p style="font-size: 1.1rem; line-height: 1.7;">
+            <strong style="color: var(--accent);">"The best way to predict the future is to invent it."</strong><br>
+            <span style="color: var(--muted); font-size: 0.95rem;">— Alan Kay</span>
+          </p>
+        </div>
+
+        <p class="anim-up" style="margin-top: 2rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;">
+          // Kode pertamamu sudah live di internet. Selamat! 🚀
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Navigation -->
+  <div class="navigation">
+    <button class="nav-btn" id="prevBtn" onclick="prevSlide()" disabled>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M15 18l-6-6 6-6"/>
+      </svg>
+    </button>
+    <div class="slide-info">
+      <span class="current" id="currentSlide">1</span> / <span id="totalSlides">10</span>
+    </div>
+    <button class="nav-btn" id="nextBtn" onclick="nextSlide()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M9 18l6-6-6-6"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Keyboard hint -->
+  <div class="keyboard-hint">
+    <span>Gunakan</span>
+    <span class="kbd">←</span>
+    <span class="kbd">→</span>
+    <span>untuk navigasi</span>
+  </div>
+
+</div>
+
+<script>
+let currentSlide = 0;
+const totalSlides = 10;
+const slides = document.querySelectorAll('.slide');
+const progressBar = document.getElementById('progressBar');
+const currentSlideEl = document.getElementById('currentSlide');
+const totalSlidesEl = document.getElementById('totalSlides');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+totalSlidesEl.textContent = totalSlides;
+
+function updateSlide(newIndex) {
+  if (newIndex < 0 || newIndex >= totalSlides) return;
+
+  slides[currentSlide].classList.remove('active');
+  if (newIndex > currentSlide) {
+    slides[currentSlide].classList.add('prev');
+  } else {
+    slides[currentSlide].classList.remove('prev');
+  }
+
+  currentSlide = newIndex;
+  slides[currentSlide].classList.add('active');
+  slides[currentSlide].classList.remove('prev');
+
+  // Update progress
+  const progress = ((currentSlide + 1) / totalSlides) * 100;
+  progressBar.style.width = progress + '%';
+  currentSlideEl.textContent = currentSlide + 1;
+
+  // Update buttons
+  prevBtn.disabled = currentSlide === 0;
+  nextBtn.disabled = currentSlide === totalSlides - 1;
+
+  // Scroll to top of slide
+  slides[currentSlide].scrollTop = 0;
+}
+
+function nextSlide() { updateSlide(currentSlide + 1); }
+function prevSlide() { updateSlide(currentSlide - 1); }
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' || e.key === ' ') {
+    e.preventDefault();
+    nextSlide();
+  } else if (e.key === 'ArrowLeft') {
+    e.preventDefault();
+    prevSlide();
+  }
+});
+</script>
+
+</body>
+</html>

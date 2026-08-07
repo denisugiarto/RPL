@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Lanjutan — Presentasi Kelas X RPL</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+<style>
+  :root{
+    --blob-opacity: 0.35;
+    --slide-padding: 70px 40px 60px;
+    --slide-display: grid;
+    --slide-align: center;
+    --slide-justify: center;
+    --slide-inner-max-height: 100%;
+    --slide-inner-margin: auto;
+    --dot-active-bg: var(--pink);
+    --hover-border: var(--pink);
+    --hover-bg: rgba(255,77,141,0.06);
+    --drag-hover-border: var(--pink);
+    --pulse-border-color: var(--pink);
+  }
+  .slide{ display:grid; place-items:center; }
+  .bg-mesh{
+    position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(circle at 15% 15%, rgba(255,77,141,0.18), transparent 45%),
+      radial-gradient(circle at 85% 15%, rgba(139,92,246,0.15), transparent 45%),
+      radial-gradient(circle at 75% 85%, rgba(0,217,192,0.10), transparent 45%),
+      radial-gradient(circle at 20% 80%, rgba(255,210,63,0.09), transparent 45%),
+      var(--bg);
+  }
+  .slide::-webkit-scrollbar { width: 6px; }
+  .slide::-webkit-scrollbar-track { background: transparent; }
+  .slide::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+  .slide::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+  .progress-fill{ background:linear-gradient(90deg,var(--pink),var(--purple)); }
+  .logo-mark{ background:linear-gradient(135deg,var(--pink),var(--purple)); }
+  .font-mono{ font-family: 'Consolas', 'Monaco', monospace; }
+  .code-block{
+    background:#0b0e12; border:1px solid var(--border);
+    border-radius:12px; padding:16px;
+    font-family:'Consolas', monospace; font-size:13px;
+    line-height:1.6; white-space:pre; overflow-x:auto;
+  }
+  .tag-css{ color:var(--css); }
+  .tag-attr{ color:var(--pink); }
+  .tag-val{ color:var(--js); }
+  .code-text{ color:#9AA5B1; }
+  .code-comment{ color:#4b5563; font-style:italic; }
+  .val-card{ border:1px solid var(--border); border-radius:12px; padding:10px; background:#0b0e12; }
+  .val-card .vlabel{
+    display:block; text-align:center; font-family:'Consolas',monospace;
+    font-size:11px; font-weight:700; color:var(--pink); margin-bottom:8px;
+  }
+  .val-card .vnote{ display:block; text-align:center; font-family:'Consolas',monospace; font-size:9px; color:var(--muted); margin-top:6px; }
+
+  /* Demo: kartu flip 3D (transform) */
+  .flip{ perspective:900px; }
+  .flip-inner{
+    position:relative; width:100%; height:190px;
+    transform-style:preserve-3d; transition:transform .7s;
+  }
+  .flip:hover .flip-inner{ transform:rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; backface-visibility:hidden;
+    border-radius:16px; display:grid; place-items:center;
+  }
+  .flip-front{ background:linear-gradient(135deg,rgba(255,77,141,0.25),rgba(139,92,246,0.25)); border:1px solid rgba(255,77,141,0.4); }
+  .flip-back{ background:linear-gradient(135deg,var(--pink),var(--purple)); color:#0F1419; transform:rotateY(180deg); }
+
+  /* Demo: animasi keyframes */
+  @keyframes floatDemo{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-12px); } }
+  @keyframes spinDemo{ to{ transform:rotate(360deg); } }
+  .anim-float{ animation:floatDemo 2.5s ease-in-out infinite; }
+  .anim-spin{ animation:spinDemo 3s linear infinite; }
+
+  /* Demo: layout grid areas */
+  .layout-areas{
+    display:grid; gap:8px;
+    grid-template-areas:
+      "header header"
+      "sidebar main"
+      "footer footer";
+    grid-template-columns:100px 1fr;
+    grid-template-rows:auto auto auto;
+  }
+  .layout-areas > div{ border-radius:8px; padding:10px; font-size:11px; font-family:'Space Grotesk'; font-weight:700; text-align:center; }
+  .area-header{ grid-area:header; background:rgba(255,77,141,0.25); border:1px solid rgba(255,77,141,0.4); }
+  .area-sidebar{ grid-area:sidebar; background:rgba(139,92,246,0.25); border:1px solid rgba(139,92,246,0.4); }
+  .area-main{ grid-area:main; background:rgba(0,217,192,0.18); border:1px solid rgba(0,217,192,0.4); }
+  .area-footer{ grid-area:footer; background:rgba(255,210,63,0.18); border:1px solid rgba(255,210,63,0.4); }
+
+  /* Demo: sticky */
+  .sticky-bar{
+    position:sticky; top:0;
+    background:rgba(139,92,246,0.15); border:1px solid rgba(139,92,246,0.4);
+    border-radius:8px; padding:8px 12px; font-size:11px;
+    font-family:'Space Grotesk'; font-weight:700; color:#c4b5fd;
+  }
+  .demo-scroll{ height:170px; overflow-y:auto; border:1px dashed rgba(255,255,255,0.15); border-radius:12px; padding:10px; }
+
+  /* Demo: variabel */
+  .var-stage{ padding:6px; }
+  .var-chip{
+    font-family:'Space Grotesk'; font-weight:700; font-size:13px;
+    color:var(--demo-color, var(--pink));
+    background:color-mix(in srgb, var(--demo-color, var(--pink)) 14%, transparent);
+    border:1.5px solid var(--demo-color, var(--pink));
+    border-radius:99px; padding:6px 14px; display:inline-flex; align-items:center; gap:8px;
+  }
+  .var-fill{ background:var(--demo-color, var(--pink)); }
+
+  /* Demo FX */
+  .fx-btn{
+    padding:8px 14px; border-radius:10px; font-size:12px; font-weight:600;
+    border:1.5px solid var(--border); background:rgba(255,255,255,0.04); color:var(--fg);
+    transition:all .25s; cursor:pointer;
+  }
+  .fx-btn:hover{ border-color:var(--pink); color:var(--pink); }
+  /* Exercise options */
+  .spec-opt{
+    padding:8px 16px; border-radius:10px; font-size:13px; font-weight:600;
+    border:1.5px solid var(--border); background:rgba(255,255,255,0.03); color:var(--fg);
+    transition:all .25s; cursor:pointer;
+  }
+  .spec-opt:hover{ border-color:var(--pink); background:rgba(255,77,141,0.07); }
+  .spec-opt.ok{ border-color:#22c55e; background:rgba(34,197,94,0.12); color:#22c55e; }
+  .spec-opt.no{ border-color:#ef4444; background:rgba(239,68,68,0.1); color:#ef4444; }
+  @media (max-width:1024px){
+    .slide{ padding:70px 40px 60px; }
+  }
+  @media (max-width:640px){
+    .grid-3, .grid-4{ grid-template-columns:1fr; }
+    .slide{ padding:70px 18px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+<div class="grain"></div>
+<div class="blob" style="width:380px;height:380px;background:var(--pink);top:-100px;left:-100px;"></div>
+<div class="blob" style="width:300px;height:300px;background:var(--purple);bottom:-80px;right:-80px;animation-delay:-4s;"></div>
+
+<div class="top-bar">
+  <div class="logo">
+    <div class="logo-mark"><i class="fa-solid fa-wand-magic-sparkles text-white text-xs"></i></div>
+    <div>
+      <p class="logo-text">CSS Lanjutan</p>
+      <p class="logo-sub">Kelas X RPL</p>
+    </div>
+  </div>
+  <div class="hint-keys hidden md:flex">
+    <span class="key">←</span><span class="key">→</span>
+    <span>untuk navigasi</span>
+  </div>
+</div>
+
+<div class="progress-track">
+  <div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="deck">
+  <div class="slides" id="slides">
+
+    <!-- SLIDE 1: COVER -->
+    <section class="slide active" data-stage="cover">
+      <div class="slide-inner grid-2">
+        <div>
+          <div class="stage-pill mb-5 anim">
+            <span class="w-2 h-2 rounded-full bg-[var(--pink)] pulse-dot"></span>
+            Modul Pembelajaran Web Front-End
+          </div>
+          <h1 class="font-display font-bold text-5xl md:text-7xl leading-[0.95] mb-6 anim-2">
+            <span style="color:var(--pink)">CSS</span> Lanjutan
+          </h1>
+          <p class="text-base md:text-lg text-[var(--muted)] max-w-xl mb-8 anim-3">
+            Naik level! Kuasai kaskade &amp; spesifisitas, variabel CSS, animasi, transform, layout grid 2D, sampai teknik modern membuat website cepat dan cantik.
+          </p>
+          <div class="flex flex-wrap gap-3 anim-4">
+            <button onclick="nextSlide()" class="px-6 py-3 rounded-xl font-semibold text-white text-sm" style="background:linear-gradient(135deg,var(--pink),var(--purple))">
+              <i class="fa-solid fa-rocket mr-2"></i>Mulai Belajar
+            </button>
+            <button onclick="goToSlide(25)" class="px-6 py-3 rounded-xl font-semibold text-sm border border-[var(--border)] hover:bg-white/5">
+              Langsung ke Tugas
+            </button>
+          </div>
+        </div>
+        <div class="flex justify-center anim-3">
+          <svg viewBox="0 0 400 420" class="w-full max-w-md">
+            <defs>
+              <linearGradient id="gx" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#FF4D8D"/><stop offset="1" stop-color="#8B5CF6"/>
+              </linearGradient>
+            </defs>
+            <rect x="80" y="50" width="220" height="220" rx="20" fill="none" stroke="rgba(255,77,141,0.25)" stroke-width="2" transform="rotate(20 190 160)"/>
+            <rect x="110" y="80" width="200" height="240" rx="20" fill="var(--card)" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+            <rect x="110" y="80" width="200" height="70" rx="20 20 0 0" fill="url(#gx)" opacity="0.9"/>
+            <circle cx="150" cy="160" r="26" fill="none" stroke="#FF4D8D" stroke-width="4"/>
+            <circle cx="180" cy="150" r="8" fill="#8B5CF6"/>
+            <rect x="150" y="210" width="120" height="10" rx="5" fill="#FF4D8D" opacity="0.6"/>
+            <rect x="150" y="228" width="84" height="8" rx="4" fill="#8B5CF6" opacity="0.5"/>
+            <rect x="150" y="244" width="104" height="8" rx="4" fill="#8B5CF6" opacity="0.5"/>
+            <g class="float-y"><rect x="50" y="140" width="86" height="30" rx="15" fill="rgba(255,210,63,0.15)" stroke="#FFD23F" stroke-width="1.5"/><text x="93" y="160" text-anchor="middle" fill="#FFD23F" font-family="monospace" font-size="11">transform</text></g>
+            <g class="float-y" style="animation-delay:-1s"><rect x="272" y="200" width="80" height="30" rx="15" fill="rgba(0,217,192,0.15)" stroke="#00D9C0" stroke-width="1.5"/><text x="312" y="220" text-anchor="middle" fill="#00D9C0" font-family="monospace" font-size="11">@keyframes</text></g>
+            <g class="float-y" style="animation-delay:-2s"><rect x="60" y="280" width="78" height="30" rx="15" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/><text x="99" y="300" text-anchor="middle" fill="var(--muted)" font-family="monospace" font-size="11">--var:</text></g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2: RECAP CEPAT CSS DASAR -->
+    <section class="slide" data-stage="recap">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-rotate" style="color:var(--pink)"></i> Penyegaran 60 detik</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Recap cepat <span style="color:var(--pink)">CSS Dasar</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3">Sebelum masuk lebih dalam, ingat kembali 4 fondasi ini:</p>
+        </div>
+        <div class="grid-4 mt-8">
+          <div class="card p-6 anim-2" style="border-color:rgba(0,217,192,0.3)">
+            <div class="w-12 h-12 rounded-xl grid place-items-center mb-3" style="background:rgba(0,217,192,0.15);color:var(--css)"><i class="fa-solid fa-crosshairs"></i></div>
+            <h3 class="font-display font-bold text-lg mb-1">Selektor</h3>
+            <p class="text-sm text-[var(--muted)]"><span class="font-mono" style="color:var(--css)">p</span>, <span class="font-mono" style="color:var(--css)">.kelas</span>, <span class="font-mono" style="color:var(--css)">#id</span></p>
+          </div>
+          <div class="card p-6 anim-2" style="border-color:rgba(255,210,63,0.3)">
+            <div class="w-12 h-12 rounded-xl grid place-items-center mb-3" style="background:rgba(255,210,63,0.15);color:var(--js)"><i class="fa-solid fa-cube"></i></div>
+            <h3 class="font-display font-bold text-lg mb-1">Box Model</h3>
+            <p class="text-sm text-[var(--muted)]">content → padding → border → margin</p>
+          </div>
+          <div class="card p-6 anim-3" style="border-color:rgba(139,92,246,0.3)">
+            <div class="w-12 h-12 rounded-xl grid place-items-center mb-3" style="background:rgba(139,92,246,0.15);color:#c4b5fd"><i class="fa-solid fa-bars"></i></div>
+            <h3 class="font-display font-bold text-lg mb-1">Flexbox</h3>
+            <p class="text-sm text-[var(--muted)]">satu arah, <span class="font-mono">justify-content</span>, <span class="font-mono">align-items</span></p>
+          </div>
+          <div class="card p-6 anim-4" style="border-color:rgba(255,77,141,0.3)">
+            <div class="w-12 h-12 rounded-xl grid place-items-center mb-3" style="background:rgba(255,77,141,0.15);color:var(--pink)"><i class="fa-solid fa-table-cells"></i></div>
+            <h3 class="font-display font-bold text-lg mb-1">Grid &amp; Media</h3>
+            <p class="text-sm text-[var(--muted)]">kolom/baris + <span class="font-mono">@media</span></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3: CASCADE & SPECIFICITY -->
+    <section class="slide" data-stage="specificity">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-scale-balanced" style="color:var(--pink)"></i> Kaskade</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Siapa yang <span style="color:var(--pink)">menang</span>?
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Saat dua aturan menabrak elemen yang sama, browser memakai aturan dengan <b class="text-white">spesifisitas paling tinggi</b>.</p>
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">Inline style</span>
+              <b class="text-white">paling kuat</b>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:#c4b5fd">#id</span>
+              <span class="text-white/80">Kedua</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">.class</span>
+              <span class="text-white/80">Ketiga</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,210,63,0.15);color:var(--js)">elemen</span>
+              <span class="text-white/80">Terlemah</span>
+            </div>
+            <div class="card p-4 text-xs" style="background:rgba(255,210,63,0.05);border-color:rgba(255,210,63,0.2)">
+              <span style="color:var(--js)">💡</span> Kalau spesifisitas sama, aturan yang <b class="text-white">ditulis paling akhir</b> yang menang.
+            </div>
+          </div>
+        </div>
+        <div class="anim-3">
+          <p class="text-xs text-[var(--muted)] mb-2 font-mono">skor spesifisitas (id, class, elemen)</p>
+          <div class="space-y-3">
+            <div class="val-card">
+              <span class="vlabel">p { color: red } → (0, 0, 1)</span>
+              <span class="vnote">1 elemen</span>
+            </div>
+            <div class="val-card">
+              <span class="vlabel">.judul { color: blue } → (0, 1, 0)</span>
+              <span class="vnote">1 class — mengalahkan elemen</span>
+            </div>
+            <div class="val-card">
+              <span class="vlabel">#nama { color: green } → (1, 0, 0)</span>
+              <span class="vnote">1 id — mengalahkan class</span>
+            </div>
+            <div class="val-card">
+              <span class="vlabel">style="..." → (1, 0, 0, 0)</span>
+              <span class="vnote">inline — selalu menang</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4: LATIHAN SPECIFICITY -->
+    <section class="slide" data-stage="spec-latihan">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-pen-to-square" style="color:var(--pink)"></i> Latihan 1</span>
+          <h2 class="font-display font-bold text-3xl md:text-4xl">Tebak warna akhirnya! 🎯</h2>
+          <p class="text-sm text-[var(--muted)] mt-2">Klik jawaban yang menurutmu benar.</p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div class="card p-5 anim-2">
+            <p class="font-display font-semibold text-sm mb-3">Soal 1 — <span class="font-mono">&lt;p class="judul"&gt;Halo&lt;/p&gt;</span></p>
+            <div class="code-block text-xs mb-3">
+<span class="tag-css">p</span> <span class="code-text">{</span> <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">red</span><span class="code-text">; }</span>
+<span class="tag-css">.judul</span> <span class="code-text">{</span> <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">blue</span><span class="code-text">; }</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button class="spec-opt" onclick="checkSpec(0,0)">Merah</button>
+              <button class="spec-opt" onclick="checkSpec(0,1)">Biru</button>
+              <button class="spec-opt" onclick="checkSpec(0,2)">Ungu</button>
+            </div>
+            <span class="spec-fb block text-sm font-medium mt-3 h-5"></span>
+          </div>
+          <div class="card p-5 anim-3">
+            <p class="font-display font-semibold text-sm mb-3">Soal 2 — <span class="font-mono">&lt;h1 style="color:red" class="judul"&gt;</span></p>
+            <div class="code-block text-xs mb-3">
+<span class="tag-css">.judul</span> <span class="code-text">{</span> <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">blue</span><span class="code-text">; }</span>
+<span class="code-comment">/* + inline style="color:red" */</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button class="spec-opt" onclick="checkSpec(1,0)">Merah</button>
+              <button class="spec-opt" onclick="checkSpec(1,1)">Biru</button>
+              <button class="spec-opt" onclick="checkSpec(1,2)">Tidak tahu</button>
+            </div>
+            <span class="spec-fb block text-sm font-medium mt-2 h-5"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5: CSS VARIABLES -->
+    <section class="slide" data-stage="variabel">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-box-open" style="color:var(--pink)"></i> Custom Properties</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Variabel <span style="color:var(--pink)">CSS</span>
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Simpan nilai sekali, pakai berkali-kali. Ganti di satu titik, semua berubah — inilah rahasia deck tema yang rapi.</p>
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">--warna</span>
+              <span class="text-white/80">Definisi variabel, diawali dua tanda <b>--</b>.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:#c4b5fd">var(--warna)</span>
+              <span class="text-white/80">Memakai nilai variabel di property manapun.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">var(--warna, #333)</span>
+              <span class="text-white/80">Nilai cadangan (fallback) jika variabel belum ada.</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">:root — deklarasi global</p>
+            <div class="code-block text-xs">
+<span class="tag-css">:root</span> <span class="code-text">{</span>
+  <span class="tag-attr">--warna-utama</span><span class="code-text">: </span><span class="tag-val">#FF4D8D</span><span class="code-text">;</span>
+  <span class="tag-attr">--radius</span><span class="code-text">: </span><span class="tag-val">16px</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+<span class="tag-css">.tombol</span> <span class="code-text">{</span>
+  <span class="tag-attr">background</span><span class="code-text">: </span><span class="tag-val">var(--warna-utama)</span><span class="code-text">;</span>
+  <span class="tag-attr">border-radius</span><span class="code-text">: </span><span class="tag-val">var(--radius)</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="card p-4" style="background:#0b0e12">
+            <p class="text-xs text-[var(--muted)] mb-3 font-mono">Bayangkan: ubah 1 baris → seluruh website berganti tema.</p>
+            <div class="flex gap-3">
+              <span class="px-4 py-2 rounded-lg text-xs font-bold" style="background:#FF4D8D;color:#0F1419">Tombol A</span>
+              <span class="px-4 py-2 rounded-lg text-xs font-bold" style="background:#8B5CF6;color:#0F1419">Tombol B</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6: LATIHAN VARIABLES -->
+    <section class="slide" data-stage="var-latihan">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-arrows-rotate" style="color:var(--pink)"></i> Latihan 2</span>
+          <h2 class="font-display font-bold text-3xl md:text-4xl">Ganti 1 variabel, semua berubah! 🪄</h2>
+          <p class="text-sm text-[var(--muted)] mt-2">Di bawah, seluruh elemen memakai <span class="font-mono" style="color:var(--pink)">var(--demo-color)</span>. Coba ganti nilainya.</p>
+        </div>
+        <div class="grid-2 gap-6">
+          <div class="card p-5 anim-2">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">:root { --demo-color: pink; }</p>
+            <div class="code-block text-xs">
+<span class="tag-css">:root</span> <span class="code-text">{</span>
+  <span class="tag-attr">--demo-color</span><span class="code-text">: </span><span class="tag-val">#FF4D8D</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+<span class="tag-css">.chip</span> <span class="code-text">{</span> <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">var(--demo-color)</span><span class="code-text">; }</span>
+            </div>
+            <button onclick="setDemoColor('#FF4D8D')" class="px-3 py-1.5 rounded-lg text-xs font-semibold mt-3" style="background:rgba(255,77,141,0.15);color:var(--pink)">Pink</button>
+            <button onclick="setDemoColor('#8B5CF6')" class="px-3 py-1.5 rounded-lg text-xs font-semibold mt-3" style="background:rgba(139,92,246,0.15);color:#c4b5fd">Ungu</button>
+            <button onclick="setDemoColor('#00D9C0')" class="px-3 py-1.5 rounded-lg text-xs font-semibold mt-3" style="background:rgba(0,217,192,0.15);color:var(--css)">Teal</button>
+          </div>
+          <div class="card p-5 anim-3" style="background:#0b0e12">
+            <p class="text-xs text-[var(--muted)] mb-3 font-mono">Hasil di Browser (semua dari var(--demo-color)):</p>
+            <div class="var-stage space-y-3" id="varStage">
+              <span class="var-chip"><i class="fa-solid fa-star"></i> Chip berwarna</span>
+              <div class="flex gap-3">
+                <span class="var-chip">Tombol A</span>
+                <span class="var-chip">Tombol B</span>
+              </div>
+              <div class="w-full var-fill rounded-lg" style="height:14px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7: SELEKTOR KOMBINATOR -->
+    <section class="slide" data-stage="kombinator">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-code-branch" style="color:var(--pink)"></i> Selektor Lanjut 1</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Selektor <span style="color:var(--pink)">kombinator</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3">Menembak elemen berdasarkan hubungannya dengan elemen lain.</p>
+        </div>
+        <div class="grid-4">
+          <div class="card p-5 anim-2">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">nav p</p>
+            <p class="text-sm text-[var(--muted)] mb-3"><b class="text-white">Turunan</b> — semua <span class="font-mono">&lt;p&gt;</span> di dalam <span class="font-mono">&lt;nav&gt;</span>, seberapa dalam pun.</p>
+            <div class="code-block text-xs"><span class="tag-css">nav p</span> <span class="code-text">{</span> <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">#9AA5B1</span><span class="code-text">; }</span></div>
+          </div>
+          <div class="card p-5 anim-3">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">ul &gt; li</p>
+            <p class="text-sm text-[var(--muted)] mb-3"><b class="text-white">Anak langsung</b> — <span class="font-mono">&gt;</span> hanya level satu di bawah.</p>
+            <div class="code-block text-xs"><span class="tag-css">ul &gt; li</span> <span class="code-text">{</span> <span class="tag-attr">margin</span><span class="code-text">: </span><span class="tag-val">8px 0</span><span class="code-text">; }</span></div>
+          </div>
+          <div class="card p-5 anim-2">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">h1 + p</p>
+            <p class="text-sm text-[var(--muted)] mb-3"><b class="text-white">Saudara terdekat</b> — <span class="font-mono">&lt;p&gt;</span> tepat setelah <span class="font-mono">&lt;h1&gt;</span>.</p>
+            <div class="code-block text-xs"><span class="tag-css">h1 + p</span> <span class="code-text">{</span> <span class="tag-attr">font-size</span><span class="code-text">: </span><span class="tag-val">18px</span><span class="code-text">; }</span></div>
+          </div>
+          <div class="card p-5 anim-4">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">h1 ~ p</p>
+            <p class="text-sm text-[var(--muted)] mb-3"><b class="text-white">Semua saudara setelah</b> — semua <span class="font-mono">&lt;p&gt;</span> setelah h1.</p>
+            <div class="code-block text-xs"><span class="tag-css">h1 ~ p</span> <span class="code-text">{</span> <span class="tag-attr">line-height</span><span class="code-text">: </span><span class="tag-val">1.6</span><span class="code-text">; }</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 8: SELEKTOR ATRIBUT -->
+    <section class="slide" data-stage="atribut">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-code" style="color:var(--pink)"></i> Selektor Lanjut 2</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Selektor <span style="color:var(--pink)">atribut</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3">Menembak elemen berdasarkan nilai atributnya, tanpa perlu menambah class.</p>
+        </div>
+        <div class="grid-4">
+          <div class="card p-5 anim-2">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">[type="text"]</p>
+            <p class="text-sm text-[var(--muted)] mb-3"><b class="text-white">Sama persis</b> — atribut bernilai persis teks ini.</p>
+            <div class="code-block text-xs"><span class="tag-css">[type="text"]</span> <span class="code-text">{</span> <span class="tag-attr">border</span><span class="code-text">: </span><span class="tag-val">1px solid</span> <span class="tag-val">#00D9C0</span><span class="code-text">; }</span></div>
+          </div>
+          <div class="card p-5 anim-3">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">[href^="https"]</p>
+            <p class="text-sm text-[var(--muted)] mb-3"><b class="text-white">Dimulai dengan</b> — <span class="font-mono">^=</span> untuk prefiks.</p>
+            <div class="code-block text-xs"><span class="tag-css">a[href^="https"]</span> <span class="code-text">{</span> <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">#22c55e</span><span class="code-text">; }</span></div>
+          </div>
+          <div class="card p-5 anim-2">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">[class*="btn"]</p>
+            <p class="text-sm text-[var(--muted)] mb-3"><b class="text-white">Mengandung</b> — <span class="font-mono">*=</span> cocok di mana pun dalam nilai.</p>
+            <div class="code-block text-xs"><span class="tag-css">[class*="btn"]</span> <span class="code-text">{</span> <span class="tag-attr">font-weight</span><span class="code-text">: </span><span class="tag-val">700</span><span class="code-text">; }</span></div>
+          </div>
+          <div class="card p-5 anim-4">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">[href$=".pdf"]</p>
+            <p class="text-sm text-[var(--muted)] mb-3"><b class="text-white">Diakhiri dengan</b> — <span class="font-mono">$=</span> untuk sufiks.</p>
+            <div class="code-block text-xs"><span class="tag-css">a[href$=".pdf"]</span> <span class="code-text">{</span> <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">var(--pink)</span><span class="code-text">; }</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9: PSEUDO-ELEMENT -->
+    <section class="slide" data-stage="pseudoelement">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-wand-sparkles" style="color:var(--pink)"></i> Pseudo-element</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            <span style="color:var(--pink)">::before</span> &amp; <span style="color:var(--pink)">::after</span>
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Menambahkan "elemen bayangan" di depan/belakang sebuah elemen — <b class="text-white">tanpa menulis HTML</b>. Wajib punya <span class="font-mono" style="color:var(--pink)">content:""</span>.</p>
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">::before</span>
+              <span class="text-white/80">Muncul di bagian awal elemen.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:#c4b5fd">::after</span>
+              <span class="text-white/80">Muncul di bagian akhir elemen.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,210,63,0.15);color:var(--js)">content</span>
+              <span class="text-white/80">Isi ornamen: teks, ikon, emoji, atau kosong.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">::selection</span>
+              <span class="text-white/80">Bonus: gaya saat teks disorot (di-select).</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css</p>
+            <div class="code-block text-xs">
+<span class="tag-css">.judul::before</span> <span class="code-text">{</span>
+  <span class="tag-attr">content</span><span class="code-text">: </span><span class="tag-val">"🚀 "</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+<span class="tag-css">.tombol::after</span> <span class="code-text">{</span>
+  <span class="tag-attr">content</span><span class="code-text">: </span><span class="tag-val">" →"</span><span class="code-text">;</span>
+  <span class="tag-attr">font-weight</span><span class="code-text">: </span><span class="tag-val">700</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="card p-5" style="background:#0b0e12">
+            <p class="text-xs text-[var(--muted)] mb-3 font-mono">Hasil di Browser:</p>
+            <p class="font-display font-bold text-xl mb-3"><span class="px-2 py-1 rounded-lg" style="background:rgba(255,77,141,0.15)">🚀</span> Judul punya ornamen</p>
+            <span class="px-4 py-2 rounded-lg text-xs font-bold" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#0F1419">Klik di sini →</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10: PSEUDO-CLASS LANJUTAN -->
+    <section class="slide" data-stage="pseudoclass">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-table-list" style="color:var(--pink)"></i> Pseudo-class Lanjutan</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Posisi &amp; <span style="color:var(--pink)">kondisi</span> elemen
+          </h2>
+          <p class="text-[var(--muted)] mt-3">Pseudo-class bukan cuma <span class="font-mono" style="color:var(--pink)">:hover</span> — bisa menembak berdasarkan urutan &amp; status.</p>
+        </div>
+        <div class="grid-4">
+          <div class="card p-5 anim-2">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">li:nth-child(2)</p>
+            <p class="text-sm text-[var(--muted)] mb-3">Elemen anak <b class="text-white">urutan ke-2</b> (juga <span class="font-mono">odd</span>/<span class="font-mono">even</span>).</p>
+            <div class="code-block text-xs"><span class="tag-css">li:nth-child(2)</span> <span class="code-text">{</span> <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">#FF4D8D</span><span class="code-text">; }</span></div>
+          </div>
+          <div class="card p-5 anim-3">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">p:not(.x)</p>
+            <p class="text-sm text-[var(--muted)] mb-3">Semua <span class="font-mono">&lt;p&gt;</span> <b class="text-white">kecuali</b> yang punya class <span class="font-mono">.x</span>.</p>
+            <div class="code-block text-xs"><span class="tag-css">p:not(.x)</span> <span class="code-text">{</span> <span class="tag-attr">opacity</span><span class="code-text">: </span><span class="tag-val">0.9</span><span class="code-text">; }</span></div>
+          </div>
+          <div class="card p-5 anim-2">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">input:focus</p>
+            <p class="text-sm text-[var(--muted)] mb-3">Saat kotak input <b class="text-white">sedang diklik/diketik</b>.</p>
+            <div class="code-block text-xs"><span class="tag-css">input:focus</span> <span class="code-text">{</span> <span class="tag-attr">border-color</span><span class="code-text">: </span><span class="tag-val">var(--css)</span><span class="code-text">; }</span></div>
+          </div>
+          <div class="card p-5 anim-4">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">form:focus-within</p>
+            <p class="text-sm text-[var(--muted)] mb-3">Seluruh form ikut berubah jika <b class="text-white">salah satu</b> isinya fokus.</p>
+            <div class="code-block text-xs"><span class="tag-css">form:focus-within</span> <span class="code-text">{</span> <span class="tag-attr">box-shadow</span><span class="code-text">: ...</span><span class="code-text">; }</span></div>
+          </div>
+        </div>
+        <div class="card p-4 mt-6 anim-3" style="background:rgba(255,210,63,0.05);border-color:rgba(255,210,63,0.2)">
+          <p class="text-sm text-white/90">💡 <b>Tabel zebra</b> tanpa class manual: <span class="font-mono" style="color:var(--js)">tr:nth-child(even) { background: rgba(255,255,255,0.04); }</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 11: TRANSITION -->
+    <section class="slide" data-stage="transition">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-right-left" style="color:var(--pink)"></i> Peralihan</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Perubahan <span style="color:var(--pink)">halus</span>
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Tanpa transition, perubahan gaya terjadi mendadak. Dengan transition, perubahan itu dianimasikan mulus dalam waktu tertentu.</p>
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">transition-property</span>
+              <span class="text-white/80">Property apa yang dianimasikan.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:#c4b5fd">transition-duration</span>
+              <span class="text-white/80">Berapa lama (mis. 0.3s).</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">transition-timing-function</span>
+              <span class="text-white/80">Kurva: ease, linear, ease-in-out.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,210,63,0.15);color:var(--js)">transition: all .3s</span>
+              <span class="text-white/80">Shorthand paling umum.</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css</p>
+            <div class="code-block text-xs">
+<span class="tag-css">.tombol</span> <span class="code-text">{</span>
+  <span class="tag-attr">background</span><span class="code-text">: </span><span class="tag-val">#1A2229</span><span class="code-text">;</span>
+  <span class="tag-attr">transition</span><span class="code-text">: </span><span class="tag-val">all .4s ease</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+<span class="tag-css">.tombol:hover</span> <span class="code-text">{</span>
+  <span class="tag-attr">background</span><span class="code-text">: </span><span class="tag-val">#FF4D8D</span><span class="code-text">;</span>
+  <span class="tag-attr">transform</span><span class="code-text">: </span><span class="tag-val">translateY(-4px)</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="card p-5 text-center" style="background:#0b0e12">
+            <p class="text-xs text-[var(--muted)] mb-3 font-mono">Coba arahkan kursor ↓</p>
+            <button class="px-6 py-3 rounded-xl font-semibold text-white text-sm" style="background:#1A2229;border:1px solid var(--border);transition:all .4s ease;cursor:pointer" onmouseover="this.style.background='#FF4D8D';this.style.transform='translateY(-4px)'" onmouseout="this.style.background='#1A2229';this.style.transform='none'">Tombol Beranimasi</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12: ANIMATION @KEYFRAMES -->
+    <section class="slide" data-stage="animation">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-film" style="color:var(--pink)"></i> Animasi Penuh</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            <span style="color:var(--pink)">@keyframes</span> — animasi berjalan sendiri
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Transition butuh pemicu (hover). Keyframes berjalan <b class="text-white">otomatis</b>, bisa diulang &amp; dikendalikan penuh.</p>
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">@keyframes nama</span>
+              <span class="text-white/80">Deklarasi kumpulan frame.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:#c4b5fd">from → to</span>
+              <span class="text-white/80">Frame awal &amp; akhir (atau 0% → 100%).</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">animation-iteration-count</span>
+              <span class="text-white/80">infinite = terus-menerus.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,210,63,0.15);color:var(--js)">animation-direction</span>
+              <span class="text-white/80">alternate = bolak-balik.</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css</p>
+            <div class="code-block text-xs">
+<span class="tag-css">@keyframes</span> <span class="tag-val">mengambang</span> <span class="code-text">{</span>
+  <span class="tag-val">0%</span><span class="code-text">, </span><span class="tag-val">100%</span><span class="code-text"> { </span><span class="tag-attr">transform</span><span class="code-text">: </span><span class="tag-val">translateY(0)</span><span class="code-text">; }</span>
+  <span class="tag-val">50%</span><span class="code-text"> { </span><span class="tag-attr">transform</span><span class="code-text">: </span><span class="tag-val">translateY(-12px)</span><span class="code-text">; }</span>
+<span class="code-text">}</span>
+<span class="tag-css">.lambang</span> <span class="code-text">{</span>
+  <span class="tag-attr">animation</span><span class="code-text">: </span><span class="tag-val">mengambang 2.5s ease-in-out infinite</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="card p-5 flex items-center justify-around" style="background:#0b0e12">
+            <div class="text-center">
+              <p class="text-[10px] text-[var(--muted)] mb-2">float (infinite)</p>
+              <div class="w-14 h-14 rounded-2xl grid place-items-center mx-auto anim-float" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#0F1419">
+                <i class="fa-solid fa-dove"></i>
+              </div>
+            </div>
+            <div class="text-center">
+              <p class="text-[10px] text-[var(--muted)] mb-2">spin (infinite)</p>
+              <div class="w-14 h-14 rounded-full grid place-items-center mx-auto anim-spin" style="background:rgba(0,217,192,0.15);border:2px solid var(--css);color:var(--css)">
+                <i class="fa-solid fa-gear"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 13: TRANSFORM -->
+    <section class="slide" data-stage="transform">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-up-right-and-down-left-from-center" style="color:var(--pink)"></i> Transform</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Mengubah <span style="color:var(--pink)">bentuk &amp; posisi</span>
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Transform menggeser, memutar, membesar, memiringkan elemen — termasuk membuat efek <b class="text-white">kartu flip 3D</b>.</p>
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">translate(x, y)</span>
+              <span class="text-white/80">Menggeser elemen.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:#c4b5fd">rotate(deg)</span>
+              <span class="text-white/80">Memutar elemen.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">scale(n)</span>
+              <span class="text-white/80">Membesar / mengecil.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,210,63,0.15);color:var(--js)">skew(deg)</span>
+              <span class="text-white/80">Memiringkan elemen.</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css — rotasi 3D</p>
+            <div class="code-block text-xs">
+<span class="tag-css">.flip</span> <span class="code-text">{ </span><span class="tag-attr">perspective</span><span class="code-text">: </span><span class="tag-val">900px</span><span class="code-text">; }</span>
+<span class="tag-css">.kartu:hover</span> <span class="code-text">{</span>
+  <span class="tag-attr">transform</span><span class="code-text">: </span><span class="tag-val">rotateY(180deg)</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="flip">
+            <div class="flip-inner">
+              <div class="flip-face flip-front">
+                <div class="text-center">
+                  <i class="fa-solid fa-rotate text-3xl" style="color:var(--pink)"></i>
+                  <p class="font-display font-bold text-sm mt-2">Arahkan kursor ke sini</p>
+                </div>
+              </div>
+              <div class="flip-face flip-back">
+                <div class="text-center">
+                  <i class="fa-solid fa-heart text-3xl"></i>
+                  <p class="font-display font-bold text-sm mt-2">CSS itu menyenangkan!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 14: GRADIENT -->
+    <section class="slide" data-stage="gradient">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-fill-drip" style="color:var(--pink)"></i> Gradasi Warna</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            <span style="color:var(--pink)">Gradient</span> menghidupkan latar
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Gradient adalah transisi bertahap antara dua warna atau lebih — bisa dibuat teks berwarna-warni juga.</p>
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">linear-gradient(135deg, a, b)</span>
+              <span class="text-white/80">Garis lurus diagonal.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:#c4b5fd">radial-gradient(c, d)</span>
+              <span class="text-white/80">Melingkar dari tengah.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">conic-gradient</span>
+              <span class="text-white/80">Melingkari titik (roda warna).</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,210,63,0.15);color:var(--js)">background-clip:text</span>
+              <span class="text-white/80">Trik teks berwarna gradien.</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css</p>
+            <div class="code-block text-xs">
+<span class="tag-css">.kartu</span> <span class="code-text">{</span>
+  <span class="tag-attr">background</span><span class="code-text">: </span><span class="tag-val">linear-gradient(135deg, #FF4D8D, #8B5CF6)</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+<span class="tag-css">.judul</span> <span class="code-text">{</span>
+  <span class="tag-attr">background</span><span class="code-text">: </span><span class="tag-val">linear-gradient(135deg, #FFD23F, #FF4D8D)</span><span class="code-text">;</span>
+  <span class="tag-attr">-webkit-background-clip</span><span class="code-text">: </span><span class="tag-val">text</span><span class="code-text">;</span>
+  <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">transparent</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="card p-5" style="background:#0b0e12">
+            <p class="text-xs text-[var(--muted)] mb-3 font-mono">Contoh hasil:</p>
+            <div class="flex flex-wrap gap-3">
+              <span class="px-5 py-3 rounded-xl text-xs font-bold" style="background:linear-gradient(135deg,#FF4D8D,#8B5CF6);color:#0F1419">Linear</span>
+              <span class="w-14 h-14 rounded-xl" style="background:radial-gradient(circle at 30% 30%,#FFD23F,#FF4D8D)"></span>
+              <span class="font-display font-bold text-2xl" style="background:linear-gradient(135deg,#FFD23F,#FF4D8D);-webkit-background-clip:text;background-clip:text;color:transparent">Teks🎨</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 15: SHADOWS -->
+    <section class="slide" data-stage="shadow">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-cube" style="color:var(--pink)"></i> Bayangan</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            <span style="color:var(--pink)">Shadow</span> untuk kedalaman
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Bayangan membuat elemen terasa "terangkat" dari layar, atau menyala (glow). Pakai beberapa layer untuk hasil lebih halus.</p>
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">box-shadow</span>
+              <span class="text-white/80">Bayangan di luar kotak. Format: x y blur spread warna.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">text-shadow</span>
+              <span class="text-white/80">Bayangan pada teks.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,210,63,0.15);color:var(--js)">0 20px 40px -12px #...</span>
+              <span class="text-white/80">Resep umum shadow lembut &amp; realistik.</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css</p>
+            <div class="code-block text-xs">
+<span class="tag-css">.kartu</span> <span class="code-text">{</span>
+  <span class="tag-attr">box-shadow</span><span class="code-text">: </span><span class="tag-val">0 12px 30px -10px rgba(0,0,0,0.5)</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+<span class="tag-css">.logo</span> <span class="code-text">{</span>
+  <span class="tag-attr">text-shadow</span><span class="code-text">: </span><span class="tag-val">0 0 12px #FF4D8D</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="card p-6 flex items-center justify-center gap-8" style="background:#0b0e12">
+            <div class="w-20 h-24 rounded-xl grid place-items-center" style="background:var(--card);box-shadow:0 12px 30px -8px rgba(0,0,0,0.6)">
+              <i class="fa-solid fa-ghost text-2xl" style="color:var(--pink)"></i>
+            </div>
+            <div class="w-20 h-24 rounded-xl grid place-items-center" style="background:var(--card);border:1px solid var(--border);box-shadow:0 0 22px rgba(255,77,141,0.5)">
+              <i class="fa-solid fa-fire text-2xl" style="color:var(--pink)"></i>
+            </div>
+            <p class="font-display font-bold text-2xl" style="text-shadow:0 0 14px var(--pink)">GLOW</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 16: FILTER & BACKDROP -->
+    <section class="slide" data-stage="filter">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-eye-dropper" style="color:var(--pink)"></i> Filter Efek</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            <span style="color:var(--pink)">Filter</span> &amp; efek kaca
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3">Filter mengubah tampilan elemen seperti di aplikasi edit foto. <span class="font-mono" style="color:var(--pink)">backdrop-filter</span> menerapkan efek ke latar di belakang elemen — rahasia tampilan kaca (glassmorphism).</p>
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">blur(px)</span>
+              <span class="text-white/80">Mengaburkan.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,210,63,0.15);color:var(--js)">brightness(n)</span>
+              <span class="text-white/80">Mengatur kecerahan.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">hue-rotate(deg)</span>
+              <span class="text-white/80">Memutar roda warna.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:#c4b5fd">backdrop-filter: blur()</span>
+              <span class="text-white/80">Kaca buram di belakang elemen.</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css</p>
+            <div class="code-block text-xs">
+<span class="tag-css">.foto</span> <span class="code-text">{ filter: </span><span class="tag-val">brightness(1.2) saturate(1.3)</span><span class="code-text">; }</span>
+<span class="tag-css">.navbar</span> <span class="code-text">{</span>
+  <span class="tag-attr">backdrop-filter</span><span class="code-text">: </span><span class="tag-val">blur(12px)</span><span class="code-text">;</span>
+  <span class="tag-attr">background</span><span class="code-text">: </span><span class="tag-val">rgba(255,255,255,0.08)</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="card p-6" style="background:linear-gradient(135deg,#FF4D8D,#8B5CF6,#00D9C0)">
+            <div class="p-4 rounded-xl font-display font-bold text-sm text-center" style="background:rgba(255,255,255,0.12);backdrop-filter:blur(8px);color:#fff;border:1px solid rgba(255,255,255,0.3)">
+              Panel Kaca (glassmorphism) 🧊
+            </div>
+            <p class="text-[10px] mt-2 text-white/70 text-center">latar berwarna di baliknya tetap kabur</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 17: LATIHAN EFEK VISUAL -->
+    <section class="slide" data-stage="fx-latihan">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-sliders" style="color:var(--pink)"></i> Latihan 3</span>
+          <h2 class="font-display font-bold text-3xl md:text-4xl">Mainkan efek elemen! 🧪</h2>
+          <p class="text-sm text-[var(--muted)] mt-2">Klik tombol untuk menerapkan transform, filter, dan shadow secara langsung.</p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-6 items-center">
+          <div class="card p-6 flex flex-wrap gap-2 justify-center anim-2">
+            <button class="fx-btn" onclick="applyFx('rotate')">rotate()</button>
+            <button class="fx-btn" onclick="applyFx('scale')">scale()</button>
+            <button class="fx-btn" onclick="applyFx('skew')">skew()</button>
+            <button class="fx-btn" onclick="applyFx('blur')">blur()</button>
+            <button class="fx-btn" onclick="applyFx('bright')">brightness()</button>
+            <button class="fx-btn" onclick="applyFx('shadow')">box-shadow</button>
+            <button class="fx-btn" onclick="resetFx()" style="border-color:var(--pink);color:var(--pink)">↺ Reset</button>
+          </div>
+          <div class="card p-6 flex justify-center anim-3" style="background:#0b0e12">
+            <div id="fxBox" class="w-28 h-28 rounded-2xl grid place-items-center" style="background:linear-gradient(135deg,var(--pink),var(--purple));color:#0F1419;transition:all .5s">
+              <i class="fa-solid fa-dice text-3xl"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 18: CSS FUNCTIONS -->
+    <section class="slide" data-stage="functions">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-calculator" style="color:var(--pink)"></i> Fungsi CSS</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Ukuran yang <span style="color:var(--pink)">berhitung</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3">CSS bisa menghitung sendiri. Inilah senjata utama layout yang fleksibel.</p>
+        </div>
+        <div class="grid-4">
+          <div class="card p-6 anim-2">
+            <p class="text-lg font-mono font-bold mb-3" style="color:var(--pink)">calc()</p>
+            <p class="text-sm text-[var(--muted)] mb-3">Menghitung kombinasi satuan — misal sisakan tempat untuk navbar.</p>
+            <div class="code-block text-xs"><span class="tag-css">.konten</span> <span class="code-text">{</span> <span class="tag-attr">width</span><span class="code-text">: </span><span class="tag-val">calc(100% - 40px)</span><span class="code-text">; }</span></div>
+          </div>
+          <div class="card p-6 anim-3">
+            <p class="text-lg font-mono font-bold mb-3" style="color:#c4b5fd">clamp()</p>
+            <p class="text-sm text-[var(--muted)] mb-3">Ukuran yang <b class="text-white">otomatis menyusut &amp; tumbuh</b> antara minimum &amp; maksimum.</p>
+            <div class="code-block text-xs"><span class="tag-css">h1</span> <span class="code-text">{</span> <span class="tag-attr">font-size</span><span class="code-text">: </span><span class="tag-val">clamp(1.5rem, 4vw, 3rem)</span><span class="code-text">; }</span></div>
+          </div>
+          <div class="card p-6 anim-2">
+            <p class="text-lg font-mono font-bold mb-3" style="color:var(--css)">min()</p>
+            <p class="text-sm text-[var(--muted)] mb-3">Mengambil <b class="text-white">nilai terkecil</b> — tidak akan melebihi batas.</p>
+            <div class="code-block text-xs"><span class="tag-css">.gambar</span> <span class="code-text">{</span> <span class="tag-attr">width</span><span class="code-text">: </span><span class="tag-val">min(90%, 600px)</span><span class="code-text">; }</span></div>
+          </div>
+          <div class="card p-6 anim-4">
+            <p class="text-lg font-mono font-bold mb-3" style="color:var(--js)">max()</p>
+            <p class="text-sm text-[var(--muted)] mb-3">Mengambil <b class="text-white">nilai terbesar</b> — selalu sekurang-kurangnya itu.</p>
+            <div class="code-block text-xs"><span class="tag-css">.tombol</span> <span class="code-text">{</span> <span class="tag-attr">width</span><span class="code-text">: </span><span class="tag-val">max(160px, 30%)</span><span class="code-text">; }</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 19: STICKY & Z-INDEX -->
+    <section class="slide" data-stage="sticky">
+      <div class="slide-inner grid-2">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-location-dot" style="color:var(--pink)"></i> Posisi Lanjut</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            <span style="color:var(--pink)">sticky</span> &amp; <span style="color:var(--pink)">z-index</span>
+          </h2>
+          <p class="text-[var(--muted)] mb-6 anim-3"><span class="font-mono" style="color:var(--pink)">position:sticky</span> membuat elemen "menempel" saat discroll. <span class="font-mono" style="color:var(--pink)">z-index</span> menentukan siapa di atas.</p>
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">position: sticky</span>
+              <span class="text-white/80">Menggabungkan relatif + fixed.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(139,92,246,0.15);color:#c4b5fd">z-index: 1</span>
+              <span class="text-white/80">Semakin besar angka, semakin di depan.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(255,210,63,0.15);color:var(--js)">z-index: -1</span>
+              <span class="text-white/80">Bisa dikirim ke belakang elemen lain.</span>
+            </div>
+            <div class="card p-4 text-xs" style="background:rgba(255,210,63,0.05);border-color:rgba(255,210,63,0.2)">
+              💡 <span class="text-white/80">z-index hanya bekerja pada elemen dengan <b class="text-white">position</b> yang bukan static.</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 space-y-4">
+          <div class="card p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">Scroll area di bawah — judul menempel:</p>
+            <div class="demo-scroll">
+              <div class="sticky-bar">📌 Judul Menempel (sticky)</div>
+              <p class="text-xs text-[var(--muted)] py-2">Baris konten 1...</p>
+              <p class="text-xs text-[var(--muted)] py-2">Baris konten 2...</p>
+              <p class="text-xs text-[var(--muted)] py-2">Baris konten 3...</p>
+              <p class="text-xs text-[var(--muted)] py-2">Baris konten 4...</p>
+              <p class="text-xs text-[var(--muted)] py-2">Baris konten 5...</p>
+            </div>
+          </div>
+          <div class="card p-5" style="background:#0b0e12">
+            <p class="text-xs text-[var(--muted)] mb-3 font-mono">z-index: A=1, B=3 → B di depan</p>
+            <div class="relative h-24">
+              <div class="absolute left-8 top-2 w-24 h-16 rounded-lg grid place-items-center text-xs font-bold" style="background:rgba(255,77,141,0.5);z-index:1">A · z=1</div>
+              <div class="absolute left-16 top-6 w-24 h-16 rounded-lg grid place-items-center text-xs font-bold" style="background:rgba(139,92,246,0.7);z-index:3;color:#fff">B · z=3</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 20: FLEXBOX LANJUTAN -->
+    <section class="slide" data-stage="flexlanjut">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-align-justify" style="color:var(--pink)"></i> Flexbox Pro</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Kendalikan <span style="color:var(--pink)">ukuran item</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3">Properti di item (anak) mengatur seberapa besar dia tumbuh / menyusut.</p>
+        </div>
+        <div class="grid-4">
+          <div class="card p-5 anim-2">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">flex-grow: 1</p>
+            <p class="text-sm text-[var(--muted)] mb-3">Item mengisi <b class="text-white">sisa ruang</b>. Angka menentukan proporsi.</p>
+            <div class="flex gap-1">
+              <span class="h-8 rounded flex-1" style="background:rgba(255,77,141,0.5)"></span>
+              <span class="h-8 rounded flex-1" style="background:rgba(139,92,246,0.5)"></span>
+              <span class="h-8 rounded flex-1" style="background:rgba(0,217,192,0.5)"></span>
+            </div>
+          </div>
+          <div class="card p-5 anim-3">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">flex-shrink: 0</p>
+            <p class="text-sm text-[var(--muted)] mb-3">Mencegah item <b class="text-white">menyusut</b> saat ruang sempit.</p>
+            <div class="flex gap-1">
+              <span class="h-8 rounded" style="background:rgba(139,92,246,0.5);flex-shrink:0;width:60px"></span>
+              <span class="h-8 rounded flex-1" style="background:rgba(255,210,63,0.4)"></span>
+            </div>
+          </div>
+          <div class="card p-5 anim-2">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">flex-wrap: wrap</p>
+            <p class="text-sm text-[var(--muted)] mb-3">Membiarkan item <b class="text-white">turun baris</b> (sudah di CSS Dasar, sering dipakai!).</p>
+            <div class="flex flex-wrap gap-1">
+              <span class="h-6 w-10 rounded" style="background:rgba(255,77,141,0.4)"></span>
+              <span class="h-6 w-10 rounded" style="background:rgba(255,77,141,0.4)"></span>
+              <span class="h-6 w-10 rounded" style="background:rgba(255,77,141,0.4)"></span>
+              <span class="h-6 w-10 rounded" style="background:rgba(255,77,141,0.4)"></span>
+              <span class="h-6 w-10 rounded" style="background:rgba(255,77,141,0.4)"></span>
+            </div>
+          </div>
+          <div class="card p-5 anim-4">
+            <p class="text-xs font-mono mb-3" style="color:var(--pink)">order: n</p>
+            <p class="text-sm text-[var(--muted)] mb-3">Mengubah <b class="text-white">urutan tampil</b> tanpa mengubah HTML.</p>
+            <div class="flex gap-1">
+              <span class="h-8 rounded grid place-items-center text-[10px] font-bold flex-1" style="background:rgba(255,77,141,0.4);order:2">1→2</span>
+              <span class="h-8 rounded grid place-items-center text-[10px] font-bold flex-1" style="background:rgba(0,217,192,0.4);order:1">2→1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 21: GRID LANJUTAN -->
+    <section class="slide" data-stage="gridlanjut">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-dice-d6" style="color:var(--pink)"></i> Grid Pro</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Layout dengan <span style="color:var(--pink)">area bernama</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3">Grid bisa "menggambar" peta layout dengan kata-kata — sangat mudah dibaca manusia.</p>
+        </div>
+        <div class="grid-2 gap-6">
+          <div class="anim-2">
+            <div class="card p-5">
+              <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css — grid-template-areas</p>
+              <div class="code-block text-xs">
+<span class="tag-css">.layout</span> <span class="code-text">{</span>
+  <span class="tag-attr">display</span><span class="code-text">: </span><span class="tag-val">grid</span><span class="code-text">;</span>
+  <span class="tag-attr">grid-template-areas</span><span class="code-text">:</span>
+    <span class="tag-val">"header header"</span>
+    <span class="tag-val">"sidebar main"</span>
+    <span class="tag-val">"footer footer"</span><span class="code-text">;</span>
+  <span class="tag-attr">grid-template-columns</span><span class="code-text">: </span><span class="tag-val">120px 1fr</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+<span class="tag-css">.header</span> <span class="code-text">{</span> <span class="tag-attr">grid-area</span><span class="code-text">: </span><span class="tag-val">header</span><span class="code-text">; }</span>
+              </div>
+            </div>
+          </div>
+          <div class="anim-3">
+            <div class="layout-areas">
+              <div class="area-header">header</div>
+              <div class="area-sidebar">sidebar</div>
+              <div class="area-main">main</div>
+              <div class="area-footer">footer</div>
+            </div>
+            <p class="text-[10px] text-[var(--muted)] mt-2 text-center">↑ Peta area → hasil nyata. Ganti 1 kata di grid-template-areas, seluruh layout ikut berubah.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 22: RESPONSIF MODERN -->
+    <section class="slide" data-stage="responsif">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-mobile-screen-button" style="color:var(--pink)"></i> Responsif Pro</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            <span style="color:var(--pink)">Mobile-first</span> &amp; breakpoint
+          </h2>
+          <p class="text-[var(--muted)] mt-3">Tulis dulu gaya untuk HP, lalu perlahan perbaiki untuk layar lebih besar.</p>
+        </div>
+        <div class="grid-2 gap-6 items-center">
+          <div class="card p-5 anim-2">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css — pola mobile-first</p>
+            <div class="code-block text-xs">
+<span class="tag-css">.galeri</span> <span class="code-text">{</span> <span class="tag-attr">display</span><span class="code-text">: </span><span class="tag-val">grid</span><span class="code-text">; </span><span class="tag-attr">gap</span><span class="code-text">: </span><span class="tag-val">12px</span><span class="code-text">; }</span>
+<span class="tag-css">h1</span> <span class="code-text">{</span> <span class="tag-attr">font-size</span><span class="code-text">: </span><span class="tag-val">clamp(1.8rem, 5vw, 3.5rem)</span><span class="code-text">; }</span>
+
+<span class="tag-css">@media (min-width: 640px)</span> <span class="code-text">{</span>
+  <span class="tag-css">.galeri</span> <span class="code-text">{</span> <span class="tag-attr">grid-template-columns</span><span class="code-text">: </span><span class="tag-val">1fr 1fr</span><span class="code-text">; }</span>
+<span class="code-text">}</span>
+<span class="tag-css">@media (min-width: 1024px)</span> <span class="code-text">{</span>
+  <span class="tag-css">.galeri</span> <span class="code-text">{</span> <span class="tag-attr">grid-template-columns</span><span class="code-text">: </span><span class="tag-val">repeat(4, 1fr)</span><span class="code-text">; }</span>
+<span class="code-text">}</span>
+            </div>
+          </div>
+          <div class="space-y-3 anim-3">
+            <div class="val-card">
+              <span class="vlabel">breakpoint umum</span>
+              <span class="vnote">640px (HP) · 768px (tablet) · 1024px (laptop) · 1280px (desktop)</span>
+            </div>
+            <div class="val-card">
+              <span class="vlabel">1 kolom → 2 → 4 kolom</span>
+              <span class="vnote">galeri bertambah kolom seiring layar membesar</span>
+            </div>
+            <div class="val-card">
+              <span class="vlabel">clamp() untuk teks</span>
+              <span class="vnote">judul mengecil di HP, membesar di desktop — otomatis</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 23: BEST PRACTICES -->
+    <section class="slide" data-stage="best">
+      <div class="slide-inner">
+        <div class="text-center mb-8 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-check-double" style="color:var(--pink)"></i> Best Practices</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Menulis CSS <span style="color:var(--pink)">rapi &amp; cepat</span>
+          </h2>
+        </div>
+        <div class="grid-4">
+          <div class="card p-6 anim-2">
+            <div class="w-12 h-12 rounded-xl grid place-items-center mb-3" style="background:rgba(255,77,141,0.15);color:var(--pink)"><i class="fa-solid fa-ban"></i></div>
+            <h3 class="font-display font-bold text-lg mb-2">Jauhi !important</h3>
+            <p class="text-sm text-[var(--muted)]">`!important` merusak kaskade. Gunakan spesifisitas yang benar, bukan memaksakan.</p>
+          </div>
+          <div class="card p-6 anim" style="border-color:rgba(139,92,246,0.3)">
+            <div class="w-12 h-12 rounded-xl grid place-items-center mb-3" style="background:rgba(139,92,246,0.15);color:#c4b5fd"><i class="fa-solid fa-tag"></i></div>
+            <h3 class="font-display font-bold text-lg mb-2">Nama class jelas</h3>
+            <p class="text-sm text-[var(--muted)]">Pakai pola sederhana ala BEM: <span class="font-mono">kartu</span>, <span class="font-mono">kartu--judul</span>, <span class="font-mono">kartu__harga</span>.</p>
+          </div>
+          <div class="card p-6 anim" style="border-color:rgba(0,217,192,0.3)">
+            <div class="w-12 h-12 rounded-xl grid place-items-center mb-3" style="background:rgba(0,217,192,0.15);color:var(--css)"><i class="fa-solid fa-bolt"></i></div>
+            <h3 class="font-display font-bold text-lg mb-2">Pakai variabel</h3>
+            <p class="text-sm text-[var(--muted)]">Warna &amp; jarak berulang → simpan di <span class="font-mono" style="color:var(--pink)">--var</span>. Konsisten &amp; mudah diubah.</p>
+          </div>
+          <div class="card p-6 anim" style="border-color:rgba(255,210,63,0.3)">
+            <div class="w-12 h-12 rounded-xl grid place-items-center mb-3" style="background:rgba(255,210,63,0.15);color:var(--js)"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <h3 class="font-display font-bold text-lg mb-2">Gunakan DevTools</h3>
+            <p class="text-sm text-[var(--muted)]">Klik kanan → Inspect. Uji properti langsung tanpa perlu menulis ulang file.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 24: QUIZ -->
+    <section class="slide" data-stage="quiz">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-circle-question" style="color:var(--pink)"></i> Quiz Singkat</span>
+          <h2 class="font-display font-bold text-3xl md:text-4xl">Coba kamu jawab! 🎯</h2>
+        </div>
+        <div id="quizContainer" class="max-w-3xl mx-auto space-y-4"></div>
+        <div id="quizResult" class="text-center mt-5 anim" style="display:none">
+          <div class="card p-5 inline-block">
+            <p class="font-display text-2xl font-bold mb-1" id="quizScore" style="color:var(--pink)">0/5</p>
+            <p class="text-sm text-[var(--muted)]" id="quizFeedback">Kerja bagus!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 25: DRAG DROP -->
+    <section class="slide" data-stage="drag">
+      <div class="slide-inner">
+        <div class="text-center mb-5 anim">
+          <span class="stage-pill mb-3"><i class="fa-solid fa-hand-pointer" style="color:var(--pink)"></i> Aktivitas 1</span>
+          <h2 class="font-display font-bold text-3xl md:text-4xl">Cocokkan Fitur CSS Lanjutan!</h2>
+          <p class="text-sm text-[var(--muted)] mt-2">Seret kartu fungsi ke fitur yang sesuai</p>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mb-4 anim-2" id="dragDropGrid">
+          <div class="drop-zone" data-stage="1"><p class="text-[10px] font-bold mb-2 text-center" style="color:var(--pink)">:hover</p><div class="space-y-2 min-h-[50px]"></div></div>
+          <div class="drop-zone" data-stage="2"><p class="text-[10px] font-bold mb-2 text-center" style="color:var(--pink)">::before</p><div class="space-y-2 min-h-[50px]"></div></div>
+          <div class="drop-zone" data-stage="3"><p class="text-[10px] font-bold mb-2 text-center" style="color:var(--pink)">var(--x)</p><div class="space-y-2 min-h-[50px]"></div></div>
+          <div class="drop-zone" data-stage="4"><p class="text-[10px] font-bold mb-2 text-center" style="color:var(--pink)">@keyframes</p><div class="space-y-2 min-h-[50px]"></div></div>
+          <div class="drop-zone" data-stage="5"><p class="text-[10px] font-bold mb-2 text-center" style="color:var(--pink)">transition</p><div class="space-y-2 min-h-[50px]"></div></div>
+          <div class="drop-zone" data-stage="6"><p class="text-[10px] font-bold mb-2 text-center" style="color:var(--pink)">calc()</p><div class="space-y-2 min-h-[50px]"></div></div>
+          <div class="drop-zone" data-stage="7"><p class="text-[10px] font-bold mb-2 text-center" style="color:var(--pink)">position: sticky</p><div class="space-y-2 min-h-[50px]"></div></div>
+          <div class="drop-zone" data-stage="8"><p class="text-[10px] font-bold mb-2 text-center" style="color:var(--pink)">z-index</p><div class="space-y-2 min-h-[50px]"></div></div>
+        </div>
+        <div class="p-3 rounded-xl flex flex-wrap gap-2 anim-3" id="dragItemsPool" style="background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1)">
+          <p class="w-full text-xs text-[var(--muted)] mb-1">📌 Seret kartu:</p>
+        </div>
+        <div class="mt-4 flex flex-wrap items-center gap-3 anim-4">
+          <button id="checkDragBtn" class="px-5 py-2 rounded-lg font-semibold text-white text-sm" style="background:linear-gradient(135deg,var(--pink),var(--purple))">
+            <i class="fa-solid fa-check mr-1"></i>Cek Jawaban
+          </button>
+          <button id="resetDragBtn" class="px-5 py-2 rounded-lg font-semibold text-sm border border-[var(--border)] hover:bg-white/5">
+            <i class="fa-solid fa-rotate-left mr-1"></i>Reset
+          </button>
+          <span id="dragFeedback" class="text-sm font-medium"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 26: TUGAS 1 -->
+    <section class="slide" data-stage="tugas1">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3" style="border-color:rgba(255,77,141,0.3)"><i class="fa-solid fa-flag-checkered" style="color:var(--pink)"></i> Tugas • Bobot 30%</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Misimu: <span style="color:var(--pink)">Kartu Profil Animasi</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3 max-w-2xl mx-auto">Buat kartu profil yang hidup — gabungkan variabel, gradient, transform, animasi, dan responsif dalam satu halaman.</p>
+        </div>
+        <div class="card p-6 mb-5 anim-2">
+          <p class="font-display font-bold text-lg mb-4">Syarat Wajib:</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-1 mt-1 text-[var(--pink)]"></i>
+              <div><b class="text-sm">Variabel CSS</b><p class="text-xs text-[var(--muted)]">Tema warna lewat <span class="font-mono" style="color:var(--pink)">--warna</span> di :root.</p></div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-2 mt-1 text-[var(--pink)]"></i>
+              <div><b class="text-sm">Gradient &amp; Shadow</b><p class="text-xs text-[var(--muted)]">Latar gradient + <span class="font-mono">box-shadow</span> pada kartu.</p></div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-3 mt-1 text-[var(--pink)]"></i>
+              <div><b class="text-sm">Animasi</b><p class="text-xs text-[var(--muted)]">Satu elemen beranimasi dengan <span class="font-mono">@keyframes</span>.</p></div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-4 mt-1 text-[var(--pink)]"></i>
+              <div><b class="text-sm">Transform &amp; Hover</b><p class="text-xs text-[var(--muted)]">Kartu berubah saat di-hover (translate/scale).</p></div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-5 mt-1 text-[var(--pink)]"></i>
+              <div><b class="text-sm">Flexbox/Grid</b><p class="text-xs text-[var(--muted)]">Susun foto, nama, dan ikon dengan flex atau grid.</p></div>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <i class="fa-solid fa-6 mt-1 text-[var(--pink)]"></i>
+              <div><b class="text-sm">Responsif</b><p class="text-xs text-[var(--muted)]">Kartu tetap rapi di HP (pakai <span class="font-mono">@media</span>).</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="card p-4 anim-4" style="background:rgba(255,77,141,0.05);border-color:rgba(255,77,141,0.2)">
+          <p class="text-xs font-semibold mb-2 flex items-center gap-2"><i class="fa-solid fa-circle-info" style="color:var(--pink)"></i>Tugas dikumpulkan dalam format:</p>
+          <p class="text-sm text-white/90">2 file: <span class="font-mono text-[var(--pink)]">tugas_css_lanjut_nama.html</span> + <span class="font-mono text-[var(--pink)]">tugas_css_lanjut_nama.css</span>, di folder yang sama.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 27: PROYEK 2 -->
+    <section class="slide" data-stage="tugas2">
+      <div class="slide-inner">
+        <div class="text-center mb-6 anim">
+          <span class="stage-pill mb-3" style="border-color:rgba(139,92,246,0.3)"><i class="fa-solid fa-rocket" style="color:#c4b5fd"></i> Proyek Bonus</span>
+          <h2 class="font-display font-bold text-4xl md:text-5xl leading-tight">
+            Proyek 2: <span style="color:#c4b5fd">Landing Page Hero</span>
+          </h2>
+          <p class="text-[var(--muted)] mt-3 max-w-2xl mx-auto">Tantangan opsional: buat bagian hero (bagian pembuka) sebuah landing page yang memukau.</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-4">
+          <div class="card p-5 anim-2">
+            <div class="w-12 h-12 rounded-xl grid place-items-center mb-3" style="background:rgba(255,77,141,0.15);color:var(--pink)"><i class="fa-solid fa-mountain-sun"></i></div>
+            <h3 class="font-display font-bold text-lg mb-2">Background</h3>
+            <p class="text-sm text-[var(--muted)]">Latar dengan <span class="font-mono" style="color:var(--pink)">gradient</span> + elemen mengambang (keyframes).</p>
+          </div>
+          <div class="card p-5 anim-3">
+            <div class="w-12 h-12 rounded-xl grid place-items-center mb-3" style="background:rgba(139,92,246,0.15);color:#c4b5fd"><i class="fa-solid fa-type"></i></div>
+            <h3 class="font-display font-bold text-lg mb-2">Judul Hero</h3>
+            <p class="text-sm text-[var(--muted)]">Judul besar pakai <span class="font-mono" style="color:#c4b5fd">clamp()</span> + teks ber-gradient.</p>
+          </div>
+          <div class="card p-5 anim-4">
+            <div class="w-12 h-12 rounded-xl grid place-items-center mb-3" style="background:rgba(0,217,192,0.15);color:var(--css)"><i class="fa-solid fa-bars"></i></div>
+            <h3 class="font-display font-bold text-lg mb-2">Navbar Kaca</h3>
+            <p class="text-sm text-[var(--muted)]">Navbar <span class="font-mono" style="color:var(--css)">sticky</span> + <span class="font-mono" style="color:var(--css)">backdrop-filter: blur()</span>.</p>
+          </div>
+        </div>
+        <div class="card p-4 mt-5 anim-3" style="background:rgba(255,210,63,0.05);border-color:rgba(255,210,63,0.2)">
+          <p class="text-xs font-semibold mb-1 flex items-center gap-2"><i class="fa-solid fa-lightbulb" style="color:var(--js)"></i>Ide lintas bab:</p>
+          <p class="text-sm text-white/90">Pakai layout <span class="font-mono">grid-template-areas</span> untuk menyusun hero, dan <span class="font-mono">:hover</span> untuk tombol CTA yang "berbicara". Kumpulkan sebagai <span class="font-mono text-[var(--js)]">bonus_hero_nama.*</span></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 28: CLOSING -->
+    <section class="slide" data-stage="closing">
+      <div class="slide-inner text-center">
+        <div class="inline-block mb-6 anim">
+          <div class="w-16 h-16 rounded-2xl grid place-items-center mx-auto" style="background:linear-gradient(135deg,var(--pink),var(--purple))">
+            <i class="fa-solid fa-wand-magic-sparkles text-2xl text-white"></i>
+          </div>
+        </div>
+        <h2 class="font-display font-bold text-4xl md:text-6xl leading-tight mb-5 anim-2">
+          Kamu bukan sekadar menulis CSS,<br>kamu kini <span style="color:var(--pink)">mendesain pengalaman</span>.
+        </h2>
+        <p class="text-lg text-[var(--muted)] max-w-2xl mx-auto mb-10 anim-3">
+          Kuasai kaskade, variabel, animasi, dan layout modern. Langkah berikutnya: hidupkan halamanmu dengan JavaScript!
+        </p>
+        <div class="flex flex-wrap gap-3 justify-center mb-12 anim-4">
+          <button onclick="goToSlide(0)" class="px-6 py-3 rounded-xl font-semibold text-white text-sm" style="background:linear-gradient(135deg,var(--pink),var(--purple))">
+            <i class="fa-solid fa-arrow-up mr-2"></i>Ulang dari Awal
+          </button>
+        </div>
+        <p class="text-xs text-[var(--muted)] mt-8">Modul Pembelajaran CSS Lanjutan — Kelas X RPL • Dibuat dengan ❤️</p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" title="Slide sebelumnya">
+    <i class="fa-solid fa-chevron-left text-xs"></i>
+  </button>
+  <div class="dots" id="dots"></div>
+  <span class="slide-counter"><b id="curSlide">1</b> / <span id="totalSlides">28</span></span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" title="Slide berikutnya">
+    <i class="fa-solid fa-chevron-right text-xs"></i>
+  </button>
+  <button class="nav-btn" onclick="toggleFullscreen()" title="Fullscreen">
+    <i class="fa-solid fa-expand text-xs"></i>
+  </button>
+</div>
+
+<div class="toast" id="toast"><span id="toastText"></span></div>
+
+<script>
+  /* ========== SLIDE NAVIGATION ========== */
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let curSlide = 0;
+
+  document.getElementById('totalSlides').textContent = totalSlides;
+
+  const dotsContainer = document.getElementById('dots');
+  slides.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => goToSlide(i);
+    dotsContainer.appendChild(dot);
+  });
+
+  function updateSlide() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === curSlide));
+    document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === curSlide));
+    document.getElementById('curSlide').textContent = curSlide + 1;
+    document.getElementById('progressFill').style.width = ((curSlide + 1) / totalSlides * 100) + '%';
+    document.getElementById('prevBtn').disabled = curSlide === 0;
+    document.getElementById('nextBtn').disabled = curSlide === totalSlides - 1;
+    if (slides[curSlide]) slides[curSlide].scrollTop = 0;
+  }
+
+  function goToSlide(i) {
+    curSlide = Math.max(0, Math.min(totalSlides - 1, i));
+    updateSlide();
+  }
+  function nextSlide() { goToSlide(curSlide + 1); }
+  function prevSlide() { goToSlide(curSlide - 1); }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+    else if (e.key === 'Home') goToSlide(0);
+    else if (e.key === 'End') goToSlide(totalSlides - 1);
+    else if (e.key === 'f' || e.key === 'F') toggleFullscreen();
+  });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+  document.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(diff) > 60) {
+      if (diff < 0) nextSlide(); else prevSlide();
+    }
+  });
+
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+
+  updateSlide();
+
+  function adjustSlidePadding() {
+    const navBar = document.querySelector('.nav-bar');
+    if (navBar) {
+      const h = navBar.offsetHeight;
+      document.querySelectorAll('.slide-inner').forEach(s => s.style.paddingBottom = (h + 12) + 'px');
+    }
+  }
+  adjustSlidePadding();
+  window.addEventListener('resize', adjustSlidePadding);
+
+  /* ========== LATIHAN 1: SPECIFICITY ========== */
+  const specAnswers = [1, 0]; // Biru, Merah
+  const specFeedbacks = [
+    ['Benar! .judul (class) mengalahkan p (elemen) ✅', 'Benar! class mengalahkan elemen.'],
+    ['Salah — p (elemen) kalah dari .judul. Jawaban: Biru', 'Salah — inline style selalu menang. Jawaban: Merah']
+  ];
+  function checkSpec(q, choice) {
+    const card = event.target.closest('.card');
+    const btns = card.querySelectorAll('.spec-opt');
+    btns.forEach((b, i) => {
+      b.classList.remove('ok', 'no');
+      b.classList.add(i === specAnswers[q] ? 'ok' : 'no');
+    });
+    const fb = card.querySelector('.spec-fb');
+    fb.textContent = specFeedbacks[q][choice === specAnswers[q] ? 0 : 1];
+    fb.style.color = choice === specAnswers[q] ? '#22c55e' : '#ef4444';
+  }
+
+  /* ========== LATIHAN 2: VARIABEL ========== */
+  function setDemoColor(color) {
+    const stage = document.getElementById('varStage');
+    if (stage) stage.style.setProperty('--demo-color', color);
+    showToast('--demo-color diubah → ' + color);
+  }
+
+  /* ========== LATIHAN 3: EFEK VISUAL ========== */
+  function applyFx(type) {
+    const el = document.getElementById('fxBox');
+    const map = {
+      rotate: 'transform:rotate(15deg)',
+      scale: 'transform:scale(1.35)',
+      skew: 'transform:skewX(-14deg)',
+      blur: 'filter:blur(2px)',
+      bright: 'filter:brightness(1.5) saturate(1.3)',
+      shadow: 'box-shadow:0 24px 45px -14px rgba(255,77,141,0.7)'
+    };
+    el.style.cssText = 'transition:all .5s; ' + (map[type] || '');
+  }
+  function resetFx() {
+    document.getElementById('fxBox').removeAttribute('style');
+  }
+
+  /* ========== QUIZ ========== */
+  const quizData = [
+    {
+      q: "Aturan CSS mana yang paling kuat?",
+      options: ["p { }", ".judul { }", "#nama { }", "style=\"...\" inline"],
+      answer: 3
+    },
+    {
+      q: "Sintaks yang benar untuk variabel CSS?",
+      options: ["$warna: pink;", "@warna: pink;", "--warna: pink;", "var--warna: pink;"],
+      answer: 2
+    },
+    {
+      q: "::before digunakan untuk...",
+      options: ["mengubah posisi elemen", "menambah konten sebelum elemen", "menghapus elemen", "membuat animasi"],
+      answer: 1
+    },
+    {
+      q: "Properti untuk peralihan halus antar state?",
+      options: ["transition", "transform", "display", "position"],
+      answer: 0
+    },
+    {
+      q: "grid-template-areas digunakan untuk...",
+      options: ["mengatur warna kolom", "memberi nama pada area layout grid", "menambahkan area responsif", "membuat animasi grid"],
+      answer: 1
+    }
+  ];
+
+  const quizContainer = document.getElementById('quizContainer');
+  const quizResult = document.getElementById('quizResult');
+  let userAnswers = new Array(quizData.length).fill(null);
+
+  quizData.forEach((item, idx) => {
+    const div = document.createElement('div');
+    div.className = 'card p-5';
+    div.innerHTML = `
+      <div class="flex items-start gap-3 mb-3">
+        <span class="w-7 h-7 rounded-lg grid place-items-center font-bold text-xs flex-shrink-0" style="background:rgba(255,77,141,0.15);color:var(--pink)">${idx+1}</span>
+        <p class="font-display font-semibold text-sm md:text-base pt-0.5">${item.q}</p>
+      </div>
+      <div class="grid sm:grid-cols-2 gap-2" id="qOptions-${idx}">
+        ${item.options.map((opt, i) => `
+          <div class="quiz-opt" data-q="${idx}" data-i="${i}">
+            <span class="opt-letter">${String.fromCharCode(65+i)}</span>
+            <span class="text-sm font-mono">${opt}</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    quizContainer.appendChild(div);
+  });
+
+  document.querySelectorAll('.quiz-opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const q = parseInt(opt.dataset.q);
+      const i = parseInt(opt.dataset.i);
+      userAnswers[q] = i;
+      const options = document.querySelectorAll(`#qOptions-${q} .quiz-opt`);
+      options.forEach((o, idx) => {
+        o.classList.remove('correct', 'wrong');
+        if (idx === quizData[q].answer) o.classList.add('correct');
+        else if (idx === i && i !== quizData[q].answer) o.classList.add('wrong');
+        o.classList.add('disabled');
+      });
+      if (userAnswers.every(a => a !== null)) {
+        const score = userAnswers.reduce((acc, a, idx) => acc + (a === quizData[idx].answer ? 1 : 0), 0);
+        document.getElementById('quizScore').textContent = `${score}/${quizData.length}`;
+        const fb = document.getElementById('quizFeedback');
+        if (score === 5) { fb.textContent = 'Sempurna! Kamu menguasai CSS Lanjutan! 🎉'; document.getElementById('quizScore').style.color = '#22c55e'; }
+        else if (score >= 3) { fb.textContent = 'Bagus! Tinggal asah lagi beberapa konsep.'; document.getElementById('quizScore').style.color = 'var(--pink)'; }
+        else { fb.textContent = 'Yuk baca lagi materinya pelan-pelan!'; document.getElementById('quizScore').style.color = 'var(--purple)'; }
+        quizResult.style.display = 'block';
+        showToast(`Quiz selesai! Skor: ${score}/${quizData.length}`);
+      }
+    });
+  });
+
+  /* ========== DRAG DROP ========== */
+  const dragItems = [
+    { id: 1, text: "Gaya saat kursor di atas elemen", stage: 1 },
+    { id: 2, text: "Menambah konten sebelum elemen", stage: 2 },
+    { id: 3, text: "Memakai nilai dari variabel CSS", stage: 3 },
+    { id: 4, text: "Mendefinisikan animasi berulang", stage: 4 },
+    { id: 5, text: "Peralihan halus saat hover", stage: 5 },
+    { id: 6, text: "Menghitung nilai di dalam CSS", stage: 6 },
+    { id: 7, text: "Elemen menempel saat discroll", stage: 7 },
+    { id: 8, text: "Urutan tumpukan elemen", stage: 8 }
+  ];
+
+  const pool = document.getElementById('dragItemsPool');
+  const dropZones = document.querySelectorAll('.drop-zone');
+
+  function shuffleItems() {
+    dropZones.forEach(z => z.querySelector('.space-y-2').innerHTML = '');
+    pool.innerHTML = '<p class="w-full text-xs text-[var(--muted)] mb-1">📌 Seret kartu:</p>';
+    const shuffled = [...dragItems].sort(() => Math.random() - 0.5);
+    shuffled.forEach(item => {
+      const el = document.createElement('div');
+      el.className = 'drag-item';
+      el.draggable = true;
+      el.dataset.id = item.id;
+      el.dataset.stage = item.stage;
+      el.textContent = item.text;
+      el.addEventListener('dragstart', e => {
+        el.classList.add('dragging');
+        e.dataTransfer.setData('text/plain', item.id);
+      });
+      el.addEventListener('dragend', () => el.classList.remove('dragging'));
+      pool.appendChild(el);
+    });
+  }
+  shuffleItems();
+
+  dropZones.forEach(zone => {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('over');
+      const id = e.dataTransfer.getData('text/plain');
+      const dragged = document.querySelector(`.drag-item[data-id="${id}"]`);
+      if (dragged) zone.querySelector('.space-y-2').appendChild(dragged);
+    });
+  });
+
+  pool.addEventListener('dragover', e => e.preventDefault());
+  pool.addEventListener('drop', e => {
+    e.preventDefault();
+    const id = e.dataTransfer.getData('text/plain');
+    const dragged = document.querySelector(`.drag-item[data-id="${id}"]`);
+    if (dragged && !pool.contains(dragged)) pool.appendChild(dragged);
+  });
+
+  document.getElementById('checkDragBtn').addEventListener('click', () => {
+    let correct = 0;
+    dropZones.forEach(zone => {
+      const expected = zone.dataset.stage;
+      zone.querySelectorAll('.drag-item').forEach(item => {
+        if (item.dataset.stage === expected) {
+          item.style.borderColor = '#22c55e';
+          item.style.background = 'rgba(34,197,94,0.1)';
+          correct++;
+        } else {
+          item.style.borderColor = '#ef4444';
+          item.style.background = 'rgba(239,68,68,0.1)';
+        }
+      });
+    });
+    const fb = document.getElementById('dragFeedback');
+    if (correct === dragItems.length) {
+      fb.textContent = `🎉 Sempurna! ${correct}/${dragItems.length} benar!`;
+      fb.style.color = '#22c55e';
+      showToast('Kerja bagus! Kamu paham fitur CSS Lanjutan.');
+    } else if (correct >= 4) {
+      fb.textContent = `Hampir! ${correct}/${dragItems.length} benar.`;
+      fb.style.color = 'var(--js)';
+    } else {
+      fb.textContent = `${correct}/${dragItems.length} benar. Coba lagi!`;
+      fb.style.color = 'var(--pink)';
+    }
+  });
+
+  document.getElementById('resetDragBtn').addEventListener('click', () => {
+    shuffleItems();
+    document.getElementById('dragFeedback').textContent = '';
+  });
+
+  /* ========== TOAST ========== */
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastText').textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3500);
+  }
+</script>
+</body>
+</html>

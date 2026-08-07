@@ -328,7 +328,7 @@
             <button onclick="nextSlide()" class="px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl font-semibold text-white text-sm" style="background:linear-gradient(135deg,var(--html),var(--purple))">
               <i class="fa-solid fa-rocket mr-2"></i>Mulai Belajar
             </button>
-            <button onclick="goToSlide(12)" class="px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl font-semibold text-sm border border-[var(--border)] hover:bg-white/5">
+            <button onclick="goToSlide(14)" class="px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl font-semibold text-sm border border-[var(--border)] hover:bg-white/5">
               Langsung ke Tugas
             </button>
           </div>
@@ -984,7 +984,102 @@
         </div>
       </div>
     </section>
-    <!-- SLIDE 11: QUIZ -->
+    <!-- SLIDE 11: PENGENALAN CSS -->
+    <section class="slide" data-stage="css">
+      <div class="slide-inner grid-2-custom">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--css)"></i> Melengkapi HTML</span>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Mempercantik dengan <span style="color:var(--css)">CSS</span>
+          </h2>
+          <p class="text-sm md:text-base text-[var(--muted)] mb-6 anim-3">HTML menyusun isi halaman, <b class="text-white">CSS menentukan tampilannya</b> — warna, ukuran huruf, hingga tata letak.</p>
+
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">Inline</span>
+              <span class="text-white/80">CSS ditulis langsung lewat atribut <span class="font-mono">style=""</span>.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">&lt;style&gt;</span>
+              <span class="text-white/80">Internal — CSS dalam satu tag <span class="font-mono">&lt;style&gt;</span> di &lt;head&gt;.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="font-mono px-3 py-1 rounded text-xs flex-shrink-0" style="background:rgba(0,217,192,0.15);color:var(--css)">&lt;link rel="stylesheet"&gt;</span>
+              <span class="text-white/80">External — file <span class="font-mono">.css</span> terpisah, paling rapi &amp; bisa dipakai ulang. <b class="text-[var(--css)]">★ Dianjurkan</b></span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 mt-6 lg:mt-0">
+          <div class="card p-4 sm:p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">style.css + cara pakai</p>
+            <div class="code-block text-xs">
+<span class="code-comment">/* style.css (external) */</span>
+<span class="tag-html">h1</span> <span class="code-text">{</span>
+  <span class="tag-attr">color</span><span class="code-text">: </span><span class="tag-val">#FF6B35</span><span class="code-text">;</span>
+  <span class="tag-attr">font-size</span><span class="code-text">: </span><span class="tag-val">32px</span><span class="code-text">;</span>
+<span class="code-text">}</span>
+<span class="tag-html">p</span> <span class="code-text">{ color: </span><span class="tag-val">#9AA5B1</span><span class="code-text">; }</span>
+
+<span class="code-text">&lt;link</span> <span class="tag-attr">rel</span><span class="code-text">=</span><span class="tag-val">"stylesheet"</span> <span class="tag-attr">href</span><span class="code-text">=</span><span class="tag-val">"style.css"</span><span class="code-text">&gt;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 12: OPEN GRAPH -->
+    <section class="slide" data-stage="opengraph">
+      <div class="slide-inner grid-2-custom">
+        <div>
+          <span class="stage-pill mb-4 anim"><i class="fa-solid fa-share-nodes" style="color:var(--css)"></i> Pratinjau di Media Sosial</span>
+          <h2 class="font-display font-bold text-3xl sm:text-4xl md:text-5xl leading-tight mb-5 anim-2">
+            Open Graph <span style="color:var(--css)">— Detail</span>
+          </h2>
+          <p class="text-sm md:text-base text-[var(--muted)] mb-6 anim-3">Open Graph menentukan tampilan preview saat link kamu di-share di WhatsApp, Instagram, atau Facebook — bukan sekadar URL mentah.</p>
+
+          <div class="space-y-3 anim-4 text-sm">
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <b class="font-mono text-xs flex-shrink-0 text-[var(--css)] pt-0.5">og:title</b>
+              <span class="text-xs text-white/80">Judul besar yang tampil di pratinjau.</span>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <b class="font-mono text-xs flex-shrink-0 text-[var(--css)] pt-0.5">og:description</b>
+              <span class="text-xs text-white/80">Ringkasan singkat di bawah judul.</span>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <b class="font-mono text-xs flex-shrink-0 text-[var(--css)] pt-0.5">og:image</b>
+              <span class="text-xs text-white/80">Gambar pratinjau (disarankan 1200×630).</span>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <b class="font-mono text-xs flex-shrink-0 text-[var(--css)] pt-0.5">og:url</b>
+              <span class="text-xs text-white/80">Link asli, agar tidak terjadi tautan ganda.</span>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <b class="font-mono text-xs flex-shrink-0 text-[var(--css)] pt-0.5">og:type</b>
+              <span class="text-xs text-white/80">Jenis konten: website, article, video, dll.</span>
+            </div>
+            <div class="flex items-start gap-3 bg-white/5 p-3 rounded-lg">
+              <b class="font-mono text-xs flex-shrink-0 text-[var(--css)] pt-0.5">og:locale</b>
+              <span class="text-xs text-white/80">Bahasa konten, mis. id_ID.</span>
+            </div>
+          </div>
+        </div>
+        <div class="anim-3 mt-6 lg:mt-0 space-y-4">
+          <div class="card p-4 sm:p-5">
+            <p class="text-xs text-[var(--muted)] mb-2 font-mono">Contoh og: di &lt;head&gt;</p>
+            <div class="code-block text-xs">
+<span class="tag-html">&lt;meta</span> <span class="tag-attr">property</span><span class="code-text">=</span><span class="tag-val">"og:title"</span> <span class="tag-attr">content</span><span class="code-text">=</span><span class="tag-val">"Toko Sepatu Maju"</span><span class="tag-html">&gt;</span>
+<span class="tag-html">&lt;meta</span> <span class="tag-attr">property</span><span class="code-text">=</span><span class="tag-val">"og:description"</span> <span class="tag-attr">content</span><span class="code-text">=</span><span class="tag-val">"Jual sepatu original."</span><span class="tag-html">&gt;</span>
+<span class="tag-html">&lt;meta</span> <span class="tag-attr">property</span><span class="code-text">=</span><span class="tag-val">"og:image"</span> <span class="tag-attr">content</span><span class="code-text">=</span><span class="tag-val">"https://…/sepatu.jpg"</span><span class="tag-html">&gt;</span>
+<span class="tag-html">&lt;meta</span> <span class="tag-attr">property</span><span class="code-text">=</span><span class="tag-val">"og:url"</span> <span class="tag-attr">content</span><span class="code-text">=</span><span class="tag-val">"https://…/"</span><span class="tag-html">&gt;</span>
+<span class="tag-html">&lt;meta</span> <span class="tag-attr">property</span><span class="code-text">=</span><span class="tag-val">"og:type"</span> <span class="tag-attr">content</span><span class="code-text">=</span><span class="tag-val">"website"</span><span class="tag-html">&gt;</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 13: QUIZ -->
     <section class="slide" data-stage="quiz">
       <div class="slide-inner">
         <div class="text-center mb-6 anim">
@@ -1001,7 +1096,7 @@
       </div>
     </section>
 
-    <!-- SLIDE 12: DRAG DROP -->
+    <!-- SLIDE 14: DRAG DROP -->
     <section class="slide" data-stage="drag">
       <div class="slide-inner">
         <div class="text-center mb-5 anim">
@@ -1046,7 +1141,7 @@
       </div>
     </section>
 
-    <!-- SLIDE 13: TUGAS -->
+    <!-- SLIDE 15: TUGAS -->
     <section class="slide" data-stage="tugas">
       <div class="slide-inner">
         <div class="text-center mb-6 anim">
@@ -1103,7 +1198,7 @@
       </div>
     </section>
 
-    <!-- SLIDE 14: CLOSING -->
+    <!-- SLIDE 16: CLOSING -->
     <section class="slide" data-stage="closing">
       <div class="slide-inner text-center">
         <div class="inline-block mb-6 anim">

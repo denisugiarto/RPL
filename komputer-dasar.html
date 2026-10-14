@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Komputer Dasar — Kelas X RPL</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+<style>
+  :root{
+    --computer:#60a5fa;
+    --blob-opacity:.35;
+    --slide-padding:70px 40px 60px;
+    --slide-display:grid;
+    --slide-align:center;
+    --slide-justify:center;
+    --dot-active-bg:var(--computer);
+    --nav-hover-bg:var(--computer);
+    --nav-hover-border:var(--computer);
+    --hover-border:var(--computer);
+  }
+  .slide{display:grid;place-items:center}
+  .bg-mesh{position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 15% 15%,rgba(96,165,250,.18),transparent 45%),radial-gradient(circle at 85% 20%,rgba(139,92,246,.15),transparent 45%),radial-gradient(circle at 75% 85%,rgba(74,222,128,.1),transparent 45%),var(--bg)}
+  .progress-fill,.logo-mark{background:linear-gradient(135deg,var(--computer),var(--purple))}
+  .slide::-webkit-scrollbar{width:6px}
+  .slide::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:10px}
+  .storage-table{width:100%;border-collapse:collapse;font-size:.9rem}
+  .storage-table th,.storage-table td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+  .storage-table th{color:var(--computer);font-family:'Space Grotesk',sans-serif}
+  .storage-table tr:last-child td{border-bottom:0}
+  .image-credit{font-size:10px;color:var(--muted);margin-top:8px}
+  .ssd-device-image{width:100%;height:220px;object-fit:contain;background:#f8fafc;border-radius:10px;margin-bottom:10px}
+  .pc-view{position:relative;width:min(100%,55vh);aspect-ratio:1000/915;margin:auto}
+  .pc-photo{width:100%;height:100%;object-fit:contain;border-radius:14px;background:#f8fafc}
+  .part-marker{position:absolute;z-index:2;transform:translate(-50%,-50%);display:flex;align-items:center;gap:5px;padding:0;border:0;background:transparent;color:#fff;cursor:pointer}
+  .part-dot{width:23px;height:23px;display:grid;place-items:center;border-radius:50%;background:var(--computer);border:2px solid #fff;color:#08111c;font-size:11px;font-weight:800;box-shadow:0 2px 10px #0009;flex:none}
+  .part-label{background:#0f172aee;border:1px solid #ffffff55;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:700;white-space:nowrap;box-shadow:0 2px 10px #0008}
+  .part-marker[aria-pressed="true"] .part-dot{background:var(--yellow);transform:scale(1.15)}
+  .part-marker:hover .part-label,.part-marker:focus-visible .part-label{border-color:var(--computer);background:#0f172a}
+  .part-marker:focus-visible{outline:2px solid var(--yellow);outline-offset:3px;border-radius:999px}
+  .part-marker.label-left{flex-direction:row-reverse}
+  .part-detail{min-height:250px}
+  .component-image{width:100%;height:300px;object-fit:contain;background:#f8fafc;border-radius:12px;margin:0 0 14px}
+  .hdd-25-image{width:180px;height:130px;object-fit:contain;background:#f8fafc;border-radius:10px;flex:none}
+  .component-image{cursor:zoom-in}
+  .gpu-gallery-controls,.image-preview-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-4px 0 14px}
+  .gpu-gallery-controls[hidden],.image-preview-controls[hidden]{display:none}
+  .gpu-gallery-controls button,.image-preview-controls button{border:1px solid #ffffff30;border-radius:999px;background:#1e293b;color:#fff;padding:8px 14px;cursor:pointer}
+  .gpu-gallery-controls button:hover,.image-preview-controls button:hover{border-color:var(--computer)}
+  .gpu-gallery-count{color:var(--muted);font-size:12px}
+  .image-preview{width:100vw;height:100vh;max-width:none;max-height:none;border:0;padding:24px;background:#08111cf2;color:#fff;overflow:hidden}
+  .image-preview::backdrop{background:#050912ed;backdrop-filter:blur(8px)}
+  .image-preview img{width:100%;height:100%;object-fit:contain}
+  .image-preview-controls{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(500px,90vw);margin:0}
+  .image-preview-close{position:absolute;top:14px;right:18px;width:44px;height:44px;border:1px solid #ffffff55;border-radius:50%;background:#1e293b;color:#fff;font-size:26px;cursor:pointer}
+  .input-card-image{width:100%;height:180px;object-fit:cover;border-radius:10px;margin-bottom:8px}
+  .input-card-image.contain{object-fit:contain;background:#f8fafc}
+  .input-card-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-bottom:8px}
+  .input-card-pair.square img{height:auto;aspect-ratio:1;object-fit:contain}
+  .input-card-pair.triple{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+  .input-card-pair img{width:100%;height:180px;object-fit:contain;background:#f8fafc;border-radius:10px}
+  .output-card-image{width:100%;height:180px;object-fit:contain;background:#f8fafc;border-radius:10px;margin-bottom:8px}
+  .cover-computer-image{width:100%;height:210px;object-fit:contain;background:#f8fafc;border-radius:12px;margin-bottom:12px}
+  details.quiz{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:14px 18px}
+  details.quiz summary{cursor:pointer;font-weight:600}
+  details.quiz p{color:var(--muted);margin-top:10px;font-size:.9rem}
+  @media(max-width:1024px){.slide{padding:70px 40px 60px}}
+  @media(max-width:640px){.slide{padding:70px 18px 60px}.grid-3,.grid-4{grid-template-columns:1fr}.storage-table{font-size:.78rem}.storage-table th,.storage-table td{padding:8px}.part-dot{width:20px;height:20px;font-size:9px}.part-label{font-size:8px;padding:3px 6px}.part-marker{gap:3px}.part-detail{min-height:0}.component-image{height:220px}.hdd-25-image{width:120px;height:100px}}
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div><div class="grain"></div>
+<div class="blob" style="width:380px;height:380px;background:var(--computer);top:-100px;left:-100px"></div>
+<div class="blob" style="width:300px;height:300px;background:var(--purple);bottom:-80px;right:-80px;animation-delay:-4s"></div>
+
+<div class="top-bar">
+  <div class="logo"><div class="logo-mark"><i class="fa-solid fa-computer text-white text-xs"></i></div><div><p class="logo-text">Komputer Dasar</p><p class="logo-sub">Kelas X RPL</p></div></div>
+  <div class="hint-keys hidden md:flex"><span class="key">←</span><span class="key">→</span><span>untuk navigasi</span></div>
+</div>
+<div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="deck"><div class="slides" id="slides">
+  <section class="slide active" data-stage="cover">
+    <div class="slide-inner grid-2 items-center">
+      <div>
+        <span class="stage-pill mb-5 anim"><i class="fa-solid fa-graduation-cap" style="color:var(--computer)"></i> Modul Pembelajaran</span>
+        <h1 class="font-display font-bold text-5xl md:text-7xl leading-[.95] mb-6 anim-2">Mengenal <span style="color:var(--computer)">Komputer</span></h1>
+        <p class="text-base md:text-lg text-[var(--muted)] max-w-xl mb-8 anim-3">Pahami bagian-bagian komputer, cara kerja penyimpanan, dan cara merawat perangkat agar data tetap aman.</p>
+        <div class="flex flex-wrap gap-3 anim-4"><button onclick="nextSlide()" class="px-6 py-3 rounded-xl font-semibold text-sm text-white" style="background:linear-gradient(135deg,var(--computer),var(--purple))"><i class="fa-solid fa-play mr-2"></i>Mulai belajar</button><span class="stage-pill">Pemula • Kelas X RPL</span></div>
+      </div>
+      <div class="anim-3 flex justify-center"><div class="card p-8 text-center w-full max-w-sm"><img class="cover-computer-image" src="assets/atx-computer-case.jpg" alt="Bagian dalam komputer desktop dengan motherboard dan komponen utama"><p class="image-credit mb-4">Foto: <a href="https://commons.wikimedia.org/wiki/File:ATX_computer_case.jpg" target="_blank" rel="noreferrer">Tiia Monto, Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">CC BY-SA 4.0</a></p><div class="grid grid-cols-3 gap-3 text-xs"><span class="stage-pill justify-center">Input</span><span class="stage-pill justify-center">Proses</span><span class="stage-pill justify-center">Output</span></div><p class="text-xs text-[var(--muted)] mt-5">Klik tombol, gunakan tombol panah, atau geser layar untuk berpindah.</p></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="tujuan">
+    <div class="slide-inner">
+      <div class="text-center mb-8 anim"><span class="stage-pill mb-4"><i class="fa-solid fa-bullseye" style="color:var(--computer)"></i> Tujuan Belajar</span><h2 class="font-display font-bold text-4xl md:text-5xl">Setelah belajar, kamu bisa…</h2></div>
+      <div class="grid-3 gap-5">
+        <div class="card p-6 anim-2"><div class="icon-bubble w-12 h-12 mb-4" style="--c1:var(--computer);--c2:var(--purple)"><i class="fa-solid fa-diagram-project text-white"></i></div><h3 class="font-display font-bold text-lg mb-2">Mengenali komponen</h3><p class="text-sm text-[var(--muted)]">Membedakan hardware, software, dan peran pengguna.</p></div>
+        <div class="card p-6 anim-3"><div class="icon-bubble w-12 h-12 mb-4" style="--c1:var(--teal);--c2:var(--computer)"><i class="fa-solid fa-hard-drive text-white"></i></div><h3 class="font-display font-bold text-lg mb-2">Memahami penyimpanan</h3><p class="text-sm text-[var(--muted)]">Menjelaskan HDD dan SSD, cara kerja dasar, serta penggunaannya.</p></div>
+        <div class="card p-6 anim-4"><div class="icon-bubble w-12 h-12 mb-4" style="--c1:var(--yellow);--c2:var(--orange)"><i class="fa-solid fa-shield-halved text-white"></i></div><h3 class="font-display font-bold text-lg mb-2">Mengelola dengan aman</h3><p class="text-sm text-[var(--muted)]">Mengatur berkas, merawat perangkat, dan menjaga data.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="konsep">
+    <div class="slide-inner grid-2 items-center">
+      <div><span class="stage-pill mb-4 anim"><i class="fa-solid fa-lightbulb" style="color:var(--computer)"></i> Konsep Dasar</span><h2 class="font-display font-bold text-4xl md:text-5xl mb-5 anim-2">Komputer mengolah <span style="color:var(--computer)">data</span>.</h2><p class="text-[var(--muted)] mb-5 anim-3">Komputer adalah perangkat elektronik yang menerima data, menjalankan instruksi, lalu menghasilkan informasi. Komputer tidak “berpikir sendiri”; ia mengikuti program yang dibuat manusia.</p><div class="card p-5 text-sm anim-4"><b class="text-white">Data</b> = fakta mentah, misalnya angka nilai.<br><b class="text-white">Informasi</b> = hasil yang sudah bermakna, misalnya rata-rata nilai kelas.</div></div>
+      <div class="card p-6 anim-3"><div class="grid grid-cols-1 gap-3 text-center"><div class="rounded-xl p-4" style="background:rgba(96,165,250,.12)"><i class="fa-solid fa-keyboard mr-2" style="color:var(--computer)"></i>INPUT <span class="text-[var(--muted)]">— data masuk</span></div><i class="fa-solid fa-arrow-down text-[var(--muted)]"></i><div class="rounded-xl p-4" style="background:rgba(139,92,246,.12)"><i class="fa-solid fa-microchip mr-2" style="color:var(--purple)"></i>PROSES <span class="text-[var(--muted)]">— instruksi dijalankan</span></div><i class="fa-solid fa-arrow-down text-[var(--muted)]"></i><div class="rounded-xl p-4" style="background:rgba(74,222,128,.1)"><i class="fa-solid fa-display mr-2" style="color:var(--teal)"></i>OUTPUT <span class="text-[var(--muted)]">— hasil ditampilkan</span></div></div><p class="text-xs text-center text-[var(--muted)] mt-4">Penyimpanan dapat menyimpan data sebelum atau sesudah diproses.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="komponen">
+    <div class="slide-inner">
+      <div class="text-center mb-8 anim"><span class="stage-pill mb-4">Tiga Bagian Sistem Komputer</span><h2 class="font-display font-bold text-4xl md:text-5xl">Perangkat, program, dan manusia</h2></div>
+      <div class="grid-3 gap-5">
+        <div class="card p-6 anim-2"><i class="fa-solid fa-microchip text-3xl mb-4" style="color:var(--computer)"></i><h3 class="font-display font-bold text-xl mb-2">Hardware</h3><p class="text-sm text-[var(--muted)]">Bagian fisik yang dapat disentuh: CPU, RAM, keyboard, monitor, HDD, dan SSD.</p></div>
+        <div class="card p-6 anim-3"><i class="fa-solid fa-window-maximize text-3xl mb-4" style="color:var(--teal)"></i><h3 class="font-display font-bold text-xl mb-2">Software</h3><p class="text-sm text-[var(--muted)]">Instruksi/program yang mengatur kerja komputer: sistem operasi, browser, dan aplikasi.</p></div>
+        <div class="card p-6 anim-4"><i class="fa-solid fa-user text-3xl mb-4" style="color:var(--yellow)"></i><h3 class="font-display font-bold text-xl mb-2">Brainware</h3><p class="text-sm text-[var(--muted)]">Orang yang menggunakan, mengelola, atau mengembangkan komputer.</p></div>
+      </div>
+      <p class="text-center text-sm text-[var(--muted)] mt-6">Contoh: siswa mengetik (brainware) di aplikasi pengolah kata (software) menggunakan keyboard (hardware).</p>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="perangkat">
+    <div class="slide-inner">
+      <div class="mb-7 anim"><span class="stage-pill mb-4">Perangkat Keras</span><h2 class="font-display font-bold text-4xl md:text-5xl">Komponen punya tugas berbeda</h2></div>
+      <div class="grid-2 gap-5">
+        <div class="card p-5 anim-2"><h3 class="font-display font-bold text-lg mb-3" style="color:var(--computer)"><i class="fa-solid fa-keyboard mr-2"></i>Input</h3><p class="text-sm text-[var(--muted)]">Mengirim perintah atau data: keyboard, mouse, mikrofon, kamera, scanner.</p></div>
+        <div class="card p-5 anim-3"><h3 class="font-display font-bold text-lg mb-3" style="color:var(--teal)"><i class="fa-solid fa-display mr-2"></i>Output</h3><p class="text-sm text-[var(--muted)]">Menyajikan hasil: monitor, speaker, printer, proyektor.</p></div>
+        <div class="card p-5 anim-3"><h3 class="font-display font-bold text-lg mb-3" style="color:var(--yellow)"><i class="fa-solid fa-gears mr-2"></i>Proses & memori</h3><p class="text-sm text-[var(--muted)]">CPU menjalankan instruksi. RAM menampung sementara data/program yang sedang digunakan; isinya hilang saat listrik mati.</p></div>
+        <div class="card p-5 anim-4"><h3 class="font-display font-bold text-lg mb-3" style="color:var(--purple)"><i class="fa-solid fa-hard-drive mr-2"></i>Penyimpanan</h3><p class="text-sm text-[var(--muted)]">Menyimpan sistem operasi, aplikasi, dan berkas walau komputer dimatikan. Contoh: HDD, SSD, flash drive.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="internal">
+    <div class="slide-inner">
+      <div class="mb-5 anim"><span class="stage-pill mb-3">Bagian di Dalam Komputer</span><h2 class="font-display font-bold text-4xl md:text-5xl">Pilih titik untuk mengenal komponennya</h2></div>
+      <div class="grid-2 gap-5 items-center">
+        <div class="pc-view anim-2">
+          <img class="pc-photo" src="assets/atx-computer-case.jpg" alt="Komputer desktop terbuka dengan motherboard, RAM, pendingin prosesor, kartu grafis, HDD, kipas casing, dan area PSU yang ditandai">
+          <button class="part-marker" style="left:36%;top:30%" data-part="cpu" aria-label="Lihat CPU dan pendingin" aria-pressed="false"><span class="part-dot">1</span><span class="part-label">CPU</span></button>
+          <button class="part-marker" style="left:55%;top:29%" data-part="ram" aria-label="Lihat RAM" aria-pressed="false"><span class="part-dot">2</span><span class="part-label">RAM</span></button>
+          <button class="part-marker label-left" style="left:28%;top:49%" data-part="motherboard" aria-label="Lihat motherboard" aria-pressed="true"><span class="part-dot">3</span><span class="part-label">Motherboard</span></button>
+          <button class="part-marker" style="left:54%;top:58%" data-part="gpu" aria-label="Lihat kartu grafis" aria-pressed="false"><span class="part-dot">4</span><span class="part-label">GPU</span></button>
+          <button class="part-marker label-left" style="left:58%;top:85%" data-part="hdd" aria-label="Lihat hard disk" aria-pressed="false"><span class="part-dot">5</span><span class="part-label">HDD</span></button>
+          <button class="part-marker label-left" style="left:91%;top:44%" data-part="fan" aria-label="Lihat kipas casing" aria-pressed="false"><span class="part-dot">6</span><span class="part-label">Kipas</span></button>
+          <button class="part-marker" style="left:36%;top:86%" data-part="psu" aria-label="Lihat area power supply yang tertutup shroud" aria-pressed="false"><span class="part-dot">7</span><span class="part-label">PSU</span></button>
+          <button class="part-marker" style="left:36%;top:38%" data-part="cpuFan" aria-label="Lihat kipas pendingin CPU" aria-pressed="false"><span class="part-dot">8</span><span class="part-label">CPU Fan</span></button>
+          <button class="part-marker" style="left:24%;top:42%" data-part="io" aria-label="Lihat port I/O" aria-pressed="false"><span class="part-dot">9</span><span class="part-label">Port I/O</span></button>
+          <button class="part-marker label-left" style="left:84%;top:18%" data-part="case" aria-label="Lihat casing komputer" aria-pressed="false"><span class="part-dot">10</span><span class="part-label">Casing</span></button>
+        </div>
+        <article class="card part-detail p-6 anim-3" id="componentDetail" aria-live="polite">
+          <img class="component-image" id="componentImage" src="assets/mobo-atx.webp" alt="Motherboard komputer format ATX" role="button" tabindex="0" aria-label="Buka pratinjau gambar dalam layar penuh">
+          <div class="gpu-gallery-controls" id="gpuGalleryControls" hidden>
+            <button type="button" id="gpuPrevious" aria-label="Gambar VGA sebelumnya">← Sebelumnya</button>
+            <span class="gpu-gallery-count" id="gpuGalleryCount" aria-live="polite"></span>
+            <button type="button" id="gpuNext" aria-label="Gambar VGA berikutnya">Berikutnya →</button>
+          </div>
+          <p class="image-credit mb-4">Foto: <a id="componentPhotoCredit" target="_blank" rel="noreferrer"></a><span id="componentLicenseWrap"> · <a id="componentLicense" target="_blank" rel="noreferrer"></a></span></p>
+          <h3 class="font-display font-bold text-2xl mb-3" id="componentTitle" style="color:var(--computer)">Motherboard</h3>
+          <p class="text-sm text-[var(--muted)] mb-4" id="componentDescription">Motherboard menyediakan jalur komunikasi dan tempat pemasangan komponen: soket CPU, slot RAM, konektor penyimpanan, slot ekspansi, port, dan rangkaian pengatur daya. Ukuran ATX pada gambar adalah salah satu standar form factor. Papan ini seperti jalan dan titik temu komponen. Cek ukuran casing serta kecocokan soket, jenis RAM, dan konektor sebelum memilih motherboard; banyak komponen laptop dibuat khusus atau disolder.</p>
+          <div id="componentSpeedComparison" class="mt-4 overflow-x-auto" hidden>
+            <table class="storage-table"><thead><tr><th>Jenis drive</th><th>Contoh laju transfer berurutan maksimum</th></tr></thead><tbody>
+              <tr><td>HDD 5.400 RPM — Barracuda 2 TB ST2000DM005</td><td>Hingga 190 MB/s sustained transfer OD <a href="https://www.seagate.com/www-content/datasheets/pdfs/3-5-barracudaDS1900-12-1908US-en_GB.pdf" target="_blank" rel="noreferrer">(Seagate)</a></td></tr>
+              <tr><td>HDD 7.200 RPM — Barracuda 2 TB ST2000DM008</td><td>Hingga 220 MB/s sustained transfer OD <a href="https://www.seagate.com/www-content/datasheets/pdfs/3-5-barracudaDS1900-12-1908US-en_GB.pdf" target="_blank" rel="noreferrer">(Seagate)</a></td></tr>
+              <tr><td>HDD 7.200 RPM — IronWolf Pro 24 TB</td><td>Hingga 285 MB/s sustained transfer <a href="https://www.seagate.com/stories/articles/seagate-adds-class-leading-24tb-ironwolf-pro-hard-drives-for-multi-user-commercial-and-enterprise-raid-storage-solutions-pr/" target="_blank" rel="noreferrer">(Seagate)</a></td></tr>
+              <tr><td>SSD SATA</td><td>Hingga 560 MB/s <a href="https://www.samsung.com/us/business/support/owners/product/870-evo-series-1tb/" target="_blank" rel="noreferrer">(Samsung 870 EVO)</a></td></tr>
+              <tr><td>SSD NVMe PCIe 4.0</td><td>Hingga 7.450 MB/s <a href="https://www.samsung.com/us/memory-storage/nvme-ssd/990-pro-2tb-nvme-pcie-gen-4-mz-v9p2t0b-am/" target="_blank" rel="noreferrer">(Samsung 990 PRO)</a></td></tr>
+            </tbody></table>
+            <p class="text-xs text-[var(--muted)] mt-2">Contoh maksimum spesifikasi pabrikan, bukan hasil pengujian yang sama; kecepatan nyata berbeda menurut model dan beban kerja.</p>
+          </div>
+          <div id="componentRamGenerations" class="mt-4 overflow-x-auto" hidden>
+            <table class="storage-table"><thead><tr><th>Generasi</th><th>Laju transfer umum</th><th>Voltase</th></tr></thead><tbody>
+              <tr><td>DDR / DDR1</td><td>200–400 MT/s</td><td>2,5 V</td></tr>
+              <tr><td>DDR2</td><td>400–1.066 MT/s</td><td>1,8 V</td></tr>
+              <tr><td>DDR3</td><td>800–2.133 MT/s</td><td>1,5 V</td></tr>
+              <tr><td>DDR4</td><td>1.600–3.200 MT/s</td><td>1,2 V</td></tr>
+              <tr><td>DDR5</td><td>3.200–7.200 MT/s</td><td>1,1 V</td></tr>
+            </tbody></table>
+            <p class="text-xs text-[var(--muted)] mt-2">Kisaran umum menurut <a href="https://www.kingston.com/en/memory/kingston-glossary" target="_blank" rel="noreferrer">Kingston</a>; kecepatan aktual bergantung pada modul, CPU, dan motherboard. Generasi DDR berbeda bentuk serta slotnya, jadi tidak dapat dipertukarkan.</p>
+          </div>
+        </article>
+      </div>
+      <p class="image-credit mt-3">Foto: Tiia Monto, <a href="https://commons.wikimedia.org/wiki/File:ATX_computer_case.jpg" target="_blank" rel="noreferrer">Wikimedia Commons</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">CC BY-SA 4.0</a>.</p>
+    </div>
+  </section>
+
+  <dialog class="image-preview" id="imagePreview" aria-label="Pratinjau gambar komponen">
+    <button class="image-preview-close" type="button" onclick="closeImagePreview()" aria-label="Tutup pratinjau">×</button>
+    <img id="previewImage" alt="">
+    <div class="image-preview-controls" id="previewGpuGalleryControls" hidden>
+      <button type="button" id="previewGpuPrevious" aria-label="Gambar VGA sebelumnya">← Sebelumnya</button>
+      <span class="gpu-gallery-count" id="previewGpuGalleryCount" aria-live="polite"></span>
+      <button type="button" id="previewGpuNext" aria-label="Gambar VGA berikutnya">Berikutnya →</button>
+    </div>
+  </dialog>
+
+  <section class="slide" data-stage="input">
+    <div class="slide-inner">
+      <div class="mb-7 anim"><span class="stage-pill mb-4">Perangkat Input</span><h2 class="font-display font-bold text-4xl md:text-5xl">Cara memasukkan data dan perintah</h2></div>
+      <div class="grid-2 gap-4">
+        <div class="card p-5 anim-2"><img class="input-card-image contain" src="assets/keyboard gaming.jpg" alt="Keyboard gaming dengan lampu warna-warni"><p class="image-credit mb-3">Aset lokal: keyboard gaming.jpg</p><h3 class="font-display font-bold mb-2">Keyboard</h3><p class="text-sm text-[var(--muted)]">Memasukkan huruf, angka, simbol, dan perintah lewat tombol.</p></div>
+        <div class="card p-5 anim-3"><div class="input-card-pair square"><img src="assets/mouse.jpg" alt="Mouse komputer Logitech tampak dekat"><img src="assets/mouse-input.jpg" alt="Mouse Logitech di atas meja"></div><p class="image-credit mb-3">Aset lokal: mouse.jpg · mouse-input.jpg</p><h3 class="font-display font-bold mb-2">Mouse & touchpad</h3><p class="text-sm text-[var(--muted)]">Menggerakkan penunjuk, memilih objek, menggulir, dan melakukan klik. Touchpad umum pada laptop.</p></div>
+        <div class="card p-5 anim-4"><img class="input-card-image contain" src="assets/microphone2.webp" alt="Mikrofon USB dengan lampu warna-warni"><p class="image-credit mb-3">Aset lokal: microphone2.webp</p><h3 class="font-display font-bold mb-2">Mikrofon</h3><p class="text-sm text-[var(--muted)]">Mengubah suara menjadi sinyal digital untuk rapat, rekaman, atau perintah suara.</p></div>
+        <div class="card p-5 anim-2"><img class="input-card-image contain" src="assets/webcam.webp" alt="Webcam USB"><p class="image-credit mb-3">Aset lokal: webcam.webp</p><h3 class="font-display font-bold mb-2">Webcam / kamera</h3><p class="text-sm text-[var(--muted)]">Menangkap foto dan video; biasanya terpasang pada laptop atau dihubungkan melalui USB.</p></div>
+        <div class="card p-5 anim-3"><div class="input-card-pair"><img src="assets/scanner.jpeg" alt="Scanner flatbed"><img src="assets/barcode scanner.jpg" alt="Pemindai barcode"></div><p class="image-credit mb-3">Aset lokal: scanner.jpeg · barcode scanner.jpg</p><h3 class="font-display font-bold mb-2">Scanner & pembaca</h3><p class="text-sm text-[var(--muted)]">Scanner mengubah dokumen/foto fisik menjadi data. Pemindai barcode dan pembaca kartu memasukkan kode atau identitas.</p></div>
+        <div class="card p-5 anim-4"><div class="input-card-pair triple"><img src="assets/gamepad.webp" alt="Gamepad"><img src="assets/joystick.jpg" alt="Joystick"><img src="assets/drawing pad.jpg" alt="Tablet gambar dengan stylus"></div><p class="image-credit mb-3">Aset lokal: gamepad.webp · joystick.jpg · drawing pad.jpg</p><h3 class="font-display font-bold mb-2">Perangkat khusus</h3><p class="text-sm text-[var(--muted)]">Gamepad, joystick, stylus, layar sentuh, dan sensor sidik jari memasukkan gerakan, tulisan, sentuhan, atau identitas.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="output">
+    <div class="slide-inner">
+      <div class="mb-7 anim"><span class="stage-pill mb-4">Perangkat Output</span><h2 class="font-display font-bold text-4xl md:text-5xl">Cara komputer menyajikan hasil</h2></div>
+      <div class="grid-2 gap-4">
+        <div class="card p-5 anim-2"><img class="output-card-image" src="assets/monitor.jpg" alt="Monitor komputer menampilkan gambar berwarna"><p class="image-credit mb-3">Aset lokal: monitor.jpg</p><h3 class="font-display font-bold mb-2">Monitor</h3><p class="text-sm text-[var(--muted)]">Menampilkan teks, gambar, dan video. Ukuran, resolusi, dan refresh rate memengaruhi pengalaman visual.</p></div>
+        <div class="card p-5 anim-3"><img class="output-card-image" src="assets/speaker.jpg" alt="Sepasang speaker komputer"><p class="image-credit mb-3">Aset lokal: speaker.jpg</p><h3 class="font-display font-bold mb-2">Speaker & headphone</h3><p class="text-sm text-[var(--muted)]">Mengubah sinyal audio menjadi suara. Headset biasanya menggabungkan headphone dan mikrofon.</p></div>
+        <div class="card p-5 anim-4"><img class="output-card-image" src="assets/printer.png" alt="Printer Epson EcoTank"><p class="image-credit mb-3">Aset lokal: printer.png</p><h3 class="font-display font-bold mb-2">Printer</h3><p class="text-sm text-[var(--muted)]">Mencetak hasil ke kertas. Inkjet menyemprotkan tinta; laser memakai toner dan cocok untuk banyak cetakan teks.</p></div>
+        <div class="card p-5 anim-2"><img class="output-card-image" src="assets/proyektor.jpg" alt="Proyektor terpasang di plafon"><p class="image-credit mb-3">Aset lokal: proyektor.jpg</p><h3 class="font-display font-bold mb-2">Proyektor</h3><p class="text-sm text-[var(--muted)]">Memperbesar tampilan komputer ke layar atau dinding untuk presentasi.</p></div>
+        <div class="card p-5 anim-3"><img class="output-card-image" src="assets/plotter.jpg" alt="Plotter format besar Canon imagePROGRAF TX-5310"><p class="image-credit mb-3">Foto: <a href="https://commons.wikimedia.org/wiki/File:Canon_imagePROGRAF_TX-5310_LARGE_FORMAT_PRINTER.jpg" target="_blank" rel="noreferrer">Dinkun Chen / Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">CC BY-SA 4.0</a></p><h3 class="font-display font-bold mb-2">Plotter</h3><p class="text-sm text-[var(--muted)]">Plotter adalah printer khusus untuk mencetak gambar besar dan garis presisi, misalnya peta atau rancangan teknik.</p></div>
+        <div class="card p-5 anim-4"><img class="output-card-image" src="assets/printer.png" alt="Printer multifungsi dengan kemampuan cetak dan pindai"><p class="image-credit mb-3">Aset lokal: printer.png</p><h3 class="font-display font-bold mb-2">Perangkat dua arah</h3><p class="text-sm text-[var(--muted)]">Printer multifungsi dapat mencetak (output) dan memindai (input), sedangkan layar sentuh menampilkan gambar sekaligus menerima sentuhan.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="hdd">
+    <div class="slide-inner grid-2 items-center">
+      <div><span class="stage-pill mb-4 anim"><i class="fa-solid fa-compact-disc" style="color:var(--yellow)"></i> Penyimpanan 1</span><h2 class="font-display font-bold text-4xl md:text-5xl mb-4 anim-2">HDD: data di piringan <span style="color:var(--yellow)">magnetik</span></h2><p class="text-[var(--muted)] mb-5 anim-3">Hard Disk Drive menyimpan bit sebagai perubahan magnetik pada piringan yang berputar. Komponen mekanisnya membuat HDD mudah dipahami—dan perlu dijaga dari benturan saat bekerja.</p><div class="space-y-3 text-sm anim-4">
+        <p><b class="text-white">Platter</b> — piringan tempat data direkam.</p><p><b class="text-white">Spindle & motor</b> — memutar platter, umumnya 5.400 atau 7.200 RPM pada HDD komputer.</p><p><b class="text-white">Read/write head</b> — membaca atau menulis data tanpa menyentuh permukaan platter.</p><p><b class="text-white">Actuator arm</b> — menggerakkan head ke lokasi data.</p></div></div>
+      <div class="card p-6 anim-3"><img class="component-image" src="assets/hdd.jpg" alt="Hard disk drive dengan piringan magnetik dan head baca-tulis terlihat"><p class="image-credit mb-4">Aset lokal: hdd.jpg</p><div class="grid grid-cols-2 gap-3 mt-5 text-xs"><span class="stage-pill justify-center">Kapasitas besar</span><span class="stage-pill justify-center">Ada bagian bergerak</span></div><div class="mt-5 pt-4 border-t border-white/10 flex items-center gap-4"><img class="hdd-25-image" src="assets/hdd-2-5-inch.jpg" alt="HDD laptop 2,5 inci terbuka, memperlihatkan platter dan head"><div><h3 class="font-display font-bold mb-2">HDD 2,5 inci</h3><p class="text-xs text-[var(--muted)]">Ukuran yang umum digunakan pada laptop. Foto ini memperlihatkan bagian dalam HDD 2,5 inci.</p><p class="image-credit">Foto: <a href="https://commons.wikimedia.org/wiki/File:Laptop-hard-drive-exposed.jpg" target="_blank" rel="noreferrer">Evan Amos / Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by-sa/3.0/" target="_blank" rel="noreferrer">CC BY-SA 3.0</a></p></div></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="hdd-detail">
+    <div class="slide-inner">
+      <div class="mb-6 anim"><span class="stage-pill mb-4">HDD Lebih Dekat</span><h2 class="font-display font-bold text-4xl md:text-5xl">Mengapa HDD terasa lebih lambat?</h2></div>
+      <div class="grid-2 gap-5">
+        <div class="card p-6 anim-2"><h3 class="font-display font-bold text-xl mb-3" style="color:var(--yellow)">Waktu pencarian</h3><p class="text-sm text-[var(--muted)]">Head harus berpindah ke jalur yang tepat (seek time), lalu menunggu bagian platter berputar ke bawah head (rotational latency). Gerakan fisik ini menambah jeda, terutama saat membuka banyak berkas kecil yang tersebar.</p></div>
+        <div class="card p-6 anim-3"><h3 class="font-display font-bold text-xl mb-3" style="color:var(--computer)">Kapan HDD cocok?</h3><p class="text-sm text-[var(--muted)]">Untuk menyimpan banyak foto, video, arsip, atau backup lokal dengan biaya per GB yang biasanya lebih rendah. HDD internal umum berukuran 3,5 inci untuk desktop dan 2,5 inci untuk laptop; ukuran fisik saja tidak menentukan kecocokan konektornya.</p></div>
+        <div class="card p-6 anim-3"><h3 class="font-display font-bold text-xl mb-3">Perkembangan teknologi</h3><p class="text-sm text-[var(--muted)]">Kapasitas HDD meningkat lewat kepadatan rekaman: dari LMR ke PMR, lalu SMR yang menumpuk jalur rekaman. Teknologi terbaru seperti HAMR memanaskan titik kecil saat menulis agar bit dapat dibuat lebih rapat. Prinsip dasarnya tetap piringan magnetik berputar.</p></div>
+        <div class="card p-6 anim-4"><h3 class="font-display font-bold text-xl mb-3">Batasan & perawatan</h3><ul class="list-disc pl-5 text-sm text-[var(--muted)] space-y-1"><li>Lebih lambat untuk akses acak dan waktu boot.</li><li>Bunyi/getaran dan konsumsi daya bisa lebih terasa.</li><li>Hindari mengguncang atau memindahkan perangkat saat HDD aktif.</li></ul></div>
+      </div>
+      <p class="text-xs text-[var(--muted)] mt-4">RPM adalah putaran per menit, bukan jaminan tunggal kecepatan. Antarmuka, model, kondisi, dan jenis beban kerja juga berpengaruh.</p>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="ssd">
+    <div class="slide-inner grid-2 items-center">
+      <div><span class="stage-pill mb-4 anim"><i class="fa-solid fa-memory" style="color:var(--teal)"></i> Penyimpanan 2</span><h2 class="font-display font-bold text-4xl md:text-5xl mb-4 anim-2">SSD: data di memori <span style="color:var(--teal)">flash</span></h2><p class="text-[var(--muted)] mb-5 anim-3">Solid State Drive menyimpan data pada chip NAND flash dan tidak memiliki piringan atau head bergerak. Controller SSD mengatur lokasi data, koreksi kesalahan, dan pemerataan pemakaian sel.</p><div class="space-y-3 text-sm anim-4"><p><b class="text-white">Sel flash</b> — menyimpan bit tanpa aliran listrik terus-menerus.</p><p><b class="text-white">Controller</b> — menerjemahkan permintaan komputer dan mengelola chip.</p><p><b class="text-white">Wear leveling</b> — menyebar penulisan agar sel tidak cepat aus di satu lokasi.</p><p><b class="text-white">TRIM</b> — sistem operasi memberi tahu blok data yang sudah tidak dipakai agar SSD dapat mengelolanya lebih efisien.</p></div></div>
+      <div class="card p-6 anim-3"><div class="grid grid-cols-2 gap-3"><div><img class="ssd-device-image" src="assets/ssd-sata.jpg" alt="SSD SATA 2,5 inci"><p class="text-center text-sm font-semibold" style="color:var(--computer)">SSD SATA 2,5 inci</p></div><div><img class="ssd-device-image" src="assets/ssd-nvme.jpg" alt="SSD M.2 NVMe"><p class="text-center text-sm font-semibold" style="color:var(--teal)">SSD M.2 NVMe</p></div></div><p class="image-credit text-center mt-3">Aset lokal: ssd-sata.jpg · ssd-nvme.jpg</p><div class="grid grid-cols-2 gap-3 mt-5 text-xs"><span class="stage-pill justify-center">Akses cepat</span><span class="stage-pill justify-center">Tanpa bagian bergerak</span></div><p class="text-center text-xs text-[var(--muted)] mt-4">Kecepatan nyata tergantung tipe SSD, koneksi, dan tugasnya.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="ssd-detail">
+    <div class="slide-inner">
+      <div class="mb-6 anim"><span class="stage-pill mb-4">SSD Lebih Dekat</span><h2 class="font-display font-bold text-4xl md:text-5xl">SATA dan NVMe itu apa?</h2><p class="text-[var(--muted)] mt-3">SSD adalah jenis perangkat penyimpanan; SATA dan NVMe menjelaskan cara perangkat berkomunikasi.</p></div>
+      <div class="grid-2 gap-5">
+        <div class="card p-6 anim-2"><img class="ssd-device-image" src="assets/ssd-sata.jpg" alt="SSD SATA berukuran 2,5 inci"><p class="image-credit mb-3">Foto: <a href="https://commons.wikimedia.org/wiki/File:A_SATA_SSD.jpg" target="_blank" rel="noreferrer">Contributers2020 / Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">CC BY-SA 4.0</a></p><h3 class="font-display font-bold text-xl mb-3" style="color:var(--computer)">SSD SATA 2,5 inci</h3><p class="text-sm text-[var(--muted)]">Menggunakan antarmuka SATA, sama keluarga koneksi yang lazim dipakai HDD. Biasanya pilihan peningkatan mudah untuk komputer lama yang mendukung SATA; tersedia juga SSD SATA berbentuk M.2.</p></div>
+        <div class="card p-6 anim-3"><img class="ssd-device-image" src="assets/ssd-nvme.jpg" alt="SSD Samsung 990 PRO M.2 NVMe dengan antarmuka PCIe 4.0"><p class="image-credit mb-3">Foto: <a href="https://commons.wikimedia.org/wiki/File:SAMSUNG_M.2_NVMe_SSD_990_PRO_4TB.jpg" target="_blank" rel="noreferrer">Dinkun Chen / Wikimedia Commons</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer">CC BY-SA 4.0</a></p><h3 class="font-display font-bold text-xl mb-3" style="color:var(--teal)">SSD M.2 NVMe</h3><p class="text-sm text-[var(--muted)]">Menggunakan protokol NVMe melalui jalur PCIe. Bentuk M.2 kecil dan langsung dipasang ke motherboard; pastikan slot mendukung NVMe karena M.2 juga bisa memakai SATA.</p></div>
+        <div class="card p-6 anim-3"><h3 class="font-display font-bold text-xl mb-3">Perkembangan SSD</h3><p class="text-sm text-[var(--muted)]">SSD berkembang dari SATA ke NVMe melalui PCIe untuk bandwidth lebih tinggi. NAND juga beralih ke 3D NAND yang menumpuk sel secara vertikal; TLC dan QLC menyimpan lebih banyak bit per sel untuk menekan biaya per kapasitas, dengan kompromi daya tahan tulis. M.2 adalah bentuk konektor, bukan jaminan memakai NVMe.</p></div>
+        <div class="card p-6 anim-4"><h3 class="font-display font-bold text-xl mb-3">Kelebihan & batasan</h3><p class="text-sm text-[var(--muted)]">Boot dan buka aplikasi biasanya lebih cepat, senyap, dan tahan guncangan operasional. SSD umumnya lebih mahal per GB; kapasitas tulis sel terbatas, tetapi pemakaian normal modern biasanya dirancang bertahun-tahun. Tetap buat backup.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="banding">
+    <div class="slide-inner">
+      <div class="text-center mb-7 anim"><span class="stage-pill mb-4">Perbandingan</span><h2 class="font-display font-bold text-4xl md:text-5xl">Pilih sesuai kebutuhan</h2></div>
+      <div class="card p-4 md:p-6 overflow-x-auto anim-2"><table class="storage-table"><thead><tr><th>Aspek</th><th>HDD</th><th>SSD</th></tr></thead><tbody>
+        <tr><td>Cara simpan</td><td>Magnetik pada platter berputar</td><td>Muatan listrik pada chip NAND flash</td></tr>
+        <tr><td>Bagian bergerak</td><td>Ada motor, platter, dan head</td><td>Tidak ada bagian mekanis bergerak</td></tr>
+        <tr><td>Respons</td><td>Lebih lambat untuk pencarian data acak</td><td>Lebih cepat untuk boot dan banyak akses acak</td></tr>
+        <tr><td>Transfer berurutan maksimum*</td><td>5.400 RPM: hingga 190 MB/s; 7.200 RPM: hingga 220 MB/s (contoh Barracuda 2 TB)</td><td>Baca: SATA hingga 560 MB/s; NVMe PCIe 4.0 hingga 7.450 MB/s</td></tr>
+        <tr><td>Kapasitas & harga</td><td>Sering unggul untuk kapasitas besar dengan biaya/GB lebih rendah</td><td>Biaya/GB umumnya lebih tinggi; kapasitas terus berkembang</td></tr>
+        <tr><td>Ketahanan</td><td>Rentan benturan saat sedang bekerja</td><td>Lebih tahan guncangan, tetapi tetap bisa gagal</td></tr>
+        <tr><td>Cocok untuk</td><td>Arsip besar, media, backup lokal</td><td>Sistem operasi, aplikasi, proyek aktif</td></tr>
+      </tbody></table></div>
+      <p class="text-xs text-[var(--muted)] mt-4 anim-3">*Contoh sustained transfer rate maksimum pada model tertentu, bukan angka umum semua HDD: Barracuda 2 TB ST2000DM005 (5.400 RPM) hingga 190 MB/s dan ST2000DM008 (7.200 RPM) hingga 220 MB/s, pada data pabrikan di outer diameter (OD). RPM bukan satu-satunya penentu; kepadatan data dan model drive juga berpengaruh. Model 7.200 RPM berkapasitas besar seperti IronWolf Pro 24 TB mencantumkan hingga 285 MB/s. Angka SSD adalah sequential read; hasil nyata bergantung pada model, lokasi data, koneksi, dan beban kerja. Sumber: <a href="https://www.seagate.com/www-content/datasheets/pdfs/3-5-barracudaDS1900-12-1908US-en_GB.pdf" target="_blank" rel="noreferrer">Seagate Barracuda 2 TB</a>, <a href="https://www.seagate.com/stories/articles/seagate-adds-class-leading-24tb-ironwolf-pro-hard-drives-for-multi-user-commercial-and-enterprise-raid-storage-solutions-pr/" target="_blank" rel="noreferrer">Seagate IronWolf Pro 24 TB</a>, <a href="https://www.samsung.com/us/business/support/owners/product/870-evo-series-1tb/" target="_blank" rel="noreferrer">Samsung SATA SSD</a>, <a href="https://www.samsung.com/us/memory-storage/nvme-ssd/990-pro-2tb-nvme-pcie-gen-4-mz-v9p2t0b-am/" target="_blank" rel="noreferrer">Samsung NVMe SSD</a>. HDD maupun SSD dapat rusak; simpan salinan data penting secara terpisah.</p>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="pilih">
+    <div class="slide-inner grid-2 items-center">
+      <div><span class="stage-pill mb-4 anim">Contoh Pemilihan</span><h2 class="font-display font-bold text-4xl md:text-5xl mb-5 anim-2">Kombinasi sering masuk akal</h2><p class="text-[var(--muted)] mb-5 anim-3">Jika perangkat mendukung dua drive: pasang SSD untuk sistem operasi dan aplikasi yang sering dipakai, lalu gunakan HDD untuk file besar dan arsip. Laptop tipis mungkin hanya mendukung satu drive—cek spesifikasinya.</p><div class="card p-5 text-sm anim-4"><b class="text-white">Anggaran terbatas?</b> SSD kecil untuk sistem dan aplikasi dapat membuat komputer terasa lebih responsif. Pastikan kapasitasnya cukup untuk pembaruan, aplikasi, dan berkas kerja.</div></div>
+      <div class="space-y-4 anim-3"><div class="card p-5"><div class="flex items-center gap-4"><i class="fa-solid fa-bolt text-2xl" style="color:var(--teal)"></i><div><b>Sistem & aplikasi → SSD</b><p class="text-xs text-[var(--muted)] mt-1">Sering dibaca, dibuka, dan diperbarui.</p></div></div></div><div class="card p-5"><div class="flex items-center gap-4"><i class="fa-solid fa-box-archive text-2xl" style="color:var(--yellow)"></i><div><b>Arsip besar → HDD</b><p class="text-xs text-[var(--muted)] mt-1">Foto/video lama atau salinan file yang jarang dibuka.</p></div></div></div><div class="card p-5"><div class="flex items-center gap-4"><i class="fa-solid fa-cloud-arrow-up text-2xl" style="color:var(--computer)"></i><div><b>Salinan penting → backup terpisah</b><p class="text-xs text-[var(--muted)] mt-1">Drive kedua bukan backup jika selalu terhubung dan terkena risiko yang sama.</p></div></div></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="berkas">
+    <div class="slide-inner">
+      <div class="mb-7 anim"><span class="stage-pill mb-4">Sistem Operasi & Berkas</span><h2 class="font-display font-bold text-4xl md:text-5xl">Simpan file agar mudah ditemukan</h2></div>
+      <div class="grid-2 gap-5">
+        <div class="card p-6 anim-2"><h3 class="font-display font-bold text-xl mb-3" style="color:var(--computer)"><i class="fa-brands fa-windows mr-2"></i>Sistem operasi</h3><p class="text-sm text-[var(--muted)]">Software utama yang mengatur perangkat keras dan menyediakan cara menjalankan aplikasi. Contohnya Windows, macOS, dan Linux.</p></div>
+        <div class="card p-6 anim-3"><h3 class="font-display font-bold text-xl mb-3" style="color:var(--teal)"><i class="fa-solid fa-folder-tree mr-2"></i>Folder & nama file</h3><p class="text-sm text-[var(--muted)]">Kelompokkan berdasarkan proyek atau mata pelajaran. Gunakan nama jelas seperti <span class="font-mono text-white">Tugas-Jaringan-Bab1.docx</span>, bukan <span class="font-mono text-white">final-baru-fix2.docx</span>.</p></div>
+        <div class="card p-6 anim-3"><h3 class="font-display font-bold text-xl mb-3">Ekstensi file</h3><p class="text-sm text-[var(--muted)]">Bagian setelah titik biasanya menunjukkan jenis/format: <span class="font-mono text-white">.pdf</span>, <span class="font-mono text-white">.jpg</span>, <span class="font-mono text-white">.docx</span>. Mengganti nama ekstensi tidak otomatis mengubah format isi.</p></div>
+        <div class="card p-6 anim-4"><h3 class="font-display font-bold text-xl mb-3">Salin, pindah, hapus</h3><p class="text-sm text-[var(--muted)]">Salin membuat duplikat; pindah mengubah lokasi; hapus memindahkan ke Recycle Bin/Trash atau menghapus permanen. Periksa lokasi dan isi sebelum mengosongkan tempat sampah.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="aman">
+    <div class="slide-inner">
+      <div class="text-center mb-7 anim"><span class="stage-pill mb-4">Keamanan & Perawatan</span><h2 class="font-display font-bold text-4xl md:text-5xl">Jaga perangkat, jaga data</h2></div>
+      <div class="grid-3 gap-5">
+        <div class="card p-6 anim-2"><i class="fa-solid fa-copy text-3xl mb-4" style="color:var(--computer)"></i><h3 class="font-display font-bold text-lg mb-2">Buat backup</h3><p class="text-sm text-[var(--muted)]">Salin file penting ke media atau layanan lain secara berkala. Uji bahwa salinannya bisa dibuka.</p></div>
+        <div class="card p-6 anim-3"><i class="fa-solid fa-link-slash text-3xl mb-4" style="color:var(--yellow)"></i><h3 class="font-display font-bold text-lg mb-2">Waspadai file asing</h3><p class="text-sm text-[var(--muted)]">Jangan membuka lampiran atau memasang program dari sumber yang tidak dipercaya. Perbarui OS dan aplikasi.</p></div>
+        <div class="card p-6 anim-4"><i class="fa-solid fa-temperature-half text-3xl mb-4" style="color:var(--teal)"></i><h3 class="font-display font-bold text-lg mb-2">Rawat perangkat</h3><p class="text-sm text-[var(--muted)]">Jaga ventilasi tidak tertutup, jauhkan cairan, hindari benturan—terutama saat HDD aktif—dan matikan dengan prosedur OS.</p></div>
+      </div>
+      <div class="card p-5 mt-5 text-sm text-center anim-4"><b class="text-white">Ingat:</b> SSD bukan pengganti backup. Kerusakan, kehilangan, pencurian, atau malware dapat membuat data hilang di semua jenis drive.</div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="praktik">
+    <div class="slide-inner grid-2 items-center">
+      <div><span class="stage-pill mb-4 anim">Aktivitas Praktik</span><h2 class="font-display font-bold text-4xl md:text-5xl mb-5 anim-2">Rapikan folder proyek</h2><ol class="list-decimal pl-5 space-y-3 text-sm text-[var(--muted)] anim-3"><li>Buat folder <span class="font-mono text-white">KomputerDasar</span>.</li><li>Di dalamnya buat folder <span class="font-mono text-white">Materi</span>, <span class="font-mono text-white">Tugas</span>, dan <span class="font-mono text-white">Gambar</span>.</li><li>Simpan satu file dengan nama yang mudah dikenali.</li><li>Salin file tersebut ke drive/folder lain, lalu pastikan kedua salinan dapat dibuka.</li><li>Diskusikan: file mana yang paling diuntungkan dari SSD? Mana yang bisa disimpan di HDD?</li></ol></div>
+      <div class="card p-6 anim-3"><h3 class="font-display font-bold text-xl mb-4">Tantangan pilihan drive</h3><div class="space-y-3 text-sm"><p class="rounded-xl p-4" style="background:rgba(255,255,255,.04)"><b>Kasus A:</b> laptop untuk belajar, membuka aplikasi, dan boot cepat.<br><span style="color:var(--teal)">Pilihan: SSD.</span></p><p class="rounded-xl p-4" style="background:rgba(255,255,255,.04)"><b>Kasus B:</b> penyimpanan video berukuran besar dengan anggaran terbatas.<br><span style="color:var(--yellow)">Pilihan: HDD dapat dipertimbangkan.</span></p><p class="text-xs text-[var(--muted)]">Jawaban dapat berubah sesuai anggaran, kompatibilitas, kapasitas, dan kebutuhan kecepatan.</p></div></div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="kuis">
+    <div class="slide-inner">
+      <div class="text-center mb-7 anim"><span class="stage-pill mb-4">Cek Pemahaman</span><h2 class="font-display font-bold text-4xl md:text-5xl">Kuis singkat</h2><p class="text-sm text-[var(--muted)] mt-2">Pilih jawabanmu dulu, lalu buka pembahasan.</p></div>
+      <div class="grid-2 gap-4">
+        <details class="quiz anim-2"><summary>1. Apa yang terjadi pada isi RAM ketika komputer dimatikan?</summary><p>Data sementara di RAM hilang. Simpan pekerjaan ke HDD/SSD sebelum mematikan komputer.</p></details>
+        <details class="quiz anim-3"><summary>2. Mengapa SSD umumnya lebih cepat membuka banyak file kecil?</summary><p>SSD mengakses chip flash secara elektronik, tanpa memindahkan head dan menunggu platter berputar.</p></details>
+        <details class="quiz anim-3"><summary>3. Apakah M.2 selalu berarti NVMe?</summary><p>Tidak. M.2 adalah bentuk/konektor; SSD M.2 dapat memakai SATA atau NVMe. Cek spesifikasi perangkat.</p></details>
+        <details class="quiz anim-4"><summary>4. Mengapa HDD perlu dijaga dari benturan saat sedang bekerja?</summary><p>HDD memiliki platter berputar dan head mekanis yang sangat dekat dengan permukaan rekaman.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-stage="closing">
+    <div class="slide-inner text-center">
+      <div class="inline-block mb-6 anim"><div class="w-16 h-16 rounded-2xl grid place-items-center mx-auto" style="background:linear-gradient(135deg,var(--computer),var(--purple))"><i class="fa-solid fa-check text-2xl text-white"></i></div></div>
+      <h2 class="font-display font-bold text-4xl md:text-6xl leading-tight mb-5 anim-2">Komputer bekerja lewat<br><span style="color:var(--computer)">komponen yang saling terhubung</span>.</h2>
+      <p class="text-lg text-[var(--muted)] max-w-2xl mx-auto mb-8 anim-3">Gunakan SSD untuk akses responsif, pertimbangkan HDD untuk arsip berkapasitas besar, dan selalu siapkan salinan data penting.</p>
+      <button onclick="goToSlide(0)" class="px-6 py-3 rounded-xl font-semibold text-white text-sm anim-4" style="background:linear-gradient(135deg,var(--computer),var(--purple))"><i class="fa-solid fa-arrow-rotate-left mr-2"></i>Ulang dari awal</button>
+      <p class="text-xs text-[var(--muted)] mt-8">Modul Komputer Dasar — Kelas X RPL</p>
+    </div>
+  </section>
+</div></div>
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="prevSlide()" title="Slide sebelumnya"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+  <div class="dots" id="dots"></div><span class="slide-counter"><b id="curSlide">1</b> / <span id="totalSlides">19</span></span>
+  <button class="nav-btn" id="nextBtn" onclick="nextSlide()" title="Slide berikutnya"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+  <button class="nav-btn" onclick="toggleFullscreen()" title="Layar penuh"><i class="fa-solid fa-expand text-xs"></i></button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let curSlide = 0;
+  document.getElementById('totalSlides').textContent = totalSlides;
+  const dots = document.getElementById('dots');
+  const componentInfo = {
+    cpu: ['CPU / prosesor', 'CPU menjalankan instruksi program: membaca perintah, mengolah data, lalu mengirim hasil ke komponen lain. Kecepatan dan jumlah inti berpengaruh pada banyaknya pekerjaan yang bisa ditangani, tetapi kinerja juga bergantung pada RAM, pendinginan, dan jenis tugas.', 'Bayangkan CPU sebagai koki yang mengerjakan pesanan. Spesifikasi komputer merangkum CPU untuk pemrosesan, RAM untuk ruang kerja, SSD/HDD untuk penyimpanan, GPU untuk grafis, dan PSU untuk daya. Pada CPU, core/thread menunjukkan kemampuan kerja paralel; clock (GHz) menunjukkan laju kerja; cache menyimpan data yang sering dipakai; socket menentukan kecocokan dengan motherboard. Intel dan AMD pada gambar adalah contoh merek prosesor.', 'cpu.webp', 'Contoh prosesor Intel Core dan AMD Ryzen', '', 'Aset lokal: cpu.webp', '', 'Aset lokal'],
+    ram: ['RAM / memori kerja', 'RAM menyimpan sementara data dan instruksi yang sedang dipakai CPU. Kapasitas lebih besar memberi ruang untuk membuka lebih banyak aplikasi atau tab tanpa sering memindahkan data ke penyimpanan yang lebih lambat.', 'RAM bersifat volatil: isinya hilang saat daya mati. Generasi DDR berkembang dengan laju transfer lebih tinggi dan voltase yang berubah. MT/s berarti juta transfer per detik. Pilih kapasitas serta kecepatan yang didukung CPU dan motherboard; bentuk DIMM/SO-DIMM juga harus cocok.', 'ram.webp', 'Modul RAM terpasang pada slot motherboard', '', 'Aset lokal: ram.webp', '', 'Aset lokal'],
+    motherboard: ['Motherboard / papan utama', 'Motherboard menyediakan jalur komunikasi dan tempat pemasangan komponen: soket CPU, slot RAM, konektor penyimpanan, slot ekspansi, port, dan rangkaian pengatur daya. Ukuran ATX pada gambar adalah salah satu standar form factor.', 'Papan ini seperti jalan dan titik temu komponen. Spesifikasi seperti form factor menentukan ukuran, socket menentukan CPU yang cocok, sedangkan tipe RAM, chipset, dan jumlah slot menunjukkan komponen serta koneksi yang didukung. Banyak komponen laptop dibuat khusus atau disolder.', 'mobo-atx.webp', 'Motherboard komputer format ATX', '', 'Aset lokal: mobo-atx.webp', '', 'Aset lokal'],
+    gpu: ['GPU / kartu grafis', 'GPU mengolah banyak operasi grafis secara paralel untuk menggambar antarmuka, foto, video, dan animasi. Kartu grafis terpisah biasanya memiliki prosesor grafis dan memori video sendiri.', 'GPU terintegrasi cukup untuk penggunaan harian dan video. Untuk memilih GPU diskret, lihat model/kelas GPU untuk kemampuan komputasi, VRAM (GB) untuk menyimpan tekstur dan frame, serta konektor daya dan ukuran kartu agar cocok dengan PC.', 'gpu.jpg', 'Kartu grafis komputer', 'Graphic card PCIe geforce560ti IMGP6415 wp.jpg', 'Rainer Knäpper', 'https://artlibre.org/licence/lal/en/', 'Free Art License'],
+    hdd: ['HDD / hard disk', 'HDD menyimpan sistem, aplikasi, dan berkas secara permanen pada piringan magnetik. Motor memutar piringan sementara lengan menggeser head untuk membaca atau menulis data.', 'Perkembangan HDD dari LMR ke PMR, SMR, dan HAMR meningkatkan kepadatan serta kapasitas, tetapi prinsip piringan magnetik berputar tetap sama. SSD berkembang dari SATA ke NVMe/PCIe dengan NAND 3D. Tabel berikut membandingkan contoh kecepatan baca berurutan; angka sebenarnya bergantung pada model dan beban kerja.', 'hdd.jpg', 'Hard disk dengan penutup terbuka', 'Open hard-drive.jpg', 'Zzubnik', 'https://creativecommons.org/publicdomain/zero/1.0/', 'Public domain'],
+    psu: ['PSU / power supply', 'PSU mengubah listrik AC dari stopkontak menjadi beberapa tegangan DC yang stabil untuk motherboard, CPU, GPU, kipas, dan drive. Kabel dengan konektor berbeda memasok daya ke bagian yang sesuai.', 'Saat membeli, perkirakan kebutuhan daya seluruh komponen—terutama CPU dan GPU—lalu cek rekomendasi watt serta konektor dari produsen kartu grafis. Sediakan cadangan untuk lonjakan beban dan rencana upgrade; jangan memilih berdasarkan daya GPU saja. Rating watt menunjukkan keluaran DC maksimum PSU. Sertifikasi 80 PLUS (misalnya Bronze, Gold, atau Platinum) menilai efisiensi pada beban uji: semakin efisien, semakin sedikit energi terbuang sebagai panas. Sertifikasi ini bukan ukuran watt atau jaminan kualitas menyeluruh, jadi periksa juga proteksi, ulasan pengujian, garansi, dan kecocokan konektor. Jangan membuka PSU karena kapasitor dapat menyimpan tegangan berbahaya.', 'psu.jpg', 'Unit power supply komputer', 'Power Supply ATX-450PNF.jpg', 'Victor Korniyenko', 'https://creativecommons.org/licenses/by-sa/3.0/', 'CC BY-SA 3.0'],
+    fan: ['Kipas casing', 'Kipas casing mengatur aliran udara: udara yang lebih dingin masuk dan udara panas keluar. Arah aliran dan posisi kipas memengaruhi suhu seluruh sistem.', 'Umumnya kipas depan/bawah memasukkan udara, sedangkan kipas belakang/atas membuang udara panas. Spesifikasi seperti ukuran (mm), kecepatan (RPM), aliran udara, dan tingkat bising membantu memilih kipas yang pas dan efektif.', 'fan.jpg', 'Kipas casing komputer', 'DM-Corsair-120MM-Fan-Top.jpg', 'Kent Madsen', 'https://creativecommons.org/licenses/by-sa/2.0/', 'CC BY-SA 2.0'],
+    cpuFan: ['CPU Fan / kipas prosesor', 'CPU menghasilkan panas saat memproses instruksi. Heatsink menyerap dan menyebarkan panas dari prosesor; kipas meniupkan udara melewati sirip logam agar panas lebih cepat dilepas.', 'Kipas CPU biasanya dipasang di atas heatsink, tepat di atas prosesor. Spesifikasi pendingin mencakup kompatibilitas socket, kemampuan membuang panas, ukuran, RPM, dan kebisingan; semuanya membantu menjaga CPU tetap bekerja pada suhu aman.', 'cpu-fan.jpg', 'Kipas dan heatsink pendingin CPU', 'Cpu fan.JPG', 'Akabe', 'https://creativecommons.org/publicdomain/zero/1.0/', 'Public domain'],
+    io: ['Port I/O / input-output', 'Port menghubungkan komputer ke perangkat luar. USB digunakan untuk aksesori dan penyimpanan, HDMI/DisplayPort untuk layar, Ethernet untuk jaringan kabel, dan jack audio untuk headphone atau mikrofon.', 'Kecepatan teoretis USB: USB 1.x 1,5 Mb/s (low-speed) atau 12 Mb/s (full-speed); USB 2.0 480 Mb/s; USB 3.2 Gen 1 5 Gb/s, Gen 2 10 Gb/s, dan Gen 2x2 20 Gb/s; USB4 20/40 Gb/s, hingga 80 Gb/s pada USB4 v2. Kecepatan nyata bergantung pada perangkat, port, dan kabel—koneksi mengikuti kemampuan paling lambat. USB-C adalah bentuk konektor, bukan jaminan kecepatan tertentu. Periksa spesifikasi port dan kabel sebelum menghubungkan perangkat.', 'Motherboard-pin-out.webp', 'Contoh port USB, jaringan, video, dan audio pada motherboard', '', 'Aset lokal: Motherboard-pin-out.webp', '', 'Aset lokal'],
+    case: ['Casing komputer', 'Casing melindungi dan menopang motherboard, PSU, drive, serta kartu ekspansi. Casing juga menyediakan ruang aliran udara dan panel depan untuk tombol, USB, atau audio.', 'Spesifikasi casing mencakup form factor motherboard yang didukung, ruang panjang GPU dan tinggi pendingin, jumlah slot drive, serta posisi kipas/radiator. Kecocokan ini memastikan komponen muat dan mendapat aliran udara yang baik.', 'atx-computer-case.jpg', 'Casing komputer desktop terbuka dengan komponen di dalamnya', 'ATX computer case.jpg', 'Tiia Monto, Wikimedia Commons', 'https://creativecommons.org/licenses/by-sa/4.0/', 'CC BY-SA 4.0']
+  };
+  const gpuGallery = [
+    ['gpu.jpg', 'Kartu grafis GeForce GTX 560 Ti dengan kipas pendingin', 'Graphic card PCIe geforce560ti IMGP6415 wp.jpg', 'Rainer Knäpper', 'https://artlibre.org/licence/lal/en/', 'Free Art License'],
+    ['gpu-exposed.jpg', 'Kartu grafis Radeon R9 270X dengan prosesor grafis terlihat', 'A Complex Graphics Card.jpg', 'Nick Stathas', 'https://creativecommons.org/licenses/by-sa/4.0/', 'CC BY-SA 4.0']
+  ];
+  let gpuGalleryIndex = 0;
+  let showingGpuGallery = false;
+  function setComponentPhotoCredit(source, author, licenseUrl, licenseName) {
+    const photoCredit = document.getElementById('componentPhotoCredit');
+    if (source) photoCredit.href = `https://commons.wikimedia.org/wiki/File:${encodeURIComponent(source).replaceAll('%20', '_')}`;
+    else photoCredit.removeAttribute('href');
+    photoCredit.textContent = author;
+    const licenseCredit = document.getElementById('componentLicense');
+    if (licenseUrl) licenseCredit.href = licenseUrl;
+    else licenseCredit.removeAttribute('href');
+    document.getElementById('componentLicenseWrap').hidden = !licenseUrl;
+    licenseCredit.textContent = licenseName;
+  }
+  function setGpuGalleryImage(index) {
+    gpuGalleryIndex = (index + gpuGallery.length) % gpuGallery.length;
+    const [image, alt, source, author, licenseUrl, licenseName] = gpuGallery[gpuGalleryIndex];
+    const componentImage = document.getElementById('componentImage');
+    componentImage.src = `assets/${image}`;
+    componentImage.alt = alt;
+    setComponentPhotoCredit(source, author, licenseUrl, licenseName);
+    const count = `${gpuGalleryIndex + 1} / ${gpuGallery.length}`;
+    document.getElementById('gpuGalleryCount').textContent = count;
+    document.getElementById('previewGpuGalleryCount').textContent = count;
+    if (document.getElementById('imagePreview').open) {
+      document.getElementById('previewImage').src = componentImage.src;
+      document.getElementById('previewImage').alt = alt;
+    }
+  }
+  document.querySelectorAll('.part-marker').forEach(marker => marker.addEventListener('click', () => {
+    const [title, description, note, image, alt, source, author, licenseUrl, licenseName] = componentInfo[marker.dataset.part];
+    document.getElementById('componentTitle').textContent = title;
+    document.getElementById('componentDescription').textContent = `${description} ${note}`;
+    document.getElementById('componentSpeedComparison').hidden = marker.dataset.part !== 'hdd';
+    document.getElementById('componentRamGenerations').hidden = marker.dataset.part !== 'ram';
+    document.getElementById('componentImage').src = `assets/${image}`;
+    document.getElementById('componentImage').alt = alt;
+    setComponentPhotoCredit(source, author, licenseUrl, licenseName);
+    showingGpuGallery = marker.dataset.part === 'gpu';
+    document.getElementById('gpuGalleryControls').hidden = !showingGpuGallery;
+    document.getElementById('previewGpuGalleryControls').hidden = !showingGpuGallery;
+    if (showingGpuGallery) setGpuGalleryImage(0);
+    document.querySelectorAll('.part-marker').forEach(button => button.setAttribute('aria-pressed', button === marker));
+  }));
+  document.querySelector('[data-part="motherboard"]').click();
+  const imagePreview = document.getElementById('imagePreview');
+  const componentImage = document.getElementById('componentImage');
+  function openImagePreview() {
+    document.getElementById('previewImage').src = componentImage.src;
+    document.getElementById('previewImage').alt = componentImage.alt;
+    document.getElementById('previewGpuGalleryControls').hidden = !showingGpuGallery;
+    imagePreview.showModal();
+  }
+  function closeImagePreview() { imagePreview.close(); }
+  document.getElementById('gpuPrevious').addEventListener('click', () => setGpuGalleryImage(gpuGalleryIndex - 1));
+  document.getElementById('gpuNext').addEventListener('click', () => setGpuGalleryImage(gpuGalleryIndex + 1));
+  document.getElementById('previewGpuPrevious').addEventListener('click', () => setGpuGalleryImage(gpuGalleryIndex - 1));
+  document.getElementById('previewGpuNext').addEventListener('click', () => setGpuGalleryImage(gpuGalleryIndex + 1));
+  componentImage.addEventListener('click', openImagePreview);
+  componentImage.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openImagePreview(); }
+  });
+  imagePreview.addEventListener('click', e => { if (e.target === imagePreview) closeImagePreview(); });
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', `Ke slide ${i + 1}`);
+    dot.onclick = () => goToSlide(i);
+    dots.appendChild(dot);
+  });
+  function updateSlide() {
+    slides.forEach((slide, i) => slide.classList.toggle('active', i === curSlide));
+    [...dots.children].forEach((dot, i) => dot.classList.toggle('active', i === curSlide));
+    document.getElementById('curSlide').textContent = curSlide + 1;
+    document.getElementById('progressFill').style.width = ((curSlide + 1) / totalSlides * 100) + '%';
+    document.getElementById('prevBtn').disabled = curSlide === 0;
+    document.getElementById('nextBtn').disabled = curSlide === totalSlides - 1;
+  }
+  function goToSlide(i) { curSlide = Math.max(0, Math.min(totalSlides - 1, i)); updateSlide(); }
+  function nextSlide() { goToSlide(curSlide + 1); }
+  function prevSlide() { goToSlide(curSlide - 1); }
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prevSlide(); }
+    else if (e.key === 'Home') goToSlide(0);
+    else if (e.key === 'End') goToSlide(totalSlides - 1);
+    else if (e.key.toLowerCase() === 'f') toggleFullscreen();
+  });
+  let touchStartX = 0;
+  document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive:true});
+  document.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(diff) > 60) diff < 0 ? nextSlide() : prevSlide();
+  }, {passive:true});
+  updateSlide();
+</script>
+</body>
+</html>

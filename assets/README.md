@@ -1,0 +1,23 @@
+# Credits gambar
+
+- `atx-computer-case.jpg` — Tiia Monto, [ATX computer case](https://commons.wikimedia.org/wiki/File:ATX_computer_case.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- `cpu.jpg` — Whityya23, [CPU Intel Core](https://commons.wikimedia.org/wiki/File:CPU-INTEL-CORE.jpg), [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+- `ram.jpg` — ElooKoN, [RAM Module (SDRAM-DDR4)](https://commons.wikimedia.org/wiki/File:RAM_Module_(SDRAM-DDR4).jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- `motherboard.jpg` — Kurt Kaiser, [Computer motherboard](https://commons.wikimedia.org/wiki/File:Computer_motherboard.jpg), [CC0](https://creativecommons.org/publicdomain/zero/1.0/).
+- `gpu.jpg` — Rainer Knäpper, [GeForce 560 Ti graphics card](https://commons.wikimedia.org/wiki/File:Graphic_card_PCIe_geforce560ti_IMGP6415_wp.jpg), [Free Art License](https://artlibre.org/licence/lal/en/).
+- `gpu-exposed.jpg` — Nick Stathas, [A Complex Graphics Card](https://commons.wikimedia.org/wiki/File:A_Complex_Graphics_Card.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- `hdd.jpg` — Zzubnik, [Open hard drive](https://commons.wikimedia.org/wiki/File:Open_hard-drive.jpg), public domain.
+- `ssd-sata.jpg` — Contributers2020, [A SATA SSD](https://commons.wikimedia.org/wiki/File:A_SATA_SSD.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- `ssd-nvme.jpg` — Dinkun Chen, [Samsung M.2 NVMe SSD 990 PRO 4TB](https://commons.wikimedia.org/wiki/File:SAMSUNG_M.2_NVMe_SSD_990_PRO_4TB.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- `fan.jpg` — Kent Madsen, [Corsair 120 mm fan](https://commons.wikimedia.org/wiki/File:DM-Corsair-120MM-Fan-Top.jpg), [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/).
+- `psu.jpg` — Victor Korniyenko, [Power Supply ATX-450PNF](https://commons.wikimedia.org/wiki/File:Power_Supply_ATX-450PNF.jpg), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
+- `cpu-fan.jpg` — Akabe, [CPU fan](https://commons.wikimedia.org/wiki/File:Cpu_fan.JPG), public domain.
+- `io-ports.jpg` — Mixabest, [Motherboard external connections](https://commons.wikimedia.org/wiki/File:Motherboard_external_connections.jpg), public domain.
+- `keyboard-input.jpg` — Marius Iordache, [Black computer keyboard](https://commons.wikimedia.org/wiki/File:Black_computer_keyboard.jpg), public domain.
+- `mouse-input.jpg` — Yos C. Wiranata, [Logitech Mouse](https://commons.wikimedia.org/wiki/File:Logitech_Mouse_(3870034178).jpg), [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/).
+- `microphone-input.jpg` — ChrisEngelsma, [Microphone](https://commons.wikimedia.org/wiki/File:Microphone.jpg), [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
+- `webcam-input.jpg` — Sushiflinger, [Webcam On Laptop](https://commons.wikimedia.org/wiki/File:Webcam_On_Laptop.JPG), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).
+- `scanner-input.jpg` — Arpingstone and Boffy b, [Scanner.view.750pix](https://commons.wikimedia.org/wiki/File:Scanner.view.750pix.jpg), public domain.
+- `gamepad-input.jpg` — Asim18, [Xbox controller S](https://commons.wikimedia.org/wiki/File:Xbox_controller_s_1.jpg), [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
+- `plotter.jpg` — Dinkun Chen, [Canon imagePROGRAF TX-5310 large format printer](https://commons.wikimedia.org/wiki/File:Canon_imagePROGRAF_TX-5310_LARGE_FORMAT_PRINTER.jpg), [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+- `hdd-2-5-inch.jpg` — Evan Amos, [Laptop hard drive exposed](https://commons.wikimedia.org/wiki/File:Laptop-hard-drive-exposed.jpg), [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).

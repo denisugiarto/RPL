@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101820">
+  <title>JavaScript Dasar — Kelas X RPL</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101820;
+      --surface: #19232c;
+      --surface-raised: #202d37;
+      --line: #34424c;
+      --text: #f4f6f3;
+      --muted: #a4b0b7;
+      --js: #ffd23f;
+      --teal: #4de0c1;
+      --orange: #ff8b5f;
+      --green: #8fe0a1;
+      --red: #ff8989;
+      --code: #0b1116;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, a:focus-visible {
+      outline: 3px solid var(--teal);
+      outline-offset: 3px;
+    }
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 8px;
+      left: 8px;
+      transform: translateY(-160%);
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--js);
+      color: #151a1d;
+      font-weight: 700;
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .topbar {
+      position: fixed;
+      z-index: 20;
+      inset: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 58px;
+      padding: 10px 24px;
+      background: rgba(16, 24, 32, .92);
+      border-bottom: 1px solid rgba(164, 176, 183, .13);
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--js);
+      color: #151a1d;
+      font: 800 17px/1 ui-monospace, monospace;
+    }
+    .brand-name { font-size: 13px; font-weight: 750; line-height: 1.2; }
+    .brand-sub { color: var(--muted); font-size: 11px; }
+    .key-hint { color: var(--muted); font-size: 12px; }
+    kbd {
+      display: inline-grid;
+      min-width: 22px;
+      min-height: 22px;
+      margin: 0 2px;
+      padding: 0 5px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: var(--surface);
+      color: var(--text);
+      font: 11px ui-monospace, monospace;
+    }
+    .progress-track {
+      position: fixed;
+      z-index: 30;
+      top: 57px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #29343c;
+    }
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      background: var(--js);
+      transition: width .25s ease;
+    }
+
+    .deck { position: relative; min-height: 100dvh; overflow: hidden; }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      min-height: 100dvh;
+      padding: 92px 34px 104px;
+      overflow: auto;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .slide.active { opacity: 1; visibility: visible; pointer-events: auto; }
+    .slide-inner {
+      width: min(1120px, 100%);
+      margin: auto;
+      padding-bottom: 12px;
+    }
+    .slide-head { max-width: 850px; margin: 0 0 28px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 10px;
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .eyebrow::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: var(--js);
+      content: "";
+      transform: rotate(45deg);
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { line-height: 1.12; letter-spacing: -.035em; }
+    h1 { max-width: 760px; margin-bottom: 20px; font-size: clamp(2.6rem, 7vw, 5.7rem); }
+    h2 { margin-bottom: 12px; font-size: clamp(2rem, 4.5vw, 3.5rem); }
+    h3 { margin-bottom: 9px; font-size: 1.25rem; }
+    .lede { max-width: 650px; color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.2rem); }
+    .accent { color: var(--js); }
+    .teal { color: var(--teal); }
+    .muted { color: var(--muted); }
+    .small { font-size: .88rem; }
+    .layout-two, .layout-three {
+      display: grid;
+      align-items: start;
+      gap: 18px;
+    }
+    .layout-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .layout-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .panel {
+      min-width: 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .panel p:last-child, .panel ul:last-child { margin-bottom: 0; }
+    .panel-quiet { background: transparent; }
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-size: 1rem;
+      font-weight: 750;
+    }
+    .symbol {
+      display: inline-flex;
+      width: auto;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      white-space: nowrap;
+      border: 1px solid rgba(255, 210, 63, .35);
+      border-radius: 10px;
+      background: rgba(255, 210, 63, .12);
+      color: var(--js);
+      font: 750 14px ui-monospace, monospace;
+    }
+    .code-panel {
+      overflow: hidden;
+      border: 1px solid #34424c;
+      border-radius: 14px;
+      background: var(--code);
+    }
+    .code-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 14px;
+      border-bottom: 1px solid #26333b;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .window-dots { display: flex; gap: 5px; }
+    .window-dots i { width: 7px; height: 7px; border-radius: 50%; background: #51616b; }
+    .window-dots i:first-child { background: var(--orange); }
+    .window-dots i:nth-child(2) { background: var(--js); }
+    .window-dots i:nth-child(3) { background: var(--teal); }
+    pre {
+      margin: 0;
+      padding: 18px;
+      overflow: auto;
+      color: #e5edf0;
+      font: 13px/1.7 ui-monospace, "SFMono-Regular", Consolas, monospace;
+      tab-size: 2;
+    }
+    code { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
+    .code-key { color: #f5c86c; }
+    .code-str { color: #8fe0a1; }
+    .code-comment { color: #82929b; }
+    .code-fn { color: #79c8f2; }
+    .code-num { color: #f1a6d2; }
+    .callout {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-left: 3px solid var(--teal);
+      border-radius: 0 10px 10px 0;
+      background: rgba(77, 224, 193, .08);
+      color: #d5e4e3;
+    }
+    .practice {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border: 1px dashed #61717a;
+      border-radius: 13px;
+      color: var(--muted);
+    }
+    .practice strong { color: var(--js); }
+    .plain-list { display: grid; gap: 10px; margin: 0; padding-left: 20px; }
+    .plain-list li::marker { color: var(--js); }
+    .topic-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic {
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: #d9e1e4;
+      font-size: 13px;
+    }
+    .file-tree {
+      margin: 0;
+      padding: 17px;
+      border-radius: 12px;
+      background: var(--code);
+      color: #d7e1e5;
+      font: 13px/1.8 ui-monospace, monospace;
+      white-space: pre-wrap;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      counter-reset: flow;
+    }
+    .flow-item {
+      position: relative;
+      min-height: 124px;
+      padding: 16px;
+      border-top: 2px solid var(--js);
+      background: var(--surface);
+      counter-increment: flow;
+    }
+    .flow-item::before {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--teal);
+      font: 700 12px ui-monospace, monospace;
+      content: "0" counter(flow);
+    }
+    .flow-item p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      align-items: center;
+      gap: 44px;
+    }
+    .hero::after {
+      position: absolute;
+      z-index: -1;
+      top: -55px;
+      right: 6%;
+      width: 290px;
+      height: 290px;
+      border: 1px solid rgba(255, 210, 63, .18);
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 0 38px rgba(255, 210, 63, .025), 0 0 0 78px rgba(77, 224, 193, .025);
+    }
+    .hero-code { transform: rotate(1.5deg); }
+    .hero-code pre { min-height: 230px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 25px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 15px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-raised);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .button:hover { border-color: var(--teal); }
+    .button-primary { border-color: var(--js); background: var(--js); color: #171b1d; }
+    .button-primary:hover { border-color: #ffe27b; background: #ffe27b; }
+    .button:disabled { opacity: .42; cursor: not-allowed; }
+    .nav-bar {
+      position: fixed;
+      z-index: 25;
+      bottom: 16px;
+      left: 50%;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      max-width: calc(100vw - 24px);
+      padding: 8px 10px;
+      transform: translateX(-50%);
+      border: 1px solid #3b4851;
+      border-radius: 15px;
+      background: rgba(25, 35, 44, .96);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .28);
+    }
+    .nav-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-raised);
+      cursor: pointer;
+      font-size: 17px;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: var(--js); color: var(--js); }
+    .slide-dots { display: flex; align-items: center; gap: 5px; max-width: 42vw; overflow-x: auto; }
+    .slide-dot {
+      width: 7px;
+      height: 7px;
+      flex: 0 0 auto;
+      padding: 0;
+      border: 0;
+      border-radius: 8px;
+      background: #61717a;
+      cursor: pointer;
+    }
+    .slide-dot[aria-current="step"] { width: 21px; background: var(--js); }
+    .slide-counter { min-width: 48px; color: var(--muted); text-align: center; font: 12px ui-monospace, monospace; }
+    .slide-counter strong { color: var(--text); }
+
+    .quiz-form { display: grid; gap: 13px; }
+    .quiz-question {
+      min-width: 0;
+      margin: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--surface);
+    }
+    .quiz-question legend { padding: 0 7px; font-weight: 700; }
+    .quiz-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+    .quiz-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 9px;
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .quiz-option:hover { background: var(--surface-raised); color: var(--text); }
+    .quiz-option input { margin-top: 4px; accent-color: var(--js); }
+    .quiz-option.is-correct { background: rgba(143, 224, 161, .1); color: var(--green); }
+    .quiz-option.is-wrong { background: rgba(255, 137, 137, .1); color: var(--red); }
+    .quiz-option.is-correct::after,
+    .quiz-option.is-wrong::after {
+      margin-left: auto;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .quiz-option.is-correct::after { content: "✓ Benar"; background: rgba(143, 224, 161, .14); }
+    .quiz-option.is-wrong::after { content: "✕ Salah"; background: rgba(255, 137, 137, .14); }
+    .quiz-result { min-height: 27px; margin: 12px 0 0; color: var(--teal); font-weight: 700; white-space: pre-line; }
+
+    .project-form { display: grid; gap: 12px; }
+    .field-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .field { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
+    .field input {
+      width: 100%;
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--code);
+      color: var(--text);
+    }
+    .result-box {
+      min-height: 68px;
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--code);
+      color: var(--teal);
+    }
+    .rubric { width: 100%; border-collapse: collapse; }
+    .rubric th, .rubric td { padding: 10px; border-bottom: 1px solid var(--line); text-align: left; }
+    .rubric th { color: var(--js); font-size: 13px; }
+    .rubric td { color: var(--muted); font-size: 13px; }
+    .closing-mark {
+      display: grid;
+      width: 70px;
+      height: 70px;
+      margin-bottom: 22px;
+      place-items: center;
+      border-radius: 20px;
+      background: var(--js);
+      color: #151a1d;
+      font: 800 30px ui-monospace, monospace;
+      transform: rotate(-5deg);
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 760px) {
+      .topbar { padding-inline: 15px; }
+      .key-hint { display: none; }
+      .slide { padding: 82px 18px 94px; }
+      .hero, .layout-two { grid-template-columns: 1fr; gap: 18px; }
+      .hero { align-items: start; }
+      .hero::after { top: 20px; right: -75px; width: 190px; height: 190px; }
+      .hero-code { transform: none; }
+      .layout-three { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .field-grid { grid-template-columns: 1fr; }
+      .panel { padding: 17px; }
+      pre { padding: 14px; font-size: 12px; }
+      .slide-dots { display: none; }
+      .nav-bar { gap: 7px; }
+    }
+    @media (max-width: 430px) {
+      h1 { font-size: 2.6rem; }
+      .quiz-options { grid-template-columns: 1fr; }
+      .flow-item { min-height: 110px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#slides">Lewati navigasi</a>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">JS</span>
+      <div>
+        <div class="brand-name">JavaScript Dasar</div>
+        <div class="brand-sub">Materi Web Front-End · Kelas X RPL</div>
+      </div>
+    </div>
+    <div class="key-hint"><kbd>←</kbd><kbd>→</kbd> atau spasi untuk berpindah</div>
+  </header>
+  <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+
+  <main class="deck" id="slides" tabindex="-1" aria-label="Materi JavaScript Dasar">
+    <section class="slide active" data-title="JavaScript membuat web merespons">
+      <div class="slide-inner hero">
+        <div>
+          <p class="eyebrow">Materi web front-end · Kelas X RPL</p>
+          <h1>JavaScript membuat web <span class="accent">merespons.</span></h1>
+          <p class="lede">Pelajari cara memberi instruksi pada halaman web: mengolah data, mengambil keputusan, dan menanggapi tindakan pengguna.</p>
+          <div class="hero-actions">
+            <button class="button button-primary" type="button" onclick="nextSlide()">Mulai belajar <span aria-hidden="true">→</span></button>
+            <button class="button" type="button" onclick="goToSlide(13)">Lihat proyek akhir</button>
+          </div>
+        </div>
+        <div class="code-panel hero-code" aria-label="Contoh kode JavaScript">
+          <div class="code-label"><span>app.js</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+          <pre><code><span class="code-key">const</span> tombol = document
+  .querySelector(<span class="code-str">"#tombol"</span>);
+
+tombol.addEventListener(
+  <span class="code-str">"click"</span>,
+  <span class="code-key">function</span> () {
+    console.log(<span class="code-str">"Tombol ditekan!"</span>);
+  }
+);</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Yang akan dipelajari">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Mulai dari dasar</p>
+          <h2>Dari baris kode ke <span class="accent">fitur web</span></h2>
+          <p class="lede">Prasyaratnya: sudah mengenal elemen HTML dan aturan CSS sederhana.</p>
+        </div>
+        <div class="layout-two">
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">GO</span> Setelah belajar, kamu bisa</div>
+            <ul class="plain-list">
+              <li>Menulis dan menjalankan JavaScript di browser.</li>
+              <li>Mengolah nilai dengan variabel, operator, kondisi, perulangan, fungsi, dan array.</li>
+              <li>Mengubah halaman saat pengguna berinteraksi.</li>
+              <li>Memvalidasi formulir dan menampilkan hasil yang mudah dipahami.</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">IDE</span> Siapkan alat</div>
+            <ul class="plain-list">
+              <li>Visual Studio Code untuk menulis kode.</li>
+              <li>Browser modern seperti Chrome, Edge, atau Firefox.</li>
+              <li>DevTools browser untuk membuka tab Console.</li>
+              <li>Folder latihan berisi file HTML dan JavaScript.</li>
+            </ul>
+            <div class="callout">JavaScript akan dijalankan di browser. Belum perlu memasang framework atau server.</div>
+          </article>
+        </div>
+        <div class="topic-list" style="margin-top:18px" aria-label="Topik materi">
+          <span class="topic">Console</span><span class="topic">Variabel</span><span class="topic">Operator</span><span class="topic">Kondisi</span><span class="topic">Perulangan</span><span class="topic">Fungsi</span><span class="topic">Array</span><span class="topic">DOM</span><span class="topic">Event</span><span class="topic">Formulir</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Menghubungkan JavaScript ke HTML">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Fondasi halaman web</p>
+          <h2>HTML menyiapkan elemen, JavaScript memberi <span class="teal">perilaku</span></h2>
+          <p class="lede">Simpan kode JavaScript di file terpisah agar mudah dibaca dan dirawat.</p>
+        </div>
+        <div class="layout-two">
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">01</span> Struktur folder</div>
+            <pre class="file-tree">latihan-js/
+├── index.html
+└── app.js</pre>
+            <p class="small muted" style="margin-top:14px">Kedua file harus berada di folder yang sama agar alamat <code>app.js</code> ditemukan.</p>
+          </article>
+          <div>
+            <div class="code-panel">
+              <div class="code-label"><span>index.html</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+              <pre><code>&lt;!doctype html&gt;
+&lt;html lang="id"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8"&gt;
+    &lt;script src="app.js" defer&gt;&lt;/script&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Latihan JavaScript&lt;/h1&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+            <div class="callout"><code>defer</code> membuat browser menjalankan file setelah HTML selesai dibaca.</div>
+          </div>
+        </div>
+        <div class="practice"><strong>Coba:</strong> buat kedua file, hubungkan <code>app.js</code>, lalu tulis <code>console.log("Siap belajar!");</code>.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Console dan pesan">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Tempat bereksperimen</p>
+          <h2>Mulai dengan <span class="accent">Console</span></h2>
+          <p class="lede">Console adalah tempat browser menampilkan pesan, hasil perhitungan, dan kesalahan JavaScript.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <pre><code>console.log(<span class="code-str">"Halo, RPL!"</span>);
+console.log(<span class="code-num">2</span> + <span class="code-num">3</span>);
+console.warn(<span class="code-str">"Ini contoh peringatan"</span>);</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">F12</span> Cara membuka Console</div>
+            <ol class="plain-list">
+              <li>Buka halaman latihan di browser.</li>
+              <li>Tekan <kbd>F12</kbd> atau klik kanan lalu pilih Inspect.</li>
+              <li>Pilih tab Console.</li>
+              <li>Periksa pesan dan baris kode saat terjadi kesalahan.</li>
+            </ol>
+            <div class="callout">Tanda titik koma membantu memisahkan instruksi. Biasakan menulis kode dengan rapi.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Coba:</strong> tampilkan nama, kelas, dan hasil dari <code>12 * 4</code> di Console.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Variabel dan tipe data">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Menyimpan informasi</p>
+          <h2>Variabel memberi nama pada <span class="accent">nilai</span></h2>
+          <p class="lede">Gunakan <code>const</code> untuk nilai yang tidak diganti. Gunakan <code>let</code> jika nilainya perlu berubah.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <pre><code><span class="code-key">const</span> nama = <span class="code-str">"Naya"</span>;
+<span class="code-key">let</span> nilai = <span class="code-num">80</span>;
+<span class="code-key">const</span> sudahMengumpulkan = <span class="code-key">true</span>;
+
+nilai = <span class="code-num">88</span>;
+console.log(nama, nilai);
+console.log(<span class="code-key">typeof</span> sudahMengumpulkan);</code></pre>
+          </div>
+          <div class="layout-three" style="grid-template-columns:1fr">
+            <article class="panel"><div class="panel-title"><span class="symbol">STR</span> Teks</div><p class="muted small"><code>"Naya"</code> atau <code>'RPL'</code>. Teks ditulis di antara tanda kutip.</p></article>
+            <article class="panel"><div class="panel-title"><span class="symbol">NUM</span> Angka</div><p class="muted small"><code>88</code> atau <code>3.5</code>. Angka bisa dipakai dalam perhitungan.</p></article>
+            <article class="panel"><div class="panel-title"><span class="symbol">T/F</span> Boolean</div><p class="muted small"><code>true</code> atau <code>false</code>. Nilai ini sering dipakai untuk kondisi.</p></article>
+          </div>
+        </div>
+        <div class="callout"><code>const</code> tidak membuat isi objek atau array menjadi kebal perubahan; yang tidak bisa diganti adalah ikatan variabelnya.</div>
+        <div class="practice"><strong>Coba:</strong> buat variabel nama produk, harga, dan status tersedia. Tampilkan semuanya di Console.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Operator dan ekspresi">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Mengolah nilai</p>
+          <h2>Operator mengubah data menjadi <span class="teal">hasil</span></h2>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <pre><code><span class="code-key">const</span> harga = <span class="code-num">12000</span>;
+<span class="code-key">const</span> jumlah = <span class="code-num">3</span>;
+<span class="code-key">const</span> total = harga * jumlah;
+
+<span class="code-key">const</span> nama = <span class="code-str">"Roti"</span>;
+<span class="code-key">const</span> pesan = <span class="code-str">"Produk: "</span> + nama;
+console.log(pesan, total);</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">+</span> Operator yang sering dipakai</div>
+            <ul class="plain-list">
+              <li>Aritmetika: <code>+ - * / %</code></li>
+              <li>Perbandingan: <code>=== !== &gt; &lt; &gt;= &lt;=</code></li>
+              <li>Logika: <code>&amp;&amp;</code> (dan), <code>||</code> (atau), <code>!</code> (kebalikan)</li>
+            </ul>
+            <div class="callout">Gunakan <code>===</code> untuk membandingkan nilai dan tipe data sekaligus.</div>
+          </article>
+        </div>
+        <div class="layout-two" style="margin-top:16px">
+          <article class="panel panel-quiet">
+            <h3>Gabungkan teks</h3>
+            <p class="muted small">Tanda <code>+</code> bisa menjumlahkan angka atau menyambung teks. Perhatikan tipe datanya.</p>
+            <pre><code><span class="code-key">const</span> umur = <span class="code-num">16</span>;
+<span class="code-key">const</span> umurAngka = Number(<span class="code-str">"16"</span>);</code></pre>
+          </article>
+          <article class="panel panel-quiet">
+            <h3>Template literal</h3>
+            <p class="muted small">Gunakan tanda backtick untuk menyisipkan nilai ke dalam teks.</p>
+            <pre><code><span class="code-key">const</span> nama = <span class="code-str">"Naya"</span>;
+console.log(&#96;Halo, &#36;{nama}!&#96;);</code></pre>
+          </article>
+        </div>
+        <div class="practice"><strong>Coba:</strong> hitung total harga dari harga barang dan jumlah pembelian, lalu tampilkan dalam kalimat.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Percabangan">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Membuat keputusan</p>
+          <h2><code>if</code> memilih tindakan berdasarkan <span class="accent">syarat</span></h2>
+          <p class="lede">Kondisi menghasilkan nilai boolean: benar (<code>true</code>) atau salah (<code>false</code>).</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <pre><code><span class="code-key">const</span> nilai = <span class="code-num">82</span>;
+
+<span class="code-key">if</span> (nilai &gt;= <span class="code-num">75</span>) {
+  console.log(<span class="code-str">"Tuntas"</span>);
+} <span class="code-key">else</span> {
+  console.log(<span class="code-str">"Perlu latihan lagi"</span>);
+}</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">IF</span> Cara membacanya</div>
+            <ul class="plain-list">
+              <li>Periksa apakah nilai minimal 75.</li>
+              <li>Jika syarat benar, jalankan isi blok <code>if</code>.</li>
+              <li>Jika syarat salah, jalankan isi blok <code>else</code>.</li>
+            </ul>
+            <div class="callout">Gunakan <code>else if</code> jika ada lebih dari dua kemungkinan. Urutkan syarat dari batas tertinggi.</div>
+          </article>
+        </div>
+        <div class="code-panel" style="margin-top:16px">
+          <div class="code-label"><span>Beberapa kategori</span><span>contoh</span></div>
+          <pre><code><span class="code-key">let</span> predikat;
+<span class="code-key">if</span> (nilai &gt;= <span class="code-num">85</span>) { predikat = <span class="code-str">"A"</span>; }
+<span class="code-key">else if</span> (nilai &gt;= <span class="code-num">75</span>) { predikat = <span class="code-str">"B"</span>; }
+<span class="code-key">else</span> { predikat = <span class="code-str">"C"</span>; }</code></pre>
+        </div>
+        <div class="practice"><strong>Coba:</strong> buat aturan diskon. Jika belanja minimal Rp100.000, tampilkan pesan bahwa pembeli mendapat diskon.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Perulangan">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Mengulang instruksi</p>
+          <h2>Perulangan menghemat penulisan <span class="teal">kode berulang</span></h2>
+          <p class="lede">Pakai <code>for</code> jika batas pengulangan sudah diketahui.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <pre><code><span class="code-key">for</span> (
+  <span class="code-key">let</span> nomor = <span class="code-num">1</span>;
+  nomor &lt;= <span class="code-num">5</span>;
+  nomor++
+) {
+  console.log(<span class="code-str">"Baris ke-"</span> + nomor);
+}</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">FOR</span> Tiga bagian <code>for</code></div>
+            <ul class="plain-list">
+              <li><code>let nomor = 1</code>: nilai awal.</li>
+              <li><code>nomor &lt;= 5</code>: syarat untuk lanjut.</li>
+              <li><code>nomor++</code>: menaikkan nomor setelah satu putaran.</li>
+            </ul>
+            <div class="callout">Pastikan nilai berubah menuju batas akhir. Jika syarat selalu benar, perulangan tidak berhenti.</div>
+          </article>
+        </div>
+        <div class="layout-two" style="margin-top:16px">
+          <article class="panel panel-quiet">
+            <h3>Perulangan <code>while</code></h3>
+            <p class="muted small">Cocok saat pengulangan berjalan selama sebuah kondisi masih benar.</p>
+            <pre><code><span class="code-key">let</span> hitung = <span class="code-num">3</span>;
+<span class="code-key">while</span> (hitung &gt; <span class="code-num">0</span>) {
+  console.log(hitung);
+  hitung--;
+}</code></pre>
+          </article>
+          <div class="practice"><strong>Coba:</strong> tampilkan angka 1 sampai 10 dan hitung jumlah seluruh angka itu.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Fungsi">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Merapikan logika</p>
+          <h2>Fungsi menyimpan langkah yang bisa <span class="accent">dipakai ulang</span></h2>
+          <p class="lede">Masukkan data lewat parameter, lalu kembalikan hasil dengan <code>return</code>.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <pre><code><span class="code-key">function</span> hitungRataRata(a, b, c) {
+  <span class="code-key">return</span> (a + b + c) / <span class="code-num">3</span>;
+}
+
+<span class="code-key">const</span> rata = hitungRataRata(
+  <span class="code-num">80</span>, <span class="code-num">90</span>, <span class="code-num">70</span>
+);
+console.log(rata); <span class="code-comment">// 80</span></code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">ƒ</span> Bagian fungsi</div>
+            <ul class="plain-list">
+              <li><code>function</code> memulai deklarasi fungsi.</li>
+              <li><code>hitungRataRata</code> adalah nama fungsi.</li>
+              <li><code>a, b, c</code> adalah parameter.</li>
+              <li><code>return</code> mengirim hasil kembali ke pemanggil.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="flow" style="margin-top:18px">
+          <div class="flow-item"><h3>Panggil</h3><p>Berikan nilai yang akan diproses.</p></div>
+          <div class="flow-item"><h3>Terima</h3><p>Parameter menerima nilai masukan.</p></div>
+          <div class="flow-item"><h3>Olah</h3><p>Jalankan instruksi dalam fungsi.</p></div>
+          <div class="flow-item"><h3>Kembalikan</h3><p>Gunakan hasil dari <code>return</code>.</p></div>
+        </div>
+        <div class="practice"><strong>Coba:</strong> buat fungsi yang menerima harga dan jumlah barang, lalu mengembalikan total pembayaran.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Array">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Mengelola kumpulan data</p>
+          <h2>Array menyimpan beberapa nilai dalam <span class="teal">satu variabel</span></h2>
+          <p class="lede">Posisi array dimulai dari indeks 0. Gunakan <code>length</code> untuk mengetahui jumlah isinya.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <pre><code><span class="code-key">const</span> nilai = [<span class="code-num">80</span>, <span class="code-num">90</span>, <span class="code-num">75</span>];
+console.log(nilai[<span class="code-num">0</span>]); <span class="code-comment">// 80</span>
+
+nilai.push(<span class="code-num">88</span>);
+<span class="code-key">let</span> total = <span class="code-num">0</span>;
+
+<span class="code-key">for</span> (<span class="code-key">const</span> angka <span class="code-key">of</span> nilai) {
+  total += angka;
+}
+
+<span class="code-key">const</span> rata = total / nilai.length;</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">[ ]</span> Yang perlu diingat</div>
+            <ul class="plain-list">
+              <li><code>nilai[0]</code> mengambil isi pertama.</li>
+              <li><code>push()</code> menambahkan nilai di akhir.</li>
+              <li><code>for...of</code> membaca setiap isi array.</li>
+              <li><code>length</code> memberi jumlah data.</li>
+            </ul>
+            <div class="callout">Nilai array yang dibuat dengan <code>const</code> tetap bisa diubah isinya. Yang tidak bisa diganti adalah variabel <code>nilai</code> agar menunjuk ke array lain.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Coba:</strong> simpan tiga nama teman dalam array, lalu tampilkan setiap nama dengan perulangan.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="DOM">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">JavaScript bertemu halaman</p>
+          <h2>DOM adalah representasi HTML yang bisa <span class="accent">diubah</span></h2>
+          <p class="lede">Pilih elemen dengan selector, lalu ubah teks atau kelasnya.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>index.html</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <pre><code>&lt;h1 id="judul"&gt;Selamat datang&lt;/h1&gt;
+&lt;p class="status"&gt;Belum aktif&lt;/p&gt;</code></pre>
+            <div class="code-label"><span>app.js</span><span>pilih dan ubah</span></div>
+            <pre><code><span class="code-key">const</span> judul =
+  document.querySelector(<span class="code-str">"#judul"</span>);
+<span class="code-key">const</span> status =
+  document.querySelector(<span class="code-str">".status"</span>);
+
+judul.textContent = <span class="code-str">"Halo, RPL!"</span>;
+status.classList.add(<span class="code-str">"aktif"</span>);</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">DOM</span> Selector dasar</div>
+            <ul class="plain-list">
+              <li><code>"#judul"</code> memilih elemen dengan <code>id="judul"</code>.</li>
+              <li><code>".status"</code> memilih elemen dengan kelas <code>status</code>.</li>
+              <li><code>textContent</code> mengganti teks.</li>
+              <li><code>classList.add()</code> menambahkan kelas CSS.</li>
+            </ul>
+            <div class="callout">Gunakan <code>textContent</code> untuk menampilkan teks dari pengguna. Jangan memasukkan teks pengguna dengan <code>innerHTML</code>.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Coba:</strong> pilih elemen judul, lalu ubah teksnya. Tambahkan kelas CSS yang mengubah warna judul.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Event">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Mendengar tindakan pengguna</p>
+          <h2>Event menjalankan kode saat sesuatu <span class="teal">terjadi</span></h2>
+          <p class="lede">Contohnya: tombol diklik, teks diketik, atau formulir dikirim.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>index.html</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <pre><code>&lt;button id="tombol"&gt;Klik saya&lt;/button&gt;
+&lt;p id="pesan"&gt;&lt;/p&gt;</code></pre>
+            <div class="code-label"><span>app.js</span><span>event listener</span></div>
+            <pre><code><span class="code-key">const</span> tombol =
+  document.querySelector(<span class="code-str">"#tombol"</span>);
+<span class="code-key">const</span> pesan =
+  document.querySelector(<span class="code-str">"#pesan"</span>);
+
+tombol.addEventListener(<span class="code-str">"click"</span>,
+  <span class="code-key">function</span> () {
+    pesan.textContent = <span class="code-str">"Tombol diklik!"</span>;
+  }
+);</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">ON</span> Pola event</div>
+            <div class="flow" style="grid-template-columns:1fr">
+              <div class="flow-item"><h3>Pilih elemen</h3><p>Temukan tombol atau input dengan selector.</p></div>
+              <div class="flow-item"><h3>Dengarkan event</h3><p>Daftarkan aksi seperti <code>click</code>.</p></div>
+              <div class="flow-item"><h3>Jalankan fungsi</h3><p>Tulis perubahan yang diinginkan.</p></div>
+            </div>
+          </article>
+        </div>
+        <div class="practice"><strong>Coba:</strong> buat tombol “Tambah angka”. Setiap kali diklik, angka di halaman bertambah satu.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Formulir dan validasi">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Menerima masukan</p>
+          <h2>Periksa input sebelum <span class="accent">memprosesnya</span></h2>
+          <p class="lede">Validasi membantu pengguna memperbaiki data yang kosong atau tidak sesuai.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>index.html</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+            <pre><code>&lt;form id="formNama"&gt;
+  &lt;label for="nama"&gt;Nama&lt;/label&gt;
+  &lt;input id="nama" required&gt;
+  &lt;button type="submit"&gt;Kirim&lt;/button&gt;
+&lt;/form&gt;
+&lt;p id="pesan" aria-live="polite"&gt;&lt;/p&gt;</code></pre>
+          </div>
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span>validasi sederhana</span></div>
+            <pre><code><span class="code-key">const</span> form =
+  document.querySelector(<span class="code-str">"#formNama"</span>);
+<span class="code-key">const</span> input =
+  document.querySelector(<span class="code-str">"#nama"</span>);
+<span class="code-key">const</span> pesan =
+  document.querySelector(<span class="code-str">"#pesan"</span>);
+
+form.addEventListener(<span class="code-str">"submit"</span>,
+  <span class="code-key">function</span> (event) {
+    event.preventDefault();
+    <span class="code-key">const</span> nama = input.value.trim();
+    <span class="code-key">if</span> (nama === <span class="code-str">""</span>) {
+      pesan.textContent = <span class="code-str">"Nama wajib diisi."</span>;
+      <span class="code-key">return</span>;
+    }
+    pesan.textContent = <span class="code-str">"Halo, "</span> + nama;
+  }
+);</code></pre>
+          </div>
+        </div>
+        <div class="layout-three" style="margin-top:16px">
+          <article class="panel"><h3><code>submit</code></h3><p class="muted small">Berjalan ketika formulir dikirim.</p></article>
+          <article class="panel"><h3><code>preventDefault()</code></h3><p class="muted small">Mencegah halaman dimuat ulang secara otomatis.</p></article>
+          <article class="panel"><h3><code>trim()</code></h3><p class="muted small">Menghapus spasi di awal dan akhir teks.</p></article>
+        </div>
+        <div class="practice"><strong>Coba:</strong> tambahkan validasi agar nilai hanya boleh diisi dengan angka dari 0 sampai 100.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Proyek kalkulator nilai">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Proyek akhir · rancang alurnya</p>
+          <h2>Kalkulator nilai <span class="accent">siswa</span></h2>
+          <p class="lede">Gabungkan formulir, validasi, perhitungan, fungsi, kondisi, dan DOM dalam satu halaman.</p>
+        </div>
+        <div class="flow">
+          <div class="flow-item"><h3>Masukkan</h3><p>Nama dan tiga nilai mata pelajaran.</p></div>
+          <div class="flow-item"><h3>Periksa</h3><p>Nama tidak kosong; nilai berada di rentang 0–100.</p></div>
+          <div class="flow-item"><h3>Hitung</h3><p>Jumlahkan nilai, lalu bagi dengan banyaknya nilai.</p></div>
+          <div class="flow-item"><h3>Tampilkan</h3><p>Perlihatkan nama, rata-rata, dan predikat.</p></div>
+        </div>
+        <div class="layout-two" style="margin-top:18px">
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">A–D</span> Aturan contoh predikat</div>
+            <ul class="plain-list">
+              <li>Rata-rata 85 atau lebih: A</li>
+              <li>Rata-rata 75 sampai kurang dari 85: B</li>
+              <li>Rata-rata 65 sampai kurang dari 75: C</li>
+              <li>Di bawah 65: D</li>
+            </ul>
+            <p class="small muted" style="margin-top:13px">Ambang ini hanya contoh untuk latihan. Guru dapat menggantinya sesuai kebutuhan kelas.</p>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">✓</span> Kriteria hasil</div>
+            <ul class="plain-list">
+              <li>Perhitungan rata-rata benar.</li>
+              <li>Input kosong atau di luar rentang ditangani.</li>
+              <li>Fungsi dan percabangan dipakai dengan jelas.</li>
+              <li>Pesan hasil mudah dibaca.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="practice"><strong>Mulai:</strong> buat form HTML dan elemen hasil sebelum menulis logika JavaScript.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Struktur proyek">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Proyek kalkulator · siapkan HTML</p>
+          <h2>Buat form dan tempat <span class="teal">hasil</span></h2>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>index.html</span><span>struktur inti</span></div>
+            <pre><code>&lt;form id="formNilai"&gt;
+  &lt;label for="nama"&gt;Nama&lt;/label&gt;
+  &lt;input id="nama" required&gt;
+
+  &lt;label&gt;Nilai Bahasa Indonesia
+    &lt;input class="nilai" type="number"
+      min="0" max="100" required&gt;
+  &lt;/label&gt;
+  &lt;label&gt;Nilai Matematika
+    &lt;input class="nilai" type="number"
+      min="0" max="100" required&gt;
+  &lt;/label&gt;
+  &lt;label&gt;Nilai Produktif
+    &lt;input class="nilai" type="number"
+      min="0" max="100" required&gt;
+  &lt;/label&gt;
+
+  &lt;button type="submit"&gt;Hitung nilai&lt;/button&gt;
+&lt;/form&gt;
+&lt;p id="hasil" aria-live="polite"&gt;&lt;/p&gt;</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">&lt;/&gt;</span> Kenapa atribut ini dipakai?</div>
+            <ul class="plain-list">
+              <li><code>required</code> meminta pengguna mengisi input.</li>
+              <li><code>type="number"</code> memudahkan input angka.</li>
+              <li><code>min</code> dan <code>max</code> memberi batas nilai.</li>
+              <li><code>aria-live</code> membantu pembaca layar mengumumkan hasil baru.</li>
+            </ul>
+            <div class="callout">Atribut HTML memberi pemeriksaan awal. JavaScript tetap perlu memastikan data sebelum dihitung.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Periksa:</strong> setiap <code>label</code> jelas, input memiliki batas, dan tombol berada di dalam form.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Logika proyek">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Proyek kalkulator · tulis JavaScript</p>
+          <h2>Validasi, hitung, lalu <span class="accent">tampilkan</span></h2>
+          <p class="lede">Pecah aturan predikat menjadi fungsi agar logika utama mudah dibaca.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span>fungsi predikat</span></div>
+            <pre><code><span class="code-key">function</span> tentukanPredikat(rata) {
+  <span class="code-key">if</span> (rata &gt;= <span class="code-num">85</span>) <span class="code-key">return</span> <span class="code-str">"A"</span>;
+  <span class="code-key">if</span> (rata &gt;= <span class="code-num">75</span>) <span class="code-key">return</span> <span class="code-str">"B"</span>;
+  <span class="code-key">if</span> (rata &gt;= <span class="code-num">65</span>) <span class="code-key">return</span> <span class="code-str">"C"</span>;
+  <span class="code-key">return</span> <span class="code-str">"D"</span>;
+}</code></pre>
+          </div>
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span>event formulir</span></div>
+            <pre><code><span class="code-key">const</span> form = document.querySelector(<span class="code-str">"#formNilai"</span>);
+<span class="code-key">const</span> namaInput = document.querySelector(<span class="code-str">"#nama"</span>);
+<span class="code-key">const</span> inputNilai = document.querySelectorAll(<span class="code-str">".nilai"</span>);
+<span class="code-key">const</span> hasil = document.querySelector(<span class="code-str">"#hasil"</span>);
+
+form.addEventListener(<span class="code-str">"submit"</span>, <span class="code-key">function</span> (event) {
+  event.preventDefault();
+  <span class="code-key">const</span> nama = namaInput.value.trim();
+  <span class="code-key">const</span> nilai = [];
+  <span class="code-key">for</span> (<span class="code-key">const</span> input <span class="code-key">of</span> inputNilai) {
+    nilai.push(input.valueAsNumber);
+  }
+
+  <span class="code-key">let</span> valid = nama !== <span class="code-str">""</span> &amp;&amp; nilai.length &gt; <span class="code-num">0</span>;
+  <span class="code-key">for</span> (<span class="code-key">const</span> angka <span class="code-key">of</span> nilai) {
+    <span class="code-key">if</span> (!Number.isFinite(angka) || angka &lt; <span class="code-num">0</span> || angka &gt; <span class="code-num">100</span>) valid = <span class="code-key">false</span>;
+  }
+  <span class="code-key">if</span> (!valid) {
+    hasil.textContent = <span class="code-str">"Periksa nama dan nilai (0–100)."</span>;
+    <span class="code-key">return</span>;
+  }
+
+  <span class="code-key">let</span> total = <span class="code-num">0</span>;
+  <span class="code-key">for</span> (<span class="code-key">const</span> angka <span class="code-key">of</span> nilai) total += angka;
+  <span class="code-key">const</span> rata = total / nilai.length;
+  hasil.textContent = nama + <span class="code-str">": rata-rata "</span> +
+    rata.toFixed(<span class="code-num">1</span>) + <span class="code-str">" · predikat "</span> + tentukanPredikat(rata);
+});</code></pre>
+          </div>
+        </div>
+        <div class="callout"><code>textContent</code> menampilkan hasil sebagai teks. <code>toFixed(1)</code> membatasi rata-rata menjadi satu angka di belakang koma.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Coba kalkulator nilai">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Demo yang bisa dicoba</p>
+          <h2>Hitung rata-rata dan <span class="teal">predikat</span></h2>
+          <p class="lede">Masukkan nama dan nilai 0–100. Aturan predikat sama dengan contoh proyek.</p>
+        </div>
+        <div class="layout-two">
+          <article class="panel">
+            <form class="project-form" id="scoreForm">
+              <label class="field" for="studentName">Nama siswa
+                <input id="studentName" name="studentName" autocomplete="name" required>
+              </label>
+              <div class="field-grid">
+                <label class="field" for="scoreIndo">Bahasa Indonesia
+                  <input class="score-input" id="scoreIndo" type="number" min="0" max="100" step="any" required>
+                </label>
+                <label class="field" for="scoreMath">Matematika
+                  <input class="score-input" id="scoreMath" type="number" min="0" max="100" step="any" required>
+                </label>
+                <label class="field" for="scoreRpl">Produktif RPL
+                  <input class="score-input" id="scoreRpl" type="number" min="0" max="100" step="any" required>
+                </label>
+              </div>
+              <button class="button button-primary" type="submit">Hitung nilai</button>
+            </form>
+            <p class="result-box" id="scoreResult" role="status" aria-live="polite">Hasil perhitungan akan muncul di sini.</p>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">TRY</span> Cek beberapa contoh</div>
+            <ul class="plain-list">
+              <li>Nilai 90, 80, 70 → rata-rata 80 → predikat B.</li>
+              <li>Nilai 100, 90, 80 → rata-rata 90 → predikat A.</li>
+              <li>Nilai 50, 60, 70 → rata-rata 60 → predikat D.</li>
+            </ul>
+            <div class="callout">Coba masukkan desimal atau nilai kosong. Browser akan membantu menolak input yang tidak sesuai.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Modifikasi:</strong> tambahkan mata pelajaran lain, lalu pastikan rata-rata memakai jumlah input terbaru.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Kuis pemahaman">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Periksa pemahaman</p>
+          <h2>Kuis singkat <span class="accent">JavaScript</span></h2>
+          <p class="lede">Pilih satu jawaban untuk setiap pertanyaan, lalu periksa hasilnya.</p>
+        </div>
+        <form class="quiz-form" id="quizForm">
+          <fieldset class="quiz-question">
+            <legend>1. Kata kunci untuk nilai yang tidak perlu diganti adalah …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>let</code></label>
+              <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>const</code></label>
+              <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>if</code></label>
+              <label class="quiz-option"><input type="radio" name="q1" value="d"> <code>return</code></label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-question">
+            <legend>2. Indeks untuk mengambil isi pertama array adalah …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q2" value="a"> <code>1</code></label>
+              <label class="quiz-option"><input type="radio" name="q2" value="b"> <code>-1</code></label>
+              <label class="quiz-option"><input type="radio" name="q2" value="c"> <code>0</code></label>
+              <label class="quiz-option"><input type="radio" name="q2" value="d"> <code>first</code></label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-question">
+            <legend>3. Event untuk menangani klik tombol adalah …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q3" value="a"> <code>change</code></label>
+              <label class="quiz-option"><input type="radio" name="q3" value="b"> <code>submit</code></label>
+              <label class="quiz-option"><input type="radio" name="q3" value="c"> <code>load</code></label>
+              <label class="quiz-option"><input type="radio" name="q3" value="d"> <code>click</code></label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-question">
+            <legend>4. Properti untuk mengganti teks elemen dengan aman adalah …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q4" value="a"> <code>textContent</code></label>
+              <label class="quiz-option"><input type="radio" name="q4" value="b"> <code>innerStyle</code></label>
+              <label class="quiz-option"><input type="radio" name="q4" value="c"> <code>outerClass</code></label>
+              <label class="quiz-option"><input type="radio" name="q4" value="d"> <code>queryText</code></label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-question">
+            <legend>5. Fungsi <code>preventDefault()</code> pada form adalah …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q5" value="a"> Menghapus semua input</label>
+              <label class="quiz-option"><input type="radio" name="q5" value="b"> Mencegah aksi bawaan browser</label>
+              <label class="quiz-option"><input type="radio" name="q5" value="c"> Mengubah angka menjadi teks</label>
+              <label class="quiz-option"><input type="radio" name="q5" value="d"> Menutup halaman</label>
+            </div>
+          </fieldset>
+          <div>
+            <button class="button button-primary" type="submit">Periksa jawaban</button>
+            <p class="quiz-result" id="quizResult" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Tantangan dan penutup">
+      <div class="slide-inner">
+        <div class="closing-mark" aria-hidden="true">JS</div>
+        <p class="eyebrow">Giliran kamu membangun</p>
+        <h2>Ubah latihan menjadi <span class="accent">fitur web</span></h2>
+        <p class="lede">Tantangan: buat halaman pencatat tugas dengan input tugas, tombol tambah, dan daftar tugas. Gunakan DOM, event, array, fungsi, dan validasi sederhana.</p>
+        <div class="layout-two" style="margin-top:24px">
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">✓</span> Sebelum dikumpulkan</div>
+            <ul class="plain-list">
+              <li>Kode terbaca dan memakai nama variabel yang jelas.</li>
+              <li>Input kosong ditangani dengan pesan yang membantu.</li>
+              <li>Setiap tombol bekerja sesuai tujuannya.</li>
+              <li>Kamu dapat menjelaskan alur kode sendiri.</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">→</span> Setelah JavaScript dasar</div>
+            <p class="muted">Latihan berikutnya bisa membahas objek, penyimpanan data di browser, dan pengambilan data dari API setelah konsep dasar ini dikuasai.</p>
+            <button class="button button-primary" type="button" onclick="goToSlide(0)">Ulang dari awal</button>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav-bar" aria-label="Navigasi materi">
+    <button class="nav-btn" id="prevBtn" type="button" aria-label="Slide sebelumnya" title="Slide sebelumnya">‹</button>
+    <div class="slide-dots" id="slideDots" aria-label="Pilih slide"></div>
+    <span class="slide-counter" aria-live="polite"><strong id="currentSlide">1</strong> / <span id="slideTotal"></span></span>
+    <button class="nav-btn" id="nextBtn" type="button" aria-label="Slide berikutnya" title="Slide berikutnya">›</button>
+  </nav>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const dots = document.getElementById("slideDots");
+    let currentIndex = 0;
+
+    document.getElementById("slideTotal").textContent = slides.length;
+    slides.forEach(function (slide, index) {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "slide-dot";
+      dot.setAttribute("aria-label", "Buka slide " + (index + 1) + ": " + slide.dataset.title);
+      dot.addEventListener("click", function () { goToSlide(index); });
+      dots.appendChild(dot);
+    });
+
+    function updateSlide() {
+      slides.forEach(function (slide, index) {
+        const active = index === currentIndex;
+        slide.classList.toggle("active", active);
+        slide.setAttribute("aria-hidden", String(!active));
+        slide.inert = !active;
+      });
+      Array.from(dots.children).forEach(function (dot, index) {
+        if (index === currentIndex) dot.setAttribute("aria-current", "step");
+        else dot.removeAttribute("aria-current");
+      });
+      document.getElementById("currentSlide").textContent = currentIndex + 1;
+      document.getElementById("progressFill").style.width =
+        ((currentIndex + 1) / slides.length * 100) + "%";
+      document.getElementById("prevBtn").disabled = currentIndex === 0;
+      document.getElementById("nextBtn").disabled = currentIndex === slides.length - 1;
+      slides[currentIndex].scrollTop = 0;
+    }
+
+    function goToSlide(index) {
+      currentIndex = Math.max(0, Math.min(slides.length - 1, index));
+      updateSlide();
+    }
+    function nextSlide() { goToSlide(currentIndex + 1); }
+    function previousSlide() { goToSlide(currentIndex - 1); }
+
+    document.getElementById("prevBtn").addEventListener("click", previousSlide);
+    document.getElementById("nextBtn").addEventListener("click", nextSlide);
+    document.addEventListener("keydown", function (event) {
+      if (event.target.closest("button, input, textarea, select, a, [contenteditable='true']")) return;
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+        event.preventDefault();
+        nextSlide();
+      } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        event.preventDefault();
+        previousSlide();
+      } else if (event.key === "Home") {
+        goToSlide(0);
+      } else if (event.key === "End") {
+        goToSlide(slides.length - 1);
+      }
+    });
+    updateSlide();
+
+    function tentukanPredikat(rata) {
+      if (rata >= 85) return "A";
+      if (rata >= 75) return "B";
+      if (rata >= 65) return "C";
+      return "D";
+    }
+
+    document.getElementById("scoreForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const name = document.getElementById("studentName").value.trim();
+      const scoreInputs = Array.from(document.querySelectorAll(".score-input"));
+      const scores = scoreInputs.map(function (input) { return input.valueAsNumber; });
+      const result = document.getElementById("scoreResult");
+
+      if (name === "" || scores.length === 0 ||
+          scores.some(function (score) {
+            return !Number.isFinite(score) || score < 0 || score > 100;
+          })) {
+        result.textContent = "Periksa nama dan pastikan setiap nilai berada di antara 0 dan 100.";
+        return;
+      }
+
+      const total = scores.reduce(function (sum, score) { return sum + score; }, 0);
+      const average = total / scores.length;
+      result.textContent = name + ": rata-rata " + average.toFixed(1) +
+        ", predikat " + tentukanPredikat(average) + ".";
+    });
+
+    const quizForm = document.getElementById("quizForm");
+    quizForm.addEventListener("change", function () {
+      quizForm.querySelectorAll(".quiz-option.is-correct, .quiz-option.is-wrong").forEach(function (option) {
+        option.classList.remove("is-correct", "is-wrong");
+      });
+      document.getElementById("quizResult").textContent = "";
+    });
+    quizForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      const answers = new FormData(event.currentTarget);
+      const key = { q1: "b", q2: "c", q3: "d", q4: "a", q5: "b" };
+      const questionNames = Object.keys(key);
+      const unanswered = questionNames.filter(function (name) { return !answers.has(name); });
+      const result = document.getElementById("quizResult");
+
+      if (unanswered.length > 0) {
+        result.textContent = "Jawab semua pertanyaan terlebih dahulu.";
+        return;
+      }
+      let score = 0;
+      const feedback = questionNames.map(function (name) {
+        const options = quizForm.querySelectorAll('input[name="' + name + '"]');
+        const correctAnswer = key[name];
+        const selectedAnswer = answers.get(name);
+        options.forEach(function (option) {
+          const label = option.closest("label");
+          if (option.value === correctAnswer) label.classList.add("is-correct");
+          if (option.checked && option.value !== correctAnswer) label.classList.add("is-wrong");
+        });
+        if (selectedAnswer === correctAnswer) {
+          score += 1;
+          return name.slice(1) + ". Benar.";
+        }
+        const correctLabel = Array.from(options).find(function (option) {
+          return option.value === correctAnswer;
+        }).closest("label");
+        return name.slice(1) + ". Salah. Jawaban benar: " + correctLabel.textContent.trim() + ".";
+      });
+      result.textContent = "Skor kamu " + score + " dari " + questionNames.length + ".\n" + feedback.join("\n");
+    });
+  </script>
+</body>
+</html>

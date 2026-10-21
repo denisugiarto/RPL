@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101820">
+  <title>JavaScript Lanjutan — Kelas X RPL</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101820;
+      --surface: #19232c;
+      --surface-raised: #202d37;
+      --line: #34424c;
+      --text: #f4f6f3;
+      --muted: #a4b0b7;
+      --js: #ffd23f;
+      --teal: #4de0c1;
+      --orange: #ff8b5f;
+      --green: #8fe0a1;
+      --red: #ff8989;
+      --code: #0b1116;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, a:focus-visible {
+      outline: 3px solid var(--teal);
+      outline-offset: 3px;
+    }
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 8px;
+      left: 8px;
+      transform: translateY(-160%);
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--js);
+      color: #151a1d;
+      font-weight: 700;
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .topbar {
+      position: fixed;
+      z-index: 20;
+      inset: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 58px;
+      padding: 10px 24px;
+      background: rgba(16, 24, 32, .92);
+      border-bottom: 1px solid rgba(164, 176, 183, .13);
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--js);
+      color: #151a1d;
+      font: 800 17px/1 ui-monospace, monospace;
+    }
+    .brand-name { font-size: 13px; font-weight: 750; line-height: 1.2; }
+    .brand-sub { color: var(--muted); font-size: 11px; }
+    .key-hint { color: var(--muted); font-size: 12px; }
+    kbd {
+      display: inline-grid;
+      min-width: 22px;
+      min-height: 22px;
+      margin: 0 2px;
+      padding: 0 5px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: var(--surface);
+      color: var(--text);
+      font: 11px ui-monospace, monospace;
+    }
+    .progress-track {
+      position: fixed;
+      z-index: 30;
+      top: 57px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #29343c;
+    }
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      background: var(--js);
+      transition: width .25s ease;
+    }
+
+    .deck { position: relative; min-height: 100dvh; overflow: hidden; }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      min-height: 100dvh;
+      padding: 92px 34px 104px;
+      overflow: auto;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .slide.active { opacity: 1; visibility: visible; pointer-events: auto; }
+    .slide-inner {
+      width: min(1120px, 100%);
+      margin: auto;
+      padding-bottom: 12px;
+    }
+    .slide-head { max-width: 850px; margin: 0 0 28px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 10px;
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .eyebrow::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: var(--js);
+      content: "";
+      transform: rotate(45deg);
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { line-height: 1.12; letter-spacing: -.035em; }
+    h1 { max-width: 760px; margin-bottom: 20px; font-size: clamp(2.6rem, 7vw, 5.7rem); }
+    h2 { margin-bottom: 12px; font-size: clamp(2rem, 4.5vw, 3.5rem); }
+    h3 { margin-bottom: 9px; font-size: 1.25rem; }
+    .lede { max-width: 650px; color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.2rem); }
+    .accent { color: var(--js); }
+    .teal { color: var(--teal); }
+    .muted { color: var(--muted); }
+    .small { font-size: .88rem; }
+    .layout-two, .layout-three {
+      display: grid;
+      align-items: start;
+      gap: 18px;
+    }
+    .layout-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .layout-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .panel {
+      min-width: 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .panel p:last-child, .panel ul:last-child { margin-bottom: 0; }
+    .panel-quiet { background: transparent; }
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-size: 1rem;
+      font-weight: 750;
+    }
+    .symbol {
+      display: inline-flex;
+      width: auto;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      white-space: nowrap;
+      border: 1px solid rgba(255, 210, 63, .35);
+      border-radius: 10px;
+      background: rgba(255, 210, 63, .12);
+      color: var(--js);
+      font: 750 14px ui-monospace, monospace;
+    }
+    .code-panel {
+      overflow: hidden;
+      border: 1px solid #34424c;
+      border-radius: 14px;
+      background: var(--code);
+    }
+    .code-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 14px;
+      border-bottom: 1px solid #26333b;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .window-dots { display: flex; gap: 5px; }
+    .window-dots i { width: 7px; height: 7px; border-radius: 50%; background: #51616b; }
+    .window-dots i:first-child { background: var(--orange); }
+    .window-dots i:nth-child(2) { background: var(--js); }
+    .window-dots i:nth-child(3) { background: var(--teal); }
+    pre {
+      margin: 0;
+      padding: 18px;
+      overflow: auto;
+      color: #e5edf0;
+      font: 13px/1.7 ui-monospace, "SFMono-Regular", Consolas, monospace;
+      tab-size: 2;
+    }
+    code { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
+    .code-key { color: #f5c86c; }
+    .code-str { color: #8fe0a1; }
+    .code-comment { color: #82929b; }
+    .code-fn { color: #79c8f2; }
+    .code-num { color: #f1a6d2; }
+    .callout {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-left: 3px solid var(--teal);
+      border-radius: 0 10px 10px 0;
+      background: rgba(77, 224, 193, .08);
+      color: #d5e4e3;
+    }
+    .practice {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border: 1px dashed #61717a;
+      border-radius: 13px;
+      color: var(--muted);
+    }
+    .practice strong { color: var(--js); }
+    .plain-list { display: grid; gap: 10px; margin: 0; padding-left: 20px; }
+    .plain-list li::marker { color: var(--js); }
+    .topic-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic {
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: #d9e1e4;
+      font-size: 13px;
+    }
+    .file-tree {
+      margin: 0;
+      padding: 17px;
+      border-radius: 12px;
+      background: var(--code);
+      color: #d7e1e5;
+      font: 13px/1.8 ui-monospace, monospace;
+      white-space: pre-wrap;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      counter-reset: flow;
+    }
+    .flow-item {
+      position: relative;
+      min-height: 124px;
+      padding: 16px;
+      border-top: 2px solid var(--js);
+      background: var(--surface);
+      counter-increment: flow;
+    }
+    .flow-item::before {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--teal);
+      font: 700 12px ui-monospace, monospace;
+      content: "0" counter(flow);
+    }
+    .flow-item p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      align-items: center;
+      gap: 44px;
+    }
+    .hero::after {
+      position: absolute;
+      z-index: -1;
+      top: -55px;
+      right: 6%;
+      width: 290px;
+      height: 290px;
+      border: 1px solid rgba(255, 210, 63, .18);
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 0 38px rgba(255, 210, 63, .025), 0 0 0 78px rgba(77, 224, 193, .025);
+    }
+    .hero-code { transform: rotate(1.5deg); }
+    .hero-code pre { min-height: 230px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 25px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 15px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-raised);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .button:hover { border-color: var(--teal); }
+    .button-primary { border-color: var(--js); background: var(--js); color: #171b1d; }
+    .button-primary:hover { border-color: #ffe27b; background: #ffe27b; }
+    .button:disabled { opacity: .42; cursor: not-allowed; }
+    .nav-bar {
+      position: fixed;
+      z-index: 25;
+      bottom: 16px;
+      left: 50%;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      max-width: calc(100vw - 24px);
+      padding: 8px 10px;
+      transform: translateX(-50%);
+      border: 1px solid #3b4851;
+      border-radius: 15px;
+      background: rgba(25, 35, 44, .96);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .28);
+    }
+    .nav-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-raised);
+      cursor: pointer;
+      font-size: 17px;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: var(--js); color: var(--js); }
+    .slide-dots { display: flex; align-items: center; gap: 5px; max-width: 42vw; overflow-x: auto; }
+    .slide-dot {
+      width: 7px;
+      height: 7px;
+      flex: 0 0 auto;
+      padding: 0;
+      border: 0;
+      border-radius: 8px;
+      background: #61717a;
+      cursor: pointer;
+    }
+    .slide-dot[aria-current="step"] { width: 21px; background: var(--js); }
+    .slide-counter { min-width: 48px; color: var(--muted); text-align: center; font: 12px ui-monospace, monospace; }
+    .slide-counter strong { color: var(--text); }
+
+    .quiz-form { display: grid; gap: 13px; }
+    .quiz-question {
+      min-width: 0;
+      margin: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--surface);
+    }
+    .quiz-question legend { padding: 0 7px; font-weight: 700; }
+    .quiz-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+    .quiz-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 9px;
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .quiz-option:hover { background: var(--surface-raised); color: var(--text); }
+    .quiz-option input { margin-top: 4px; accent-color: var(--js); }
+    .quiz-option.is-correct { background: rgba(143, 224, 161, .1); color: var(--green); }
+    .quiz-option.is-wrong { background: rgba(255, 137, 137, .1); color: var(--red); }
+    .quiz-option.is-correct::after,
+    .quiz-option.is-wrong::after {
+      margin-left: auto;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .quiz-option.is-correct::after { content: "✓ Benar"; background: rgba(143, 224, 161, .14); }
+    .quiz-option.is-wrong::after { content: "✕ Salah"; background: rgba(255, 137, 137, .14); }
+    .quiz-result { min-height: 27px; margin: 12px 0 0; color: var(--teal); font-weight: 700; white-space: pre-line; }
+
+    .project-form { display: grid; gap: 12px; }
+    .field-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .field { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
+    .field input {
+      width: 100%;
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--code);
+      color: var(--text);
+    }
+    .result-box {
+      min-height: 68px;
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--code);
+      color: var(--teal);
+    }
+    .rubric { width: 100%; border-collapse: collapse; }
+    .rubric th, .rubric td { padding: 10px; border-bottom: 1px solid var(--line); text-align: left; }
+    .rubric th { color: var(--js); font-size: 13px; }
+    .rubric td { color: var(--muted); font-size: 13px; }
+    .closing-mark {
+      display: grid;
+      width: 70px;
+      height: 70px;
+      margin-bottom: 22px;
+      place-items: center;
+      border-radius: 20px;
+      background: var(--js);
+      color: #151a1d;
+      font: 800 30px ui-monospace, monospace;
+      transform: rotate(-5deg);
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 760px) {
+      .topbar { padding-inline: 15px; }
+      .key-hint { display: none; }
+      .slide { padding: 82px 18px 94px; }
+      .hero, .layout-two { grid-template-columns: 1fr; gap: 18px; }
+      .hero { align-items: start; }
+      .hero::after { top: 20px; right: -75px; width: 190px; height: 190px; }
+      .hero-code { transform: none; }
+      .layout-three { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .field-grid { grid-template-columns: 1fr; }
+      .panel { padding: 17px; }
+      pre { padding: 14px; font-size: 12px; }
+      .slide-dots { display: none; }
+      .nav-bar { gap: 7px; }
+    }
+    @media (max-width: 430px) {
+      h1 { font-size: 2.6rem; }
+      .quiz-options { grid-template-columns: 1fr; }
+      .flow-item { min-height: 110px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#slides">Lewati navigasi</a>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">JS</span>
+      <div>
+        <div class="brand-name">JavaScript Lanjutan</div>
+        <div class="brand-sub">Materi Web Front-End · Kelas X RPL</div>
+      </div>
+    </div>
+    <div class="key-hint"><kbd>←</kbd><kbd>→</kbd> atau spasi untuk berpindah</div>
+  </header>
+  <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+
+  <main class="deck" id="slides" tabindex="-1" aria-label="Materi JavaScript Lanjutan">
+    <section class="slide active" id="javascriptLanjutan" data-title="JavaScript lanjutan">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Bab berikutnya · setelah dasar</p>
+          <h2>Data tersusun, tersimpan, lalu <span class="teal">terhubung</span></h2>
+          <p class="lede">Gunakan konsep dasar untuk membuat fitur yang mengelola data lebih nyata.</p>
+        </div>
+        <div class="layout-three">
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">{ }</span> Susun data</div>
+            <p class="muted">Kelompokkan informasi terkait ke dalam objek dan daftar objek.</p>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">DB</span> Simpan data</div>
+            <p class="muted">Ubah objek menjadi JSON lalu simpan di browser dengan <code>localStorage</code>.</p>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">API</span> Ambil data</div>
+            <p class="muted">Minta data dari API, tunggu hasilnya, dan tampilkan keadaan berhasil atau gagal.</p>
+          </article>
+        </div>
+        <div class="callout">Kita tetap memakai variabel, fungsi, array, DOM, dan event dari materi dasar.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Objek dan properti">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Data yang saling berkaitan</p>
+          <h2>Objek menyimpan satu <span class="accent">entitas</span></h2>
+          <p class="lede">Objek mengelompokkan beberapa nilai dengan nama properti yang mudah dikenali.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span>objek siswa</span></div>
+            <pre><code><span class="code-key">const</span> siswa = {
+  nama: <span class="code-str">"Alya"</span>,
+  kelas: <span class="code-str">"X RPL 1"</span>,
+  nilai: <span class="code-num">88</span>
+};
+
+console.log(siswa.nama);
+siswa.nilai = <span class="code-num">92</span>;
+
+<span class="code-key">const</span> kunci = <span class="code-str">"nilai"</span>;
+console.log(siswa[kunci]);</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">KEY</span> Cara membacanya</div>
+            <ul class="plain-list">
+              <li><code>nama</code>, <code>kelas</code>, dan <code>nilai</code> adalah nama properti.</li>
+              <li><code>siswa.nama</code> mengambil properti dengan notasi titik.</li>
+              <li><code>siswa[kunci]</code> berguna saat nama properti tersimpan di variabel.</li>
+              <li>Nilai properti bisa diperbarui, ditambahkan, atau dibaca.</li>
+            </ul>
+            <div class="callout"><code>const</code> menjaga variabel <code>siswa</code> tetap menunjuk ke objek yang sama. Nilai propertinya masih bisa diubah.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Coba:</strong> tambahkan properti <code>jurusan</code>, lalu ubah nilai siswa menjadi 95.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Array berisi objek">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Banyak data dengan bentuk serupa</p>
+          <h2>Daftar objek mudah <span class="teal">diolah</span></h2>
+          <p class="lede">Gabungkan array dan objek saat ingin menyimpan banyak catatan dengan struktur yang sama.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span>filter dan map</span></div>
+            <pre><code><span class="code-key">const</span> tugas = [
+  { judul: <span class="code-str">"Navbar"</span>, selesai: <span class="code-key">true</span> },
+  { judul: <span class="code-str">"Kartu produk"</span>, selesai: <span class="code-key">false</span> },
+  { judul: <span class="code-str">"Form kontak"</span>, selesai: <span class="code-key">false</span> }
+];
+
+<span class="code-key">const</span> belumSelesai = tugas.filter(<span class="code-key">function</span> (item) {
+  <span class="code-key">return</span> !item.selesai;
+});
+
+<span class="code-key">const</span> semuaJudul = tugas.map(<span class="code-key">function</span> (item) {
+  <span class="code-key">return</span> item.judul;
+});</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">[ ]</span> Dua cara mengolah daftar</div>
+            <ul class="plain-list">
+              <li><code>filter()</code> membuat array baru berisi data yang lolos suatu syarat.</li>
+              <li><code>map()</code> membuat array baru dari hasil perubahan setiap item.</li>
+              <li><code>item</code> adalah nama sementara untuk satu objek saat fungsi berjalan.</li>
+            </ul>
+            <div class="callout">Di contoh ini, <code>belumSelesai</code> berisi dua tugas. <code>semuaJudul</code> berisi tiga teks judul.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Coba:</strong> gunakan <code>filter()</code> untuk mengambil tugas yang sudah selesai.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="JSON untuk pertukaran data">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Format data untuk disimpan dan dikirim</p>
+          <h2>JSON mengubah objek menjadi <span class="accent">teks</span></h2>
+          <p class="lede">JavaScript memakai dua fungsi untuk berpindah antara objek dan teks JSON.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span>objek ↔ teks</span></div>
+            <pre><code><span class="code-key">const</span> siswa = {
+  nama: <span class="code-str">"Alya"</span>,
+  nilai: <span class="code-num">92</span>
+};
+
+<span class="code-key">const</span> teksJson = JSON.stringify(siswa);
+console.log(teksJson);
+<span class="code-comment">// {"nama":"Alya","nilai":92}</span>
+
+<span class="code-key">const</span> dataKembali = JSON.parse(teksJson);
+console.log(dataKembali.nama);</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">JSON</span> Ingat pasangan ini</div>
+            <ul class="plain-list">
+              <li><code>JSON.stringify(objek)</code> menghasilkan teks JSON.</li>
+              <li><code>JSON.parse(teks)</code> membaca teks JSON menjadi nilai JavaScript.</li>
+              <li>JSON cocok untuk data seperti teks, angka, boolean, array, dan objek.</li>
+              <li>JSON tidak menyimpan fungsi.</li>
+            </ul>
+            <div class="callout">Teks JSON yang formatnya rusak membuat <code>JSON.parse()</code> menghasilkan error.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Coba:</strong> tambahkan properti <code>jurusan</code>, ubah objek ke JSON, lalu parse kembali.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="localStorage">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Mengingat data setelah halaman ditutup</p>
+          <h2><code>localStorage</code> menyimpan data di <span class="teal">browser</span></h2>
+          <p class="lede">Simpan JSON sebagai teks, lalu baca kembali saat halaman dibuka.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span>simpan dan baca</span></div>
+            <pre><code><span class="code-key">function</span> simpanTugas(daftarTugas) {
+  localStorage.setItem(
+    <span class="code-str">"daftarTugas"</span>,
+    JSON.stringify(daftarTugas)
+  );
+}
+
+<span class="code-key">function</span> bacaTugas() {
+  <span class="code-key">const</span> teks = localStorage.getItem(<span class="code-str">"daftarTugas"</span>);
+  <span class="code-key">if</span> (teks === <span class="code-key">null</span>) <span class="code-key">return</span> [];
+  <span class="code-key">return</span> JSON.parse(teks);
+}
+
+<span class="code-key">const</span> tugasDimuat = bacaTugas();
+<span class="code-comment">// Setelah daftar diubah: simpanTugas(tugasDimuat);</span></code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">SAVE</span> Tiga operasi dasar</div>
+            <ul class="plain-list">
+              <li><code>setItem(kunci, nilai)</code> menyimpan teks.</li>
+              <li><code>getItem(kunci)</code> membaca nilai; hasilnya <code>null</code> jika belum ada.</li>
+              <li><code>removeItem(kunci)</code> menghapus satu data.</li>
+              <li>Data tersimpan untuk halaman dari asal situs yang sama.</li>
+            </ul>
+            <div class="callout">Panggil <code>simpanTugas()</code> setelah data berubah. Jangan simpan kata sandi atau data rahasia. Saat halaman dibuka lewat <code>file://</code>, perilaku penyimpanan bisa berbeda; coba lewat server lokal.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Coba:</strong> simpan daftar tugas, muat ulang halaman, lalu baca kembali nilainya dari Console.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Meminta data dengan fetch">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Mengambil data dari server</p>
+          <h2><code>fetch()</code> meminta data dari <span class="accent">API</span></h2>
+          <p class="lede">API memberi cara bagi halaman web untuk meminta data dari layanan lain.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span>Promise dengan then</span></div>
+            <pre><code><span class="code-key">const</span> alamatApi =
+  <span class="code-str">"https://mdn.github.io/learning-area/javascript/apis/"</span> +
+  <span class="code-str">"fetching-data/can-store/products.json"</span>;
+
+fetch(alamatApi)
+  .then(<span class="code-key">function</span> (response) {
+    <span class="code-key">if</span> (!response.ok) {
+      <span class="code-key">throw new</span> Error(<span class="code-str">"HTTP "</span> + response.status);
+    }
+    <span class="code-key">return</span> response.json();
+  })
+  .then(<span class="code-key">function</span> (data) {
+    console.log(data);
+  })
+  .catch(<span class="code-key">function</span> (error) {
+    console.error(<span class="code-str">"Gagal mengambil data:"</span>, error);
+  });</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">API</span> Baca alurnya</div>
+            <ul class="plain-list">
+              <li><code>fetch()</code> meminta alamat API dan menghasilkan <code>Promise</code>.</li>
+              <li><code>response.ok</code> memeriksa apakah server memberi status sukses.</li>
+              <li><code>response.json()</code> membaca isi jawaban sebagai data JSON.</li>
+              <li><code>catch()</code> menangani kegagalan jaringan atau error yang dilempar.</li>
+            </ul>
+            <div class="callout"><code>Promise</code> menandai hasil yang akan tersedia setelah proses selesai. <code>fetch()</code> tidak otomatis gagal untuk status 404 atau 500, jadi periksa <code>response.ok</code>. Contoh ini perlu internet, izin CORS, dan sebaiknya dijalankan lewat server lokal.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Amati:</strong> buka alamat API di browser untuk melihat teks JSON yang dikirim server.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="async dan await">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Menulis kode asinkron dengan alur yang jelas</p>
+          <h2><code>async</code> dan <code>await</code> membuat kode mudah <span class="teal">dibaca</span></h2>
+          <p class="lede">Keduanya membantu menunggu pekerjaan seperti permintaan API tanpa menghentikan seluruh halaman.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span>async/await dan try/catch</span></div>
+            <pre><code><span class="code-key">async function</span> muatProduk() {
+  <span class="code-key">try</span> {
+    <span class="code-key">const</span> response = <span class="code-key">await</span> fetch(alamatApi);
+    <span class="code-key">if</span> (!response.ok) {
+      <span class="code-key">throw new</span> Error(<span class="code-str">"HTTP "</span> + response.status);
+    }
+    <span class="code-key">const</span> data = <span class="code-key">await</span> response.json();
+    console.log(data);
+  } <span class="code-key">catch</span> (error) {
+    console.error(<span class="code-str">"Data gagal dimuat:"</span>, error);
+  }
+}
+
+muatProduk();</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">WAIT</span> Langkah demi langkah</div>
+            <ul class="plain-list">
+              <li><code>async</code> menandai fungsi yang bekerja dengan <code>Promise</code>.</li>
+              <li><code>await</code> menunggu hasil <code>fetch()</code> atau <code>response.json()</code>.</li>
+              <li><code>try</code> berisi langkah yang dicoba.</li>
+              <li><code>catch</code> menjalankan penanganan jika terjadi error.</li>
+            </ul>
+            <div class="callout">Dalam file JavaScript biasa, tulis <code>await</code> di dalam fungsi <code>async</code>.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Perhatikan:</strong> fungsi ini memakai variabel <code>alamatApi</code> dari contoh sebelumnya. Ubah alamatnya untuk melihat pesan di <code>catch</code>.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Tampilkan data API ke halaman">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Dari jawaban server ke tampilan</p>
+          <h2>Tampilkan status dan isi <span class="accent">data</span></h2>
+          <p class="lede">Pengguna perlu tahu apakah data sedang dimuat, berhasil tampil, kosong, atau gagal diambil.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>app.js</span><span>status dan daftar</span></div>
+            <pre><code><span class="code-key">async function</span> tampilkanProduk() {
+  <span class="code-key">const</span> pesan = document.querySelector(<span class="code-str">"#pesan"</span>);
+  <span class="code-key">const</span> daftar = document.querySelector(<span class="code-str">"#daftarProduk"</span>);
+  pesan.textContent = <span class="code-str">"Memuat produk..."</span>;
+  daftar.textContent = <span class="code-str">""</span>;
+
+  <span class="code-key">try</span> {
+    <span class="code-key">const</span> response = <span class="code-key">await</span> fetch(alamatApi);
+    <span class="code-key">if</span> (!response.ok) <span class="code-key">throw new</span> Error(response.status);
+    <span class="code-key">const</span> data = <span class="code-key">await</span> response.json();
+    <span class="code-key">if</span> (data.length === <span class="code-num">0</span>) {
+      pesan.textContent = <span class="code-str">"Belum ada produk."</span>;
+      <span class="code-key">return</span>;
+    }
+    data.forEach(<span class="code-key">function</span> (produk) {
+      <span class="code-key">const</span> item = document.createElement(<span class="code-str">"li"</span>);
+      item.textContent = produk.name + <span class="code-str">" — "</span> + produk.type;
+      daftar.appendChild(item);
+    });
+    pesan.textContent = <span class="code-str">"Produk berhasil dimuat."</span>;
+  } <span class="code-key">catch</span> (error) {
+    pesan.textContent = <span class="code-str">"Data gagal dimuat. Periksa koneksi."</span>;
+    console.error(error);
+  }
+}
+
+tampilkanProduk();</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">DOM</span> Siapkan elemen HTML</div>
+            <pre class="file-tree">&lt;p id="pesan" aria-live="polite"&gt;&lt;/p&gt;
+&lt;ul id="daftarProduk"&gt;&lt;/ul&gt;</pre>
+            <ul class="plain-list" style="margin-top:14px">
+              <li><code>textContent</code> menampilkan teks data dengan aman.</li>
+              <li><code>createElement()</code> membuat elemen untuk satu produk.</li>
+              <li><code>aria-live</code> membantu pembaca layar mengetahui status terbaru.</li>
+            </ul>
+            <div class="callout">Jangan memasukkan data API langsung ke <code>innerHTML</code>. Buat elemen dan isi teksnya dengan <code>textContent</code>.</div>
+            <p class="small muted" style="margin-top:12px">Contoh ini memakai variabel <code>alamatApi</code> dari slide permintaan API.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Proyek mini katalog barang">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Gabungkan semua konsep</p>
+          <h2>Bangun katalog barang <span class="teal">kelas</span></h2>
+          <p class="lede">Tampilkan daftar barang, sediakan pencarian, dan ingat barang favorit di browser.</p>
+        </div>
+        <div class="flow">
+          <div class="flow-item"><h3>Ambil</h3><p>Minta daftar data dari API.</p></div>
+          <div class="flow-item"><h3>Periksa</h3><p>Tangani status berhasil, kosong, dan gagal.</p></div>
+          <div class="flow-item"><h3>Tampilkan</h3><p>Gunakan objek, array, DOM, dan pencarian.</p></div>
+          <div class="flow-item"><h3>Simpan</h3><p>Simpan nama barang favorit ke localStorage.</p></div>
+        </div>
+        <div class="layout-two" style="margin-top:18px">
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">BUILD</span> Fitur yang dibuat</div>
+            <ul class="plain-list">
+              <li>Daftar nama dan kategori barang dari API.</li>
+              <li>Kolom pencarian yang menyaring daftar dengan <code>filter()</code>.</li>
+              <li>Tombol favorit untuk menambah atau menghapus nama barang.</li>
+              <li>Daftar favorit tetap ada setelah halaman dimuat ulang.</li>
+            </ul>
+            <div class="callout">Simpan array favorit sebagai JSON. Saat membaca, ubah teksnya kembali dengan <code>JSON.parse()</code>.</div>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">DOCS</span> Baca dokumentasi</div>
+            <ul class="plain-list small">
+              <li><a style="color:var(--teal)" href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Object_basics" target="_blank" rel="noreferrer">Dasar objek JavaScript · MDN</a></li>
+              <li><a style="color:var(--teal)" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter" target="_blank" rel="noreferrer">Array filter() · MDN</a></li>
+              <li><a style="color:var(--teal)" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map" target="_blank" rel="noreferrer">Array map() · MDN</a></li>
+              <li><a style="color:var(--teal)" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON" target="_blank" rel="noreferrer">JSON · MDN</a></li>
+              <li><a style="color:var(--teal)" href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API" target="_blank" rel="noreferrer">Web Storage API · MDN</a></li>
+              <li><a style="color:var(--teal)" href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API" target="_blank" rel="noreferrer">Fetch API · MDN</a></li>
+              <li><a style="color:var(--teal)" href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function" target="_blank" rel="noreferrer">Fungsi async · MDN</a></li>
+            </ul>
+          </article>
+        </div>
+        <div class="practice"><strong>Periksa hasil:</strong> pencarian bekerja, data favorit pulih setelah muat ulang, dan pesan error mudah dipahami.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Kuis JavaScript lanjutan">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Periksa pemahaman</p>
+          <h2>Kuis JavaScript <span class="accent">lanjutan</span></h2>
+          <p class="lede">Pilih satu jawaban untuk setiap pertanyaan. Jawaban benar dan salah akan ditandai setelah diperiksa.</p>
+        </div>
+        <form class="quiz-form" id="quizLanjutanForm">
+          <fieldset class="quiz-question">
+            <legend>1. Cara mengambil nama dari objek <code>produk</code> adalah …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q1" value="a"> <code>produk[0]</code></label>
+              <label class="quiz-option"><input type="radio" name="q1" value="b"> <code>produk.nama</code></label>
+              <label class="quiz-option"><input type="radio" name="q1" value="c"> <code>produk-&gt;nama</code></label>
+              <label class="quiz-option"><input type="radio" name="q1" value="d"> <code>nama.produk</code></label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-question">
+            <legend>2. Fungsi untuk mengubah objek menjadi teks JSON adalah …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q2" value="a"> <code>JSON.parse()</code></label>
+              <label class="quiz-option"><input type="radio" name="q2" value="b"> <code>JSON.read()</code></label>
+              <label class="quiz-option"><input type="radio" name="q2" value="c"> <code>JSON.stringify()</code></label>
+              <label class="quiz-option"><input type="radio" name="q2" value="d"> <code>JSON.fetch()</code></label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-question">
+            <legend>3. Nilai yang disimpan di <code>localStorage</code> berbentuk …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q3" value="a"> Fungsi JavaScript</label>
+              <label class="quiz-option"><input type="radio" name="q3" value="b"> Elemen HTML</label>
+              <label class="quiz-option"><input type="radio" name="q3" value="c"> Objek tanpa diubah</label>
+              <label class="quiz-option"><input type="radio" name="q3" value="d"> Teks</label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-question">
+            <legend>4. Properti untuk memeriksa status sukses respons <code>fetch()</code> adalah …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q4" value="a"> <code>response.done</code></label>
+              <label class="quiz-option"><input type="radio" name="q4" value="b"> <code>response.ok</code></label>
+              <label class="quiz-option"><input type="radio" name="q4" value="c"> <code>response.json</code></label>
+              <label class="quiz-option"><input type="radio" name="q4" value="d"> <code>response.ready</code></label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-question">
+            <legend>5. Untuk memakai <code>await</code> pada file JavaScript biasa, tulis di dalam …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q5" value="a"> Fungsi <code>async</code></label>
+              <label class="quiz-option"><input type="radio" name="q5" value="b"> Objek JSON</label>
+              <label class="quiz-option"><input type="radio" name="q5" value="c"> Selector DOM</label>
+              <label class="quiz-option"><input type="radio" name="q5" value="d"> Array</label>
+            </div>
+          </fieldset>
+          <div>
+            <button class="button button-primary" type="submit">Periksa jawaban</button>
+            <p class="quiz-result" id="quizLanjutanResult" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+        <p class="practice"><a style="color:var(--teal)" href="javascript-dasar.html">Kembali ke materi JavaScript dasar</a> · <a style="color:var(--teal)" href="react-dasar.html">Materi berikutnya: React dasar</a></p>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav-bar" aria-label="Navigasi materi">
+    <button class="nav-btn" id="prevBtn" type="button" aria-label="Slide sebelumnya" title="Slide sebelumnya">‹</button>
+    <div class="slide-dots" id="slideDots" aria-label="Pilih slide"></div>
+    <span class="slide-counter" aria-live="polite"><strong id="currentSlide">1</strong> / <span id="slideTotal"></span></span>
+    <button class="nav-btn" id="nextBtn" type="button" aria-label="Slide berikutnya" title="Slide berikutnya">›</button>
+  </nav>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const dots = document.getElementById("slideDots");
+    let currentIndex = 0;
+
+    document.getElementById("slideTotal").textContent = slides.length;
+    slides.forEach(function (slide, index) {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "slide-dot";
+      dot.setAttribute("aria-label", "Buka slide " + (index + 1) + ": " + slide.dataset.title);
+      dot.addEventListener("click", function () { goToSlide(index); });
+      dots.appendChild(dot);
+    });
+
+    function updateSlide() {
+      slides.forEach(function (slide, index) {
+        const active = index === currentIndex;
+        slide.classList.toggle("active", active);
+        slide.setAttribute("aria-hidden", String(!active));
+        slide.inert = !active;
+      });
+      Array.from(dots.children).forEach(function (dot, index) {
+        if (index === currentIndex) dot.setAttribute("aria-current", "step");
+        else dot.removeAttribute("aria-current");
+      });
+      document.getElementById("currentSlide").textContent = currentIndex + 1;
+      document.getElementById("progressFill").style.width =
+        ((currentIndex + 1) / slides.length * 100) + "%";
+      document.getElementById("prevBtn").disabled = currentIndex === 0;
+      document.getElementById("nextBtn").disabled = currentIndex === slides.length - 1;
+      slides[currentIndex].scrollTop = 0;
+    }
+
+    function goToSlide(index) {
+      currentIndex = Math.max(0, Math.min(slides.length - 1, index));
+      updateSlide();
+    }
+    function nextSlide() { goToSlide(currentIndex + 1); }
+    function previousSlide() { goToSlide(currentIndex - 1); }
+
+    document.getElementById("prevBtn").addEventListener("click", previousSlide);
+    document.getElementById("nextBtn").addEventListener("click", nextSlide);
+    document.addEventListener("keydown", function (event) {
+      if (event.target.closest("button, input, textarea, select, a, [contenteditable='true']")) return;
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+        event.preventDefault();
+        nextSlide();
+      } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        event.preventDefault();
+        previousSlide();
+      } else if (event.key === "Home") {
+        goToSlide(0);
+      } else if (event.key === "End") {
+        goToSlide(slides.length - 1);
+      }
+    });
+    updateSlide();
+
+
+    function pasangUmpanBalikQuiz(formId, resultId, key) {
+      const form = document.getElementById(formId);
+      const result = document.getElementById(resultId);
+      const questionNames = Object.keys(key);
+
+      form.addEventListener("change", function () {
+        form.querySelectorAll(".quiz-option.is-correct, .quiz-option.is-wrong").forEach(function (option) {
+          option.classList.remove("is-correct", "is-wrong");
+        });
+        result.textContent = "";
+      });
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const answers = new FormData(form);
+        const unanswered = questionNames.filter(function (name) { return !answers.has(name); });
+        if (unanswered.length > 0) {
+          result.textContent = "Jawab semua pertanyaan terlebih dahulu.";
+          return;
+        }
+
+        let score = 0;
+        const feedback = questionNames.map(function (name) {
+          const options = form.querySelectorAll('input[name="' + name + '"]');
+          const selectedAnswer = answers.get(name);
+          options.forEach(function (option) {
+            const label = option.closest("label");
+            if (option.value === key[name]) label.classList.add("is-correct");
+            if (option.checked && option.value !== key[name]) label.classList.add("is-wrong");
+          });
+          if (selectedAnswer === key[name]) {
+            score += 1;
+            return name.slice(1) + ". Benar.";
+          }
+          const correctLabel = Array.from(options).find(function (option) {
+            return option.value === key[name];
+          }).closest("label");
+          return name.slice(1) + ". Salah. Jawaban benar: " + correctLabel.textContent.trim() + ".";
+        });
+        result.textContent = "Skor kamu " + score + " dari " + questionNames.length + ".\n" + feedback.join("\n");
+      });
+    }
+    pasangUmpanBalikQuiz("quizLanjutanForm", "quizLanjutanResult", { q1: "b", q2: "c", q3: "d", q4: "b", q5: "a" });
+  </script>
+</body>
+</html>

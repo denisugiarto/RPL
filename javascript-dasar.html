@@ -1213,7 +1213,7 @@ form.addEventListener(<span class="code-str">"submit"</span>, <span class="code-
       </div>
     </section>
 
-    <section class="slide" data-title="Tantangan dan penutup">
+    <section class="slide" data-title="Tantangan JavaScript dasar">
       <div class="slide-inner">
         <div class="closing-mark" aria-hidden="true">JS</div>
         <p class="eyebrow">Giliran kamu membangun</p>
@@ -1230,13 +1230,14 @@ form.addEventListener(<span class="code-str">"submit"</span>, <span class="code-
             </ul>
           </article>
           <article class="panel">
-            <div class="panel-title"><span class="symbol">→</span> Setelah JavaScript dasar</div>
-            <p class="muted">Latihan berikutnya bisa membahas objek, penyimpanan data di browser, dan pengambilan data dari API setelah konsep dasar ini dikuasai.</p>
-            <button class="button button-primary" type="button" onclick="goToSlide(0)">Ulang dari awal</button>
+            <div class="panel-title"><span class="symbol">→</span> JavaScript lanjutan</div>
+            <p class="muted">Lanjutkan dengan objek, penyimpanan data di browser, dan pengambilan data dari API.</p>
+            <a class="button button-primary" href="javascript-lanjutan.html">Lanjut ke materi lanjutan <span aria-hidden="true">→</span></a>
           </article>
         </div>
       </div>
     </section>
+
   </main>
 
   <nav class="nav-bar" aria-label="Navigasi materi">
@@ -1333,46 +1334,48 @@ form.addEventListener(<span class="code-str">"submit"</span>, <span class="code-
         ", predikat " + tentukanPredikat(average) + ".";
     });
 
-    const quizForm = document.getElementById("quizForm");
-    quizForm.addEventListener("change", function () {
-      quizForm.querySelectorAll(".quiz-option.is-correct, .quiz-option.is-wrong").forEach(function (option) {
-        option.classList.remove("is-correct", "is-wrong");
-      });
-      document.getElementById("quizResult").textContent = "";
-    });
-    quizForm.addEventListener("submit", function (event) {
-      event.preventDefault();
-      const answers = new FormData(event.currentTarget);
-      const key = { q1: "b", q2: "c", q3: "d", q4: "a", q5: "b" };
+    function pasangUmpanBalikQuiz(formId, resultId, key) {
+      const form = document.getElementById(formId);
+      const result = document.getElementById(resultId);
       const questionNames = Object.keys(key);
-      const unanswered = questionNames.filter(function (name) { return !answers.has(name); });
-      const result = document.getElementById("quizResult");
 
-      if (unanswered.length > 0) {
-        result.textContent = "Jawab semua pertanyaan terlebih dahulu.";
-        return;
-      }
-      let score = 0;
-      const feedback = questionNames.map(function (name) {
-        const options = quizForm.querySelectorAll('input[name="' + name + '"]');
-        const correctAnswer = key[name];
-        const selectedAnswer = answers.get(name);
-        options.forEach(function (option) {
-          const label = option.closest("label");
-          if (option.value === correctAnswer) label.classList.add("is-correct");
-          if (option.checked && option.value !== correctAnswer) label.classList.add("is-wrong");
+      form.addEventListener("change", function () {
+        form.querySelectorAll(".quiz-option.is-correct, .quiz-option.is-wrong").forEach(function (option) {
+          option.classList.remove("is-correct", "is-wrong");
         });
-        if (selectedAnswer === correctAnswer) {
-          score += 1;
-          return name.slice(1) + ". Benar.";
-        }
-        const correctLabel = Array.from(options).find(function (option) {
-          return option.value === correctAnswer;
-        }).closest("label");
-        return name.slice(1) + ". Salah. Jawaban benar: " + correctLabel.textContent.trim() + ".";
+        result.textContent = "";
       });
-      result.textContent = "Skor kamu " + score + " dari " + questionNames.length + ".\n" + feedback.join("\n");
-    });
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const answers = new FormData(form);
+        const unanswered = questionNames.filter(function (name) { return !answers.has(name); });
+        if (unanswered.length > 0) {
+          result.textContent = "Jawab semua pertanyaan terlebih dahulu.";
+          return;
+        }
+
+        let score = 0;
+        const feedback = questionNames.map(function (name) {
+          const options = form.querySelectorAll('input[name="' + name + '"]');
+          const selectedAnswer = answers.get(name);
+          options.forEach(function (option) {
+            const label = option.closest("label");
+            if (option.value === key[name]) label.classList.add("is-correct");
+            if (option.checked && option.value !== key[name]) label.classList.add("is-wrong");
+          });
+          if (selectedAnswer === key[name]) {
+            score += 1;
+            return name.slice(1) + ". Benar.";
+          }
+          const correctLabel = Array.from(options).find(function (option) {
+            return option.value === key[name];
+          }).closest("label");
+          return name.slice(1) + ". Salah. Jawaban benar: " + correctLabel.textContent.trim() + ".";
+        });
+        result.textContent = "Skor kamu " + score + " dari " + questionNames.length + ".\n" + feedback.join("\n");
+      });
+    }
+    pasangUmpanBalikQuiz("quizForm", "quizResult", { q1: "b", q2: "c", q3: "d", q4: "a", q5: "b" });
   </script>
 </body>
 </html>

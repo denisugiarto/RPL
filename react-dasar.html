@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101820">
+  <title>React Dasar — Kelas X RPL</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101820;
+      --surface: #19232c;
+      --surface-raised: #202d37;
+      --line: #34424c;
+      --text: #f4f6f3;
+      --muted: #a4b0b7;
+      --js: #ffd23f;
+      --teal: #4de0c1;
+      --orange: #ff8b5f;
+      --green: #8fe0a1;
+      --red: #ff8989;
+      --code: #0b1116;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, a:focus-visible {
+      outline: 3px solid var(--teal);
+      outline-offset: 3px;
+    }
+    .skip-link {
+      position: fixed;
+      z-index: 100;
+      top: 8px;
+      left: 8px;
+      transform: translateY(-160%);
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: var(--js);
+      color: #151a1d;
+      font-weight: 700;
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .topbar {
+      position: fixed;
+      z-index: 20;
+      inset: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 58px;
+      padding: 10px 24px;
+      background: rgba(16, 24, 32, .92);
+      border-bottom: 1px solid rgba(164, 176, 183, .13);
+      backdrop-filter: blur(12px);
+    }
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-mark {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--js);
+      color: #151a1d;
+      font: 800 17px/1 ui-monospace, monospace;
+    }
+    .brand-name { font-size: 13px; font-weight: 750; line-height: 1.2; }
+    .brand-sub { color: var(--muted); font-size: 11px; }
+    .key-hint { color: var(--muted); font-size: 12px; }
+    kbd {
+      display: inline-grid;
+      min-width: 22px;
+      min-height: 22px;
+      margin: 0 2px;
+      padding: 0 5px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: var(--surface);
+      color: var(--text);
+      font: 11px ui-monospace, monospace;
+    }
+    .progress-track {
+      position: fixed;
+      z-index: 30;
+      top: 57px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #29343c;
+    }
+    .progress-fill {
+      width: 0;
+      height: 100%;
+      background: var(--js);
+      transition: width .25s ease;
+    }
+
+    .deck { position: relative; min-height: 100dvh; overflow: hidden; }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      min-height: 100dvh;
+      padding: 92px 34px 104px;
+      overflow: auto;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity .2s ease;
+    }
+    .slide.active { opacity: 1; visibility: visible; pointer-events: auto; }
+    .slide-inner {
+      width: min(1120px, 100%);
+      margin: auto;
+      padding-bottom: 12px;
+    }
+    .slide-head { max-width: 850px; margin: 0 0 28px; }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 0 0 10px;
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .eyebrow::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      background: var(--js);
+      content: "";
+      transform: rotate(45deg);
+    }
+    h1, h2, h3, p { margin-top: 0; }
+    h1, h2, h3 { line-height: 1.12; letter-spacing: -.035em; }
+    h1 { max-width: 760px; margin-bottom: 20px; font-size: clamp(2.6rem, 7vw, 5.7rem); }
+    h2 { margin-bottom: 12px; font-size: clamp(2rem, 4.5vw, 3.5rem); }
+    h3 { margin-bottom: 9px; font-size: 1.25rem; }
+    .lede { max-width: 650px; color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.2rem); }
+    .accent { color: var(--js); }
+    .teal { color: var(--teal); }
+    .muted { color: var(--muted); }
+    .small { font-size: .88rem; }
+    .layout-two, .layout-three {
+      display: grid;
+      align-items: start;
+      gap: 18px;
+    }
+    .layout-two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .layout-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .panel {
+      min-width: 0;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    .panel p:last-child, .panel ul:last-child { margin-bottom: 0; }
+    .panel-quiet { background: transparent; }
+    .panel-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+      font-size: 1rem;
+      font-weight: 750;
+    }
+    .symbol {
+      display: inline-flex;
+      width: auto;
+      min-width: 34px;
+      height: 34px;
+      padding: 0 8px;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 auto;
+      white-space: nowrap;
+      border: 1px solid rgba(255, 210, 63, .35);
+      border-radius: 10px;
+      background: rgba(255, 210, 63, .12);
+      color: var(--js);
+      font: 750 14px ui-monospace, monospace;
+    }
+    .code-panel {
+      overflow: hidden;
+      border: 1px solid #34424c;
+      border-radius: 14px;
+      background: var(--code);
+    }
+    .code-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 14px;
+      border-bottom: 1px solid #26333b;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .window-dots { display: flex; gap: 5px; }
+    .window-dots i { width: 7px; height: 7px; border-radius: 50%; background: #51616b; }
+    .window-dots i:first-child { background: var(--orange); }
+    .window-dots i:nth-child(2) { background: var(--js); }
+    .window-dots i:nth-child(3) { background: var(--teal); }
+    pre {
+      margin: 0;
+      padding: 18px;
+      overflow: auto;
+      color: #e5edf0;
+      font: 13px/1.7 ui-monospace, "SFMono-Regular", Consolas, monospace;
+      tab-size: 2;
+    }
+    code { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
+    .code-key { color: #f5c86c; }
+    .code-str { color: #8fe0a1; }
+    .code-comment { color: #82929b; }
+    .code-fn { color: #79c8f2; }
+    .code-num { color: #f1a6d2; }
+    .callout {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-left: 3px solid var(--teal);
+      border-radius: 0 10px 10px 0;
+      background: rgba(77, 224, 193, .08);
+      color: #d5e4e3;
+    }
+    .practice {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border: 1px dashed #61717a;
+      border-radius: 13px;
+      color: var(--muted);
+    }
+    .practice strong { color: var(--js); }
+    .plain-list { display: grid; gap: 10px; margin: 0; padding-left: 20px; }
+    .plain-list li::marker { color: var(--js); }
+    .topic-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic {
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: #d9e1e4;
+      font-size: 13px;
+    }
+    .file-tree {
+      margin: 0;
+      padding: 17px;
+      border-radius: 12px;
+      background: var(--code);
+      color: #d7e1e5;
+      font: 13px/1.8 ui-monospace, monospace;
+      white-space: pre-wrap;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      counter-reset: flow;
+    }
+    .flow-item {
+      position: relative;
+      min-height: 124px;
+      padding: 16px;
+      border-top: 2px solid var(--js);
+      background: var(--surface);
+      counter-increment: flow;
+    }
+    .flow-item::before {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--teal);
+      font: 700 12px ui-monospace, monospace;
+      content: "0" counter(flow);
+    }
+    .flow-item p { margin: 0; color: var(--muted); font-size: 13px; }
+
+    .hero {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      align-items: center;
+      gap: 44px;
+    }
+    .hero::after {
+      position: absolute;
+      z-index: -1;
+      top: -55px;
+      right: 6%;
+      width: 290px;
+      height: 290px;
+      border: 1px solid rgba(255, 210, 63, .18);
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 0 38px rgba(255, 210, 63, .025), 0 0 0 78px rgba(77, 224, 193, .025);
+    }
+    .hero-code { transform: rotate(1.5deg); }
+    .hero-code pre { min-height: 230px; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 25px; }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 15px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-raised);
+      color: var(--text);
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .button:hover { border-color: var(--teal); }
+    .button-primary { border-color: var(--js); background: var(--js); color: #171b1d; }
+    .button-primary:hover { border-color: #ffe27b; background: #ffe27b; }
+    .button:disabled { opacity: .42; cursor: not-allowed; }
+    .nav-bar {
+      position: fixed;
+      z-index: 25;
+      bottom: 16px;
+      left: 50%;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      max-width: calc(100vw - 24px);
+      padding: 8px 10px;
+      transform: translateX(-50%);
+      border: 1px solid #3b4851;
+      border-radius: 15px;
+      background: rgba(25, 35, 44, .96);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .28);
+    }
+    .nav-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface-raised);
+      cursor: pointer;
+      font-size: 17px;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: var(--js); color: var(--js); }
+    .slide-dots { display: flex; align-items: center; gap: 5px; max-width: 42vw; overflow-x: auto; }
+    .slide-dot {
+      width: 7px;
+      height: 7px;
+      flex: 0 0 auto;
+      padding: 0;
+      border: 0;
+      border-radius: 8px;
+      background: #61717a;
+      cursor: pointer;
+    }
+    .slide-dot[aria-current="step"] { width: 21px; background: var(--js); }
+    .slide-counter { min-width: 48px; color: var(--muted); text-align: center; font: 12px ui-monospace, monospace; }
+    .slide-counter strong { color: var(--text); }
+
+    .quiz-form { display: grid; gap: 13px; }
+    .quiz-question {
+      min-width: 0;
+      margin: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--surface);
+    }
+    .quiz-question legend { padding: 0 7px; font-weight: 700; }
+    .quiz-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+    .quiz-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 9px;
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .quiz-option:hover { background: var(--surface-raised); color: var(--text); }
+    .quiz-option input { margin-top: 4px; accent-color: var(--js); }
+    .quiz-option.is-correct { background: rgba(143, 224, 161, .1); color: var(--green); }
+    .quiz-option.is-wrong { background: rgba(255, 137, 137, .1); color: var(--red); }
+    .quiz-option.is-correct::after,
+    .quiz-option.is-wrong::after {
+      margin-left: auto;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .quiz-option.is-correct::after { content: "✓ Benar"; background: rgba(143, 224, 161, .14); }
+    .quiz-option.is-wrong::after { content: "✕ Salah"; background: rgba(255, 137, 137, .14); }
+    .quiz-result { min-height: 27px; margin: 12px 0 0; color: var(--teal); font-weight: 700; white-space: pre-line; }
+
+    .project-form { display: grid; gap: 12px; }
+    .field-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .field { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
+    .field input {
+      width: 100%;
+      min-height: 42px;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--code);
+      color: var(--text);
+    }
+    .result-box {
+      min-height: 68px;
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--code);
+      color: var(--teal);
+    }
+    .rubric { width: 100%; border-collapse: collapse; }
+    .rubric th, .rubric td { padding: 10px; border-bottom: 1px solid var(--line); text-align: left; }
+    .rubric th { color: var(--js); font-size: 13px; }
+    .rubric td { color: var(--muted); font-size: 13px; }
+    .closing-mark {
+      display: grid;
+      width: 70px;
+      height: 70px;
+      margin-bottom: 22px;
+      place-items: center;
+      border-radius: 20px;
+      background: var(--js);
+      color: #151a1d;
+      font: 800 30px ui-monospace, monospace;
+      transform: rotate(-5deg);
+    }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 760px) {
+      .topbar { padding-inline: 15px; }
+      .key-hint { display: none; }
+      .slide { padding: 82px 18px 94px; }
+      .hero, .layout-two { grid-template-columns: 1fr; gap: 18px; }
+      .hero { align-items: start; }
+      .hero::after { top: 20px; right: -75px; width: 190px; height: 190px; }
+      .hero-code { transform: none; }
+      .layout-three { grid-template-columns: 1fr; }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .field-grid { grid-template-columns: 1fr; }
+      .panel { padding: 17px; }
+      pre { padding: 14px; font-size: 12px; }
+      .slide-dots { display: none; }
+      .nav-bar { gap: 7px; }
+    }
+    @media (max-width: 430px) {
+      h1 { font-size: 2.6rem; }
+      .quiz-options { grid-template-columns: 1fr; }
+      .flow-item { min-height: 110px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#slides">Lewati navigasi</a>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">R</span>
+      <div>
+        <div class="brand-name">React Dasar</div>
+        <div class="brand-sub">Materi Web Front-End · Kelas X RPL</div>
+      </div>
+    </div>
+    <div class="key-hint"><kbd>←</kbd><kbd>→</kbd> atau spasi untuk berpindah</div>
+  </header>
+  <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+
+  <main class="deck" id="slides" tabindex="-1" aria-label="Materi React Dasar">
+    <section class="slide active" data-title="Mulai belajar React">
+      <div class="slide-inner hero">
+        <div>
+          <p class="eyebrow">Materi web front-end · Kelas X RPL</p>
+          <h1>Susun antarmuka dari <span class="teal">komponen.</span></h1>
+          <p class="lede">Gunakan JavaScript untuk membangun tampilan web yang tersusun, interaktif, dan mudah dikembangkan.</p>
+          <div class="hero-actions">
+            <button class="button button-primary" type="button" onclick="nextSlide()">Mulai belajar <span aria-hidden="true">→</span></button>
+            <a class="button" href="javascript-lanjutan.html">Ulang materi JavaScript</a>
+          </div>
+        </div>
+        <div class="code-panel hero-code" aria-label="Contoh susunan komponen React">
+          <div class="code-label"><span>App.jsx</span><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span></div>
+          <pre><code><span class="code-key">function</span> App() {
+  <span class="code-key">return</span> (
+    &lt;main&gt;
+      &lt;Judul /&gt;
+      &lt;KolomCari /&gt;
+      &lt;DaftarProduk /&gt;
+    &lt;/main&gt;
+  );
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Bekal untuk mulai">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Sambungkan dengan bekal JavaScript</p>
+          <h2>Kenali datanya, lalu <span class="accent">bangun tampilannya</span></h2>
+          <p class="lede">React akan terasa lebih mudah setelah kamu memahami fungsi, array, objek, event, dan pengambilan data.</p>
+        </div>
+        <div class="layout-two">
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">JS</span> Prasyarat</div>
+            <ul class="plain-list">
+              <li>HTML dan CSS sederhana.</li>
+              <li>Variabel, fungsi, objek, dan array.</li>
+              <li>Event, form, dan perubahan tampilan dengan DOM.</li>
+              <li>Dasar Promise, <code>fetch()</code>, dan <code>async/await</code>.</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">GOAL</span> Setelah belajar</div>
+            <ul class="plain-list">
+              <li>Membagi halaman menjadi komponen.</li>
+              <li>Mengirim data melalui props dan mengubah tampilan dengan state.</li>
+              <li>Membuat pencarian dan daftar data dari API.</li>
+              <li>Menyusun proyek katalog sederhana.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="practice"><strong>Siapkan:</strong> VS Code, Node.js dengan npm, dan browser modern. Proyek React dijalankan lewat server pengembangan, bukan dengan membuka file JSX langsung.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Apa yang dikerjakan React">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Tampilan dibagi menjadi bagian kecil</p>
+          <h2>React menyusun UI dari <span class="teal">komponen</span></h2>
+          <p class="lede">Komponen adalah bagian antarmuka yang punya nama dan bisa dipakai kembali.</p>
+        </div>
+        <div class="flow">
+          <div class="flow-item"><h3>App</h3><p>Halaman utama</p></div>
+          <div class="flow-item"><h3>Header</h3><p>Judul dan navigasi</p></div>
+          <div class="flow-item"><h3>SearchBar</h3><p>Kolom pencarian</p></div>
+          <div class="flow-item"><h3>ProductCard</h3><p>Satu barang</p></div>
+        </div>
+        <div class="layout-two" style="margin-top:18px">
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">UI</span> Data mengatur tampilan</div>
+            <p>Komponen menerima data dan menampilkan antarmuka. Saat props atau state berubah, React memperbarui bagian tampilan yang perlu berubah.</p>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">RULE</span> Biarkan React mengelola UI</div>
+            <p>Di dalam React, hindari mengubah DOM secara manual dengan <code>innerHTML</code> atau <code>querySelector()</code>. Ubah data, lalu biarkan React merender ulang.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Menyiapkan proyek dengan Vite">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Siapkan lingkungan latihan</p>
+          <h2>Buat proyek React dengan <span class="accent">Vite</span></h2>
+          <p class="lede">Vite menyiapkan server lokal dan alat untuk mengubah JSX menjadi kode yang dapat dijalankan browser.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>Terminal</span><span>jalankan berurutan</span></div>
+            <pre><code>npm create vite@latest katalog-kelas -- --template react
+cd katalog-kelas
+npm install
+npm run dev</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">RUN</span> Setelah server hidup</div>
+            <ol class="plain-list">
+              <li>Buka alamat lokal yang muncul di Terminal.</li>
+              <li>File utama latihan ada di <code>src/App.jsx</code>.</li>
+              <li>Simpan perubahan; browser akan memperbarui tampilan.</li>
+            </ol>
+            <div class="callout">Pastikan Node.js dan npm terpasang. Jika perintah gagal, periksa versi Node yang disyaratkan oleh versi Vite yang digunakan.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Catatan guru:</strong> Vite dipakai agar siswa fokus pada dasar React. Proyek React yang berkembang dapat memakai framework dengan fitur yang lebih lengkap.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="JSX menulis tampilan">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">HTML-like syntax di JavaScript</p>
+          <h2>JSX menuliskan <span class="teal">tampilan</span></h2>
+          <p class="lede">JSX terlihat seperti HTML, tetapi dapat memakai ekspresi JavaScript di dalam kurung kurawal.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>App.jsx</span><span>JSX</span></div>
+            <pre><code><span class="code-key">const</span> nama = <span class="code-str">"Alya"</span>;
+
+<span class="code-key">function</span> Sambutan() {
+  <span class="code-key">return</span> (
+    &lt;section className=<span class="code-str">"kartu"</span>&gt;
+      &lt;h1&gt;Halo, {nama}!&lt;/h1&gt;
+      &lt;p&gt;Selamat belajar React.&lt;/p&gt;
+    &lt;/section&gt;
+  );
+}</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">JSX</span> Perhatikan aturan ini</div>
+            <ul class="plain-list">
+              <li>Gunakan <code>className</code> untuk memberi class CSS.</li>
+              <li>Tulis ekspresi JavaScript di antara <code>{ }</code>.</li>
+              <li>Elemen yang tidak punya isi ditutup, misalnya <code>&lt;img /&gt;</code>.</li>
+              <li>JSX dalam <code>return</code> harus punya satu elemen induk.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="practice"><strong>Ubah:</strong> ganti nama, teks sambutan, dan nama class, lalu simpan.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Membuat komponen">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Satu fungsi, satu bagian tampilan</p>
+          <h2>Komponen React adalah <span class="accent">fungsi</span></h2>
+          <p class="lede">Nama komponen diawali huruf besar. Komponen mengembalikan JSX yang ingin ditampilkan.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>src/App.jsx</span><span>komponen pertama</span></div>
+            <pre><code><span class="code-key">function</span> Judul() {
+  <span class="code-key">return</span> &lt;h1&gt;Katalog Barang&lt;/h1&gt;;
+}
+
+<span class="code-key">function</span> App() {
+  <span class="code-key">return</span> (
+    &lt;main&gt;
+      &lt;Judul /&gt;
+    &lt;/main&gt;
+  );
+}
+
+<span class="code-key">export default</span> App;</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">APP</span> Bacalah dari atas</div>
+            <ul class="plain-list">
+              <li><code>Judul</code> menggambar judul halaman.</li>
+              <li><code>&lt;Judul /&gt;</code> memakai komponen sebagai elemen JSX.</li>
+              <li><code>App</code> menggabungkan bagian halaman.</li>
+              <li><code>export default</code> menyediakan komponen utama untuk file lain.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="practice"><strong>Coba:</strong> buat komponen <code>Footer</code> lalu tampilkan di bawah <code>Judul</code>.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Props mengirim data">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Komponen yang bisa dipakai ulang</p>
+          <h2>Props memberi komponen <span class="teal">data</span></h2>
+          <p class="lede">Komponen induk mengirim nilai ke komponen anak melalui atribut JSX yang disebut props.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>ProductCard.jsx</span><span>menerima props</span></div>
+            <pre><code><span class="code-key">function</span> ProductCard({ nama, kategori }) {
+  <span class="code-key">return</span> (
+    &lt;article className=<span class="code-str">"produk"</span>&gt;
+      &lt;h2&gt;{nama}&lt;/h2&gt;
+      &lt;p&gt;Kategori: {kategori}&lt;/p&gt;
+    &lt;/article&gt;
+  );
+}
+
+&lt;ProductCard
+  nama=<span class="code-str">"Roti tawar"</span>
+  kategori=<span class="code-str">"Makanan"</span>
+/&gt;</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">DATA</span> Props itu seperti argumen</div>
+            <ul class="plain-list">
+              <li><code>nama</code> dan <code>kategori</code> adalah props.</li>
+              <li>Props bisa berisi teks, angka, array, objek, atau fungsi.</li>
+              <li>Komponen menerima props dan menggunakannya untuk merender UI.</li>
+              <li>Anggap props sebagai data baca-saja; perubahan data dikelola oleh induk.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Merender daftar dengan map">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Dari array ke elemen antarmuka</p>
+          <h2><code>map()</code> membuat <span class="accent">daftar UI</span></h2>
+          <p class="lede">Array barang dapat diubah menjadi kumpulan komponen yang punya bentuk seragam.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>App.jsx</span><span>daftar produk</span></div>
+            <pre><code><span class="code-key">const</span> produk = [
+  { id: <span class="code-num">1</span>, nama: <span class="code-str">"Roti"</span> },
+  { id: <span class="code-num">2</span>, nama: <span class="code-str">"Susu"</span> }
+];
+
+<span class="code-key">function</span> DaftarProduk() {
+  <span class="code-key">return</span> (
+    &lt;ul&gt;
+      {produk.map((item) =&gt; (
+        &lt;li key={item.id}&gt;{item.nama}&lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">KEY</span> Mengapa ada <code>key</code>?</div>
+            <ul class="plain-list">
+              <li><code>map()</code> memanggil fungsi untuk setiap item.</li>
+              <li><code>key</code> membantu React mengenali item yang berubah.</li>
+              <li>Pilih nilai yang unik dan tetap, seperti <code>id</code>.</li>
+              <li>Jangan gunakan posisi array sebagai key jika daftar bisa berubah urutannya.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Menangani event">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Tanggapi tindakan pengguna</p>
+          <h2>Event menghubungkan klik dengan <span class="teal">aksi</span></h2>
+          <p class="lede">Kirim fungsi sebagai event handler. React akan menjalankannya saat pengguna berinteraksi.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>ProductCard.jsx</span><span>event onClick</span></div>
+            <pre><code><span class="code-key">function</span> ProductCard({ nama, onPilih }) {
+  <span class="code-key">return</span> (
+    &lt;article&gt;
+      &lt;h2&gt;{nama}&lt;/h2&gt;
+      &lt;button
+        type=<span class="code-str">"button"</span>
+        onClick={onPilih}
+      &gt;
+        Pilih
+      &lt;/button&gt;
+    &lt;/article&gt;
+  );
+}</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">EVENT</span> Huruf besar-kecil penting</div>
+            <ul class="plain-list">
+              <li>Nama event React memakai camelCase: <code>onClick</code>.</li>
+              <li>Nilainya fungsi: <code>onClick={onPilih}</code>.</li>
+              <li>Jangan langsung memanggilnya: <code>onClick={onPilih()}</code>.</li>
+              <li>Props <code>onPilih</code> membolehkan komponen anak memberi tahu induknya.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="practice"><strong>Coba:</strong> buat tombol yang memanggil <code>alert("Dipilih")</code> melalui fungsi bernama.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="State dengan useState">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Data yang berubah saat aplikasi dipakai</p>
+          <h2><code>useState</code> mengingat <span class="accent">perubahan</span></h2>
+          <p class="lede">State menyimpan data milik komponen. Memanggil fungsi setter meminta React merender tampilan terbaru.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>Counter.jsx</span><span>state angka</span></div>
+            <pre><code><span class="code-key">import</span> { useState } <span class="code-key">from</span> <span class="code-str">"react"</span>;
+
+<span class="code-key">function</span> Counter() {
+  <span class="code-key">const</span> [jumlah, setJumlah] = useState(<span class="code-num">0</span>);
+
+  <span class="code-key">return</span> (
+    &lt;button onClick={() =&gt; setJumlah(jumlah + <span class="code-num">1</span>)}&gt;
+      Dipilih {jumlah} kali
+    &lt;/button&gt;
+  );
+}</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">STATE</span> Dua bagian state</div>
+            <ul class="plain-list">
+              <li><code>jumlah</code> adalah nilai saat ini.</li>
+              <li><code>setJumlah</code> meminta React mengganti nilainya.</li>
+              <li><code>useState(0)</code> menentukan nilai awal.</li>
+              <li>Jangan mengubah state langsung dengan <code>jumlah++</code>.</li>
+            </ul>
+            <div class="callout">Panggil Hook seperti <code>useState</code> di bagian atas fungsi komponen, bukan di dalam kondisi atau perulangan.</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Memperbarui array state">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">State yang berisi daftar</p>
+          <h2>Buat array baru saat favorit <span class="teal">berubah</span></h2>
+          <p class="lede">Jangan mengubah array state langsung. Buat array baru dengan spread, <code>filter()</code>, atau <code>map()</code>.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>App.jsx</span><span>tambah atau hapus favorit</span></div>
+            <pre><code><span class="code-key">function</span> App({ produk }) {
+  <span class="code-key">const</span> [favorit, setFavorit] = useState([]);
+
+  <span class="code-key">function</span> ubahFavorit(id) {
+    setFavorit((current) =&gt;
+      current.includes(id)
+        ? current.filter((item) =&gt; item !== id)
+        : [...current, id]
+    );
+  }
+
+  <span class="code-key">return</span> &lt;ProductList items={produk} onToggle={ubahFavorit} /&gt;;
+}</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">ARRAY</span> Salin, lalu perbarui</div>
+            <ul class="plain-list">
+              <li><code>current</code> adalah nilai state terbaru.</li>
+              <li><code>filter()</code> membuat array baru tanpa barang yang dihapus.</li>
+              <li><code>[...current, id]</code> membuat array baru dengan barang tambahan.</li>
+              <li>Fungsi setter menjaga perubahan state terbaca oleh React.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="practice"><strong>Sambungkan:</strong> panggil <code>ubahFavorit(product.name)</code> dari event tombol kartu barang.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Input dan pencarian">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Hubungkan form ke state</p>
+          <h2>Input terkontrol membuat pencarian <span class="teal">responsif</span></h2>
+          <p class="lede">Nilai input berasal dari state. Saat pengguna mengetik, event memperbarui state.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>App.jsx</span><span>input dan filter</span></div>
+            <pre><code><span class="code-key">function</span> App({ produk }) {
+  <span class="code-key">const</span> [cari, setCari] = useState(<span class="code-str">""</span>);
+  <span class="code-key">const</span> hasil = produk.filter((item) =&gt;
+    item.name.toLowerCase().includes(cari.toLowerCase())
+  );
+
+  <span class="code-key">return</span> (
+    &lt;&gt;
+      &lt;label&gt;
+        Cari barang
+        &lt;input
+          value={cari}
+          onChange={(event) =&gt; setCari(event.target.value)}
+        /&gt;
+      &lt;/label&gt;
+      &lt;DaftarProduk items={hasil} /&gt;
+    &lt;/&gt;
+  );
+}</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">INPUT</span> Satu sumber nilai</div>
+            <ul class="plain-list">
+              <li><code>value={cari}</code> menampilkan nilai state pada input.</li>
+              <li><code>onChange</code> mengambil teks yang baru diketik.</li>
+              <li><code>filter()</code> menghasilkan daftar hasil pencarian.</li>
+              <li>Nilai <code>hasil</code> bisa dihitung langsung dari state; tidak perlu disimpan sebagai state kedua.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="practice"><strong>Ingat:</strong> untuk pencarian tanpa membedakan huruf besar dan kecil, ubah teks dan kata pencarian menjadi huruf kecil.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Tampilkan kondisi antarmuka">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Beritahu pengguna apa yang sedang terjadi</p>
+          <h2>Tampilan berbeda mengikuti <span class="accent">keadaan data</span></h2>
+          <p class="lede">Data belum selesai dimuat, gagal, atau tidak ditemukan? Tampilkan pesan yang sesuai.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>ProductResults.jsx</span><span>kondisi</span></div>
+            <pre><code><span class="code-key">if</span> (memuat) {
+  <span class="code-key">return</span> &lt;p&gt;Memuat barang...&lt;/p&gt;;
+}
+
+<span class="code-key">if</span> (error) {
+  <span class="code-key">return</span> &lt;p role=<span class="code-str">"alert"</span>&gt;{error}&lt;/p&gt;;
+}
+
+<span class="code-key">if</span> (hasil.length === <span class="code-num">0</span>) {
+  <span class="code-key">return</span> &lt;p&gt;Barang tidak ditemukan.&lt;/p&gt;;
+}
+
+<span class="code-key">return</span> &lt;DaftarProduk items={hasil} /&gt;;</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">UI</span> Empat keadaan dasar</div>
+            <ul class="plain-list">
+              <li><strong>Memuat:</strong> proses pengambilan data berlangsung.</li>
+              <li><strong>Gagal:</strong> tampilkan pesan dan cara mencoba lagi.</li>
+              <li><strong>Kosong:</strong> pencarian tidak menemukan barang.</li>
+              <li><strong>Berhasil:</strong> tampilkan daftar barang.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Mengambil data dengan useEffect">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Sinkronkan komponen dengan layanan luar</p>
+          <h2><code>useEffect</code> menjalankan <span class="teal">fetch</span></h2>
+          <p class="lede">Contoh ini meminta daftar barang saat komponen dipasang, lalu menyimpan hasilnya dalam state.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>App.jsx</span><span>permintaan API</span></div>
+            <pre><code><span class="code-key">import</span> { useEffect, useState } <span class="code-key">from</span> <span class="code-str">"react"</span>;
+
+<span class="code-key">const</span> alamatApi =
+  <span class="code-str">"https://mdn.github.io/learning-area/javascript/apis/fetching-data/can-store/products.json"</span>;
+
+<span class="code-key">function</span> App() {
+  <span class="code-key">const</span> [produk, setProduk] = useState([]);
+  <span class="code-key">const</span> [memuat, setMemuat] = useState(<span class="code-key">true</span>);
+  <span class="code-key">const</span> [error, setError] = useState(<span class="code-str">""</span>);
+
+  useEffect(() =&gt; {
+    <span class="code-key">const</span> controller = <span class="code-key">new</span> AbortController();
+    <span class="code-key">async function</span> muatProduk() {
+      <span class="code-key">try</span> {
+        <span class="code-key">const</span> response = <span class="code-key">await</span> fetch(alamatApi, {
+          signal: controller.signal
+        });
+        <span class="code-key">if</span> (!response.ok) <span class="code-key">throw new</span> Error();
+        setProduk(<span class="code-key">await</span> response.json());
+      } <span class="code-key">catch</span> {
+        <span class="code-key">if</span> (!controller.signal.aborted) {
+          setError(<span class="code-str">"Barang gagal dimuat."</span>);
+        }
+      } <span class="code-key">finally</span> {
+        <span class="code-key">if</span> (!controller.signal.aborted) setMemuat(<span class="code-key">false</span>);
+      }
+    }
+
+    muatProduk();
+    <span class="code-key">return</span> () =&gt; controller.abort();
+  }, []);
+
+  <span class="code-key">return</span> (
+    &lt;ProductResults products={produk} loading={memuat} error={error} /&gt;
+  );
+}</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">WAIT</span> Alur permintaan</div>
+            <ul class="plain-list">
+              <li><code>useEffect</code> menjalankan proses setelah tampilan dirender.</li>
+              <li><code>[]</code> berarti Effect ini tidak bergantung pada props atau state lain.</li>
+              <li><code>response.ok</code> memastikan status HTTP sukses.</li>
+              <li><code>AbortController</code> membatalkan permintaan saat komponen dilepas.</li>
+            </ul>
+            <div class="callout">Ini pola latihan untuk memahami Effect. Aplikasi yang lebih besar bisa memakai mekanisme data dari framework atau pustaka cache.</div>
+          </article>
+        </div>
+        <div class="practice"><strong>Contoh API:</strong> MDN Can Store products. Jalankan dari proyek lokal dan pastikan koneksi internet aktif.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Susun kartu katalog">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Gabungkan props dan daftar</p>
+          <h2>Satu data barang menjadi satu <span class="accent">kartu</span></h2>
+          <p class="lede">Komponen kartu menerima satu objek. Komponen daftar membuat kartu untuk setiap barang.</p>
+        </div>
+        <div class="layout-two">
+          <div class="code-panel">
+            <div class="code-label"><span>ProductList.jsx</span><span>kartu dari data API</span></div>
+            <pre><code><span class="code-key">function</span> ProductCard({ product, onPilih }) {
+  <span class="code-key">return</span> (
+    &lt;article className=<span class="code-str">"produk"</span>&gt;
+      &lt;h2&gt;{product.name}&lt;/h2&gt;
+      &lt;p&gt;Kategori: {product.type}&lt;/p&gt;
+      &lt;p&gt;Harga: ${product.price.toFixed(<span class="code-num">2</span>)}&lt;/p&gt;
+      &lt;button onClick={onPilih}&gt;Simpan favorit&lt;/button&gt;
+    &lt;/article&gt;
+  );
+}
+
+<span class="code-key">function</span> ProductList({ items, onToggle }) {
+  <span class="code-key">return</span> items.map((product) =&gt; (
+    &lt;ProductCard
+      key={product.name}
+      product={product}
+      onPilih={() =&gt; onToggle(product.name)}
+    /&gt;
+  ));
+}</code></pre>
+          </div>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">CARD</span> Bagian yang saling terhubung</div>
+            <ul class="plain-list">
+              <li><code>ProductList</code> menerima array melalui props <code>items</code>.</li>
+              <li><code>ProductCard</code> menerima objek melalui props <code>product</code>.</li>
+              <li><code>key</code> memakai nama unik yang tersedia pada data contoh MDN.</li>
+              <li>Jika API lain menyediakan <code>id</code>, gunakan <code>id</code> sebagai key.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="practice"><strong>Format harga:</strong> contoh memakai angka dolar dari data latihan. Sesuaikan mata uang jika memakai data lain.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Rancang proyek katalog">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Proyek mini · katalog barang</p>
+          <h2>Satukan komponen menjadi <span class="teal">fitur</span></h2>
+          <p class="lede">Bangun halaman katalog yang mengambil data, mencari barang, dan menandai favorit.</p>
+        </div>
+        <div class="flow">
+          <div class="flow-item"><h3>Ambil</h3><p>Fetch data barang dari API.</p></div>
+          <div class="flow-item"><h3>Tampilkan</h3><p>ProductCard dan daftar.</p></div>
+          <div class="flow-item"><h3>Cari</h3><p>Input dan filter.</p></div>
+          <div class="flow-item"><h3>Pilih</h3><p>Simpan barang favorit.</p></div>
+        </div>
+        <div class="layout-two" style="margin-top:18px">
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">BUILD</span> Susunan komponen</div>
+            <pre class="file-tree">src/
+  App.jsx
+  components/
+    SearchBar.jsx
+    ProductList.jsx
+    ProductCard.jsx</pre>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">DONE</span> Kriteria selesai</div>
+            <ul class="plain-list">
+              <li>Status loading dan error tampil dengan jelas.</li>
+              <li>Pencarian menyaring nama barang.</li>
+              <li>Tombol favorit memperbarui state.</li>
+              <li>Data favorit tetap ada setelah halaman dimuat ulang sebagai tantangan tambahan.</li>
+            </ul>
+          </article>
+        </div>
+        <div class="practice"><strong>Pecah pekerjaan:</strong> mulai dari tampilan statis, lanjutkan ke data API, lalu pencarian dan favorit.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Git dan sumber belajar">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Simpan progres proyek</p>
+          <h2>Gunakan Git saat <span class="accent">membangun</span></h2>
+          <p class="lede">Simpan kemajuan per fitur agar perubahan mudah dilacak dan dikembalikan.</p>
+        </div>
+        <div class="layout-two">
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">GIT</span> Materi di situs ini</div>
+            <p>Pelajari konsep repository, staging, commit, dan push lewat materi berikut:</p>
+            <div class="hero-actions">
+              <a class="button button-primary" href="git-dasar.html">Git &amp; GitHub</a>
+              <a class="button" href="git-vscode.html">Git di VS Code</a>
+            </div>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">DOCS</span> Dokumentasi resmi</div>
+            <ul class="plain-list small">
+              <li><a style="color:var(--teal)" href="https://react.dev/learn" target="_blank" rel="noreferrer">React Quick Start</a></li>
+              <li><a style="color:var(--teal)" href="https://react.dev/learn/your-first-component" target="_blank" rel="noreferrer">Komponen pertama</a></li>
+              <li><a style="color:var(--teal)" href="https://react.dev/reference/react/useState" target="_blank" rel="noreferrer">useState</a></li>
+              <li><a style="color:var(--teal)" href="https://react.dev/reference/react/useEffect" target="_blank" rel="noreferrer">useEffect dan fetch</a></li>
+              <li><a style="color:var(--teal)" href="https://vite.dev/guide/" target="_blank" rel="noreferrer">Panduan Vite</a></li>
+            </ul>
+          </article>
+        </div>
+        <div class="practice"><strong>Ide commit:</strong> “buat komponen kartu”, “tampilkan data API”, “tambahkan pencarian”, lalu “simpan favorit”.</div>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Kuis React dasar">
+      <div class="slide-inner">
+        <div class="slide-head">
+          <p class="eyebrow">Periksa pemahaman</p>
+          <h2>Kuis singkat <span class="accent">React</span></h2>
+          <p class="lede">Pilih satu jawaban untuk setiap pertanyaan, lalu periksa hasilnya.</p>
+        </div>
+        <form class="quiz-form" id="reactQuizForm">
+          <fieldset class="quiz-question">
+            <legend>1. Nama komponen React biasanya diawali dengan …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q1" value="a"> Huruf kecil</label>
+              <label class="quiz-option"><input type="radio" name="q1" value="b"> Huruf besar</label>
+              <label class="quiz-option"><input type="radio" name="q1" value="c"> Angka</label>
+              <label class="quiz-option"><input type="radio" name="q1" value="d"> Tanda hubung</label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-question">
+            <legend>2. Data yang dikirim induk ke anak disebut …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q2" value="a"> Event</label>
+              <label class="quiz-option"><input type="radio" name="q2" value="b"> Selector</label>
+              <label class="quiz-option"><input type="radio" name="q2" value="c"> Props</label>
+              <label class="quiz-option"><input type="radio" name="q2" value="d"> Effect</label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-question">
+            <legend>3. Apa yang sebaiknya dipanggil untuk memperbarui state?</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q3" value="a"> Fungsi setter dari useState</label>
+              <label class="quiz-option"><input type="radio" name="q3" value="b"> document.write()</label>
+              <label class="quiz-option"><input type="radio" name="q3" value="c"> innerHTML</label>
+              <label class="quiz-option"><input type="radio" name="q3" value="d"> Fungsi render manual</label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-question">
+            <legend>4. Nilai yang baik untuk <code>key</code> daftar adalah …</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q4" value="a"> Nilai acak baru setiap render</label>
+              <label class="quiz-option"><input type="radio" name="q4" value="b"> Teks yang sama untuk semua baris</label>
+              <label class="quiz-option"><input type="radio" name="q4" value="c"> Nomor urut yang berubah saat daftar disaring</label>
+              <label class="quiz-option"><input type="radio" name="q4" value="d"> ID unik dan stabil</label>
+            </div>
+          </fieldset>
+          <fieldset class="quiz-question">
+            <legend>5. Hook apa yang dipakai untuk menyinkronkan komponen dengan API?</legend>
+            <div class="quiz-options">
+              <label class="quiz-option"><input type="radio" name="q5" value="a"> useMemo</label>
+              <label class="quiz-option"><input type="radio" name="q5" value="b"> useEffect</label>
+              <label class="quiz-option"><input type="radio" name="q5" value="c"> useId</label>
+              <label class="quiz-option"><input type="radio" name="q5" value="d"> useRef</label>
+            </div>
+          </fieldset>
+          <div>
+            <button class="button button-primary" type="submit">Periksa jawaban</button>
+            <p class="quiz-result" id="reactQuizResult" role="status" aria-live="polite"></p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="slide" data-title="Selesai dan lanjutkan">
+      <div class="slide-inner">
+        <div class="closing-mark" aria-hidden="true">R</div>
+        <p class="eyebrow">Giliran kamu membangun</p>
+        <h2>Dari fungsi kecil ke <span class="teal">aplikasi utuh</span></h2>
+        <p class="lede">Buat katalog barang, ceritakan cara datanya bergerak, dan simpan setiap kemajuan dengan Git.</p>
+        <div class="layout-two" style="margin-top:24px">
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">CHECK</span> Sebelum dikumpulkan</div>
+            <ul class="plain-list">
+              <li>Komponen punya nama jelas dan melakukan satu tugas.</li>
+              <li>Props dipakai untuk menerima data; state diperbarui lewat setter.</li>
+              <li>Daftar memakai key stabil dan unik.</li>
+              <li>Status loading, kosong, dan error ditangani.</li>
+              <li>Kode sudah disimpan dalam repository Git.</li>
+            </ul>
+          </article>
+          <article class="panel">
+            <div class="panel-title"><span class="symbol">NEXT</span> Setelah React dasar</div>
+            <p class="muted">Pilih jalur berikutnya: TypeScript untuk menambah pemeriksaan tipe, atau Node.js dan database untuk mulai membangun sisi server.</p>
+            <a class="button button-primary" href="javascript-lanjutan.html">Kembali ke JavaScript</a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="nav-bar" aria-label="Navigasi materi">
+    <button class="nav-btn" id="prevBtn" type="button" aria-label="Slide sebelumnya" title="Slide sebelumnya">‹</button>
+    <div class="slide-dots" id="slideDots" aria-label="Pilih slide"></div>
+    <span class="slide-counter" aria-live="polite"><strong id="currentSlide">1</strong> / <span id="slideTotal"></span></span>
+    <button class="nav-btn" id="nextBtn" type="button" aria-label="Slide berikutnya" title="Slide berikutnya">›</button>
+  </nav>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const dots = document.getElementById("slideDots");
+    let currentIndex = 0;
+
+    document.getElementById("slideTotal").textContent = slides.length;
+    slides.forEach(function (slide, index) {
+      const dot = document.createElement("button");
+      dot.type = "button";
+      dot.className = "slide-dot";
+      dot.setAttribute("aria-label", "Buka slide " + (index + 1) + ": " + slide.dataset.title);
+      dot.addEventListener("click", function () { goToSlide(index); });
+      dots.appendChild(dot);
+    });
+
+    function updateSlide() {
+      slides.forEach(function (slide, index) {
+        const active = index === currentIndex;
+        slide.classList.toggle("active", active);
+        slide.setAttribute("aria-hidden", String(!active));
+        slide.inert = !active;
+      });
+      Array.from(dots.children).forEach(function (dot, index) {
+        if (index === currentIndex) dot.setAttribute("aria-current", "step");
+        else dot.removeAttribute("aria-current");
+      });
+      document.getElementById("currentSlide").textContent = currentIndex + 1;
+      document.getElementById("progressFill").style.width =
+        ((currentIndex + 1) / slides.length * 100) + "%";
+      document.getElementById("prevBtn").disabled = currentIndex === 0;
+      document.getElementById("nextBtn").disabled = currentIndex === slides.length - 1;
+      slides[currentIndex].scrollTop = 0;
+    }
+
+    function goToSlide(index) {
+      currentIndex = Math.max(0, Math.min(slides.length - 1, index));
+      updateSlide();
+    }
+    function nextSlide() { goToSlide(currentIndex + 1); }
+    function previousSlide() { goToSlide(currentIndex - 1); }
+
+    document.getElementById("prevBtn").addEventListener("click", previousSlide);
+    document.getElementById("nextBtn").addEventListener("click", nextSlide);
+    document.addEventListener("keydown", function (event) {
+      if (event.target.closest("button, input, textarea, select, a, [contenteditable='true']")) return;
+      if (event.key === "ArrowRight" || event.key === "PageDown" || event.key === " ") {
+        event.preventDefault();
+        nextSlide();
+      } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
+        event.preventDefault();
+        previousSlide();
+      } else if (event.key === "Home") {
+        goToSlide(0);
+      } else if (event.key === "End") {
+        goToSlide(slides.length - 1);
+      }
+    });
+    updateSlide();
+
+
+    function pasangUmpanBalikQuiz(formId, resultId, key) {
+      const form = document.getElementById(formId);
+      const result = document.getElementById(resultId);
+      const questionNames = Object.keys(key);
+
+      form.addEventListener("change", function () {
+        form.querySelectorAll(".quiz-option.is-correct, .quiz-option.is-wrong").forEach(function (option) {
+          option.classList.remove("is-correct", "is-wrong");
+        });
+        result.textContent = "";
+      });
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const answers = new FormData(form);
+        const unanswered = questionNames.filter(function (name) { return !answers.has(name); });
+        if (unanswered.length > 0) {
+          result.textContent = "Jawab semua pertanyaan terlebih dahulu.";
+          return;
+        }
+
+        let score = 0;
+        const feedback = questionNames.map(function (name) {
+          const options = form.querySelectorAll('input[name="' + name + '"]');
+          const selectedAnswer = answers.get(name);
+          options.forEach(function (option) {
+            const label = option.closest("label");
+            if (option.value === key[name]) label.classList.add("is-correct");
+            if (option.checked && option.value !== key[name]) label.classList.add("is-wrong");
+          });
+          if (selectedAnswer === key[name]) {
+            score += 1;
+            return name.slice(1) + ". Benar.";
+          }
+          const correctLabel = Array.from(options).find(function (option) {
+            return option.value === key[name];
+          }).closest("label");
+          return name.slice(1) + ". Salah. Jawaban benar: " + correctLabel.textContent.trim() + ".";
+        });
+        result.textContent = "Skor kamu " + score + " dari " + questionNames.length + ".\n" + feedback.join("\n");
+      });
+    }
+    pasangUmpanBalikQuiz("reactQuizForm", "reactQuizResult", { q1: "b", q2: "c", q3: "a", q4: "d", q5: "b" });
+  </script>
+</body>
+</html>

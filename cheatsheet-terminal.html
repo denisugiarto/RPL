@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10191f">
+  <title>Cheatsheet Terminal — Materi RPL</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10191f;
+      --panel: #19252e;
+      --panel-deep: #0b1318;
+      --text: #f3f6f8;
+      --muted: #b2c0c8;
+      --line: #34444e;
+      --yellow: #ffd33d;
+      --teal: #58e0c1;
+      --warning: #ffd28c;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.6 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    a { color: var(--teal); }
+    a:focus-visible { outline: 3px solid var(--yellow); outline-offset: 4px; }
+    code, kbd {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    code {
+      color: var(--yellow);
+      overflow-wrap: anywhere;
+    }
+    .topbar {
+      min-height: 58px;
+      padding: 0 max(24px, calc((100vw - 1120px) / 2));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+      background: #111b21;
+    }
+    .brand { color: var(--text); text-decoration: none; font-weight: 700; }
+    .brand-mark {
+      display: inline-grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      margin-right: 9px;
+      border-radius: 9px;
+      background: var(--yellow);
+      color: #172027;
+      font-weight: 900;
+    }
+    .topbar-label { color: var(--muted); font-size: .88rem; }
+    main { width: min(100% - 40px, 1000px); margin: 0 auto; padding: 52px 0 80px; }
+    .eyebrow { margin: 0 0 12px; color: var(--teal); font-weight: 700; }
+    h1 { max-width: 800px; margin: 0; font-size: clamp(2.4rem, 7vw, 4.6rem); line-height: 1.02; letter-spacing: -.055em; }
+    h1 span { color: var(--yellow); }
+    .intro { max-width: 720px; margin: 20px 0 0; color: var(--muted); font-size: 1.12rem; }
+    .note {
+      margin: 24px 0 0;
+      padding: 14px 17px;
+      border-left: 3px solid var(--teal);
+      border-radius: 0 10px 10px 0;
+      background: #183233;
+      color: #e2f3ef;
+    }
+    .jump-links { display: flex; flex-wrap: wrap; gap: 9px; margin: 25px 0 44px; }
+    .jump-links a {
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: .9rem;
+    }
+    .jump-links a:hover { border-color: var(--teal); color: var(--teal); }
+    .section { margin-top: 48px; scroll-margin-top: 20px; }
+    .section-heading { margin-bottom: 16px; }
+    .section-heading p { margin: 4px 0 0; color: var(--muted); }
+    h2 { margin: 0; font-size: clamp(1.55rem, 4vw, 2.2rem); letter-spacing: -.03em; }
+    h3 { margin: 0 0 12px; font-size: 1.1rem; }
+    .shell-grid, .card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .panel {
+      min-width: 0;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--panel);
+    }
+    .panel-label { margin: 0 0 13px; color: var(--teal); font-size: .8rem; font-weight: 800; }
+    .command-list { display: grid; gap: 12px; margin: 0; padding: 0; list-style: none; }
+    .command-list li { display: grid; gap: 3px; }
+    .command-list code { display: block; padding: 6px 9px; border-radius: 7px; background: var(--panel-deep); }
+    .command-list span { color: var(--muted); font-size: .92rem; }
+    .shared-commands { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .shared-commands div { padding: 12px; border-radius: 9px; background: var(--panel-deep); }
+    .shared-commands code { display: block; margin-bottom: 5px; }
+    .shared-commands span { color: var(--muted); font-size: .9rem; }
+    .tool-panel { height: 100%; }
+    .tool-panel .command-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .warning {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border: 1px solid #725c37;
+      border-radius: 10px;
+      background: #302719;
+      color: #ffedcf;
+    }
+    .warning strong { color: var(--warning); }
+    .small { color: var(--muted); font-size: .9rem; }
+    footer { margin-top: 54px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+    @media (max-width: 700px) {
+      .topbar { padding: 0 18px; }
+      .topbar-label { display: none; }
+      main { width: min(100% - 32px, 1000px); padding-top: 36px; }
+      .shell-grid, .card-grid { grid-template-columns: 1fr; }
+      .shared-commands { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 460px) {
+      .tool-panel .command-list { grid-template-columns: 1fr; }
+      .panel { padding: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html"><span class="brand-mark">R</span>Materi RPL</a>
+    <span class="topbar-label">Panduan cepat untuk praktik coding</span>
+  </header>
+
+  <main>
+    <p class="eyebrow">Linux/Bash • Node.js • npm • Git • Docker</p>
+    <h1>Perintah terminal <span>siap pakai</span></h1>
+    <p class="intro">Cari perintah yang dibutuhkan, lihat contoh, lalu ganti nama folder atau proyek sesuai latihanmu.</p>
+    <aside class="note"><strong>Catatan:</strong> Jangan ketik tanda prompt seperti <code>$</code> di awal contoh. Jalankan perintah dari folder proyek yang benar.</aside>
+
+    <nav class="jump-links" aria-label="Bagian cheatsheet">
+      <a href="#folder">Linux/Bash</a>
+      <a href="#node">Node.js & npm</a>
+      <a href="#git">Git</a>
+      <a href="#docker">Docker</a>
+      <a href="#aman">Kebiasaan aman</a>
+      <a href="#referensi">Referensi lanjutan</a>
+    </nav>
+
+    <section class="section" id="folder">
+      <div class="section-heading">
+        <h2>Linux dan Bash</h2>
+        <p>Perintah dasar untuk terminal Linux/macOS dengan shell Bash.</p>
+      </div>
+      <article class="panel tool-panel">
+        <ul class="command-list">
+          <li><code>pwd</code><span>Melihat lokasi folder saat ini.</span></li>
+          <li><code>ls -la</code><span>Melihat semua file, termasuk file tersembunyi.</span></li>
+          <li><code>cd nama-folder</code><span>Masuk ke folder.</span></li>
+          <li><code>cd ..</code><span>Naik satu tingkat folder.</span></li>
+          <li><code>mkdir -p src/components</code><span>Membuat folder bertingkat sekaligus.</span></li>
+          <li><code>touch app.js</code><span>Membuat file kosong atau memperbarui waktu file.</span></li>
+          <li><code>cat app.js</code><span>Menampilkan isi file teks.</span></li>
+          <li><code>less app.js</code><span>Membaca file panjang per halaman; tekan <kbd>q</kbd> untuk keluar.</span></li>
+          <li><code>cp app.js salinan.js</code><span>Menyalin file.</span></li>
+          <li><code>cp -r src backup-src</code><span>Menyalin folder beserta isinya.</span></li>
+          <li><code>mv app.js src/app.js</code><span>Memindahkan atau mengganti nama file.</span></li>
+          <li><code>rm -i app.js</code><span>Menghapus file setelah meminta konfirmasi.</span></li>
+          <li><code>find . -name "*.js"</code><span>Mencari file JavaScript di folder proyek.</span></li>
+          <li><code>grep -R "TODO" src</code><span>Mencari teks di file dalam folder <code>src</code>.</span></li>
+          <li><code>code .</code><span>Membuka folder saat ini di VS Code jika perintah tersedia.</span></li>
+          <li><code>clear</code><span>Membersihkan tampilan terminal.</span></li>
+        </ul>
+        <p class="small">Jika nama file atau folder berisi spasi, gunakan tanda kutip, misalnya <code>cd "Proyek RPL"</code>. Hindari <code>rm -rf</code> karena dapat menghapus banyak file tanpa konfirmasi.</p>
+      </article>
+    </section>
+
+    <section class="section" id="node">
+      <div class="section-heading">
+        <h2>Node.js dan npm</h2>
+        <p>Jalankan dari folder proyek yang berisi <code>package.json</code>.</p>
+      </div>
+      <article class="panel tool-panel">
+        <ul class="command-list">
+          <li><code>node --version</code><span>Memeriksa versi Node.js.</span></li>
+          <li><code>npm --version</code><span>Memeriksa versi npm.</span></li>
+          <li><code>node</code><span>Membuka mode interaktif Node.js; ketik <code>.exit</code> untuk keluar.</span></li>
+          <li><code>node app.js</code><span>Menjalankan file JavaScript dengan Node.js.</span></li>
+          <li><code>npm init -y</code><span>Membuat <code>package.json</code> dengan pengaturan awal.</span></li>
+          <li><code>npm install</code><span>Memasang dependensi yang tercatat dalam proyek.</span></li>
+          <li><code>npm install nama-paket</code><span>Menambahkan paket sebagai dependensi proyek.</span></li>
+          <li><code>npm install -D nama-paket</code><span>Menambahkan paket untuk kebutuhan pengembangan.</span></li>
+          <li><code>npm uninstall nama-paket</code><span>Menghapus paket dari proyek.</span></li>
+          <li><code>npm run</code><span>Melihat script yang tersedia dalam <code>package.json</code>.</span></li>
+          <li><code>npm run dev</code><span>Menjalankan server pengembangan jika script tersedia.</span></li>
+          <li><code>npm start</code><span>Menjalankan script <code>start</code> jika tersedia.</span></li>
+          <li><code>npm run build</code><span>Membuat hasil build jika script tersedia.</span></li>
+          <li><code>npm list</code><span>Melihat paket yang terpasang di proyek.</span></li>
+          <li><code>npm outdated</code><span>Memeriksa paket yang memiliki versi lebih baru.</span></li>
+          <li><code>Ctrl + C</code><span>Menghentikan server atau proses yang sedang berjalan.</span></li>
+        </ul>
+      </article>
+    </section>
+
+    <section class="section" id="git">
+      <div class="section-heading">
+        <h2>Git</h2>
+        <p>Alur umum: siapkan repositori, simpan perubahan, lalu bagikan ke remote seperti GitHub.</p>
+      </div>
+      <div class="shell-grid">
+        <article class="panel tool-panel">
+          <h3>Konfigurasi dan repositori</h3>
+          <ul class="command-list">
+            <li><code>git --version</code><span>Memeriksa instalasi Git.</span></li>
+            <li><code>git config --global user.name "Nama Kamu"</code><span>Mengatur nama pada commit.</span></li>
+            <li><code>git config --global user.email "kamu@example.com"</code><span>Mengatur email pada commit.</span></li>
+            <li><code>git config --list</code><span>Melihat konfigurasi Git yang aktif.</span></li>
+            <li><code>git init</code><span>Membuat repositori Git di folder saat ini.</span></li>
+            <li><code>git clone URL-repositori</code><span>Mengunduh salinan repositori.</span></li>
+          </ul>
+        </article>
+        <article class="panel tool-panel">
+          <h3>Simpan perubahan</h3>
+          <ul class="command-list">
+            <li><code>git status</code><span>Melihat file yang berubah dan branch aktif.</span></li>
+            <li><code>git add app.js</code><span>Memilih satu file untuk commit.</span></li>
+            <li><code>git add .</code><span>Memilih perubahan di folder saat ini.</span></li>
+            <li><code>git diff</code><span>Melihat perubahan yang belum masuk staging.</span></li>
+            <li><code>git diff --staged</code><span>Meninjau perubahan yang siap di-commit.</span></li>
+            <li><code>git commit -m "tambah fitur"</code><span>Menyimpan staging ke riwayat Git.</span></li>
+            <li><code>git log --oneline</code><span>Melihat ringkasan riwayat commit.</span></li>
+          </ul>
+        </article>
+        <article class="panel tool-panel">
+          <h3>Branch dan kolaborasi</h3>
+          <ul class="command-list">
+            <li><code>git branch</code><span>Melihat daftar branch lokal.</span></li>
+            <li><code>git switch -c fitur/nama-fitur</code><span>Membuat branch dan langsung berpindah.</span></li>
+            <li><code>git switch main</code><span>Berpindah ke branch <code>main</code>.</span></li>
+            <li><code>git remote -v</code><span>Melihat alamat remote yang terhubung.</span></li>
+            <li><code>git fetch origin</code><span>Mengambil informasi terbaru tanpa menggabungkan perubahan.</span></li>
+            <li><code>git pull</code><span>Mengambil dan menggabungkan perubahan dari remote.</span></li>
+            <li><code>git push -u origin nama-branch</code><span>Mengirim branch pertama kali ke remote.</span></li>
+          </ul>
+        </article>
+        <article class="panel tool-panel">
+          <h3>Batalkan dengan hati-hati</h3>
+          <ul class="command-list">
+            <li><code>git restore --staged app.js</code><span>Mengeluarkan file dari staging tanpa menghapus isinya.</span></li>
+            <li><code>git restore app.js</code><span>Mengembalikan perubahan file yang belum di-commit; perubahan itu hilang.</span></li>
+            <li><code>git revert HASH</code><span>Membatalkan commit dengan membuat commit baru.</span></li>
+            <li><code>git stash</code><span>Menyimpan sementara perubahan yang belum di-commit.</span></li>
+            <li><code>git stash pop</code><span>Mengembalikan perubahan yang disimpan sementara.</span></li>
+          </ul>
+          <p class="small">Jangan gunakan <code>git reset --hard</code> tanpa memahami dampaknya karena perubahan lokal dapat terhapus.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="docker">
+      <div class="section-heading">
+        <h2>Docker dan Docker Compose</h2>
+        <p>Docker CLI mengelola image dan container. Compose menjalankan beberapa layanan dari file konfigurasi proyek.</p>
+      </div>
+      <div class="shell-grid">
+        <article class="panel tool-panel">
+          <h3>Image dan container</h3>
+          <ul class="command-list">
+            <li><code>docker --version</code><span>Memeriksa versi Docker CLI.</span></li>
+            <li><code>docker info</code><span>Memeriksa koneksi ke Docker Engine.</span></li>
+            <li><code>docker pull nginx</code><span>Mengunduh image dari registry.</span></li>
+            <li><code>docker images</code><span>Melihat image yang tersedia di komputer.</span></li>
+            <li><code>docker build -t web-rpl:1.0 .</code><span>Membangun image dari Dockerfile di folder saat ini.</span></li>
+            <li><code>docker run -d --name web-rpl -p 8080:80 nginx</code><span>Membuat container latar belakang dan membuka port 8080.</span></li>
+            <li><code>docker ps</code><span>Melihat container yang sedang berjalan.</span></li>
+            <li><code>docker ps -a</code><span>Melihat semua container, termasuk yang berhenti.</span></li>
+          </ul>
+        </article>
+        <article class="panel tool-panel">
+          <h3>Periksa dan kelola container</h3>
+          <ul class="command-list">
+            <li><code>docker logs -f web-rpl</code><span>Mengikuti log container; tekan <kbd>Ctrl + C</kbd> untuk berhenti melihat.</span></li>
+            <li><code>docker exec -it web-rpl sh</code><span>Membuka shell di dalam container yang berjalan.</span></li>
+            <li><code>docker inspect web-rpl</code><span>Melihat detail konfigurasi container.</span></li>
+            <li><code>docker stats</code><span>Melihat penggunaan sumber daya container.</span></li>
+            <li><code>docker stop web-rpl</code><span>Menghentikan container dengan aman.</span></li>
+            <li><code>docker start web-rpl</code><span>Menjalankan kembali container yang berhenti.</span></li>
+            <li><code>docker rm web-rpl</code><span>Menghapus container yang sudah berhenti.</span></li>
+            <li><code>docker rmi web-rpl:1.0</code><span>Menghapus image jika tidak sedang dipakai container.</span></li>
+          </ul>
+        </article>
+        <article class="panel tool-panel">
+          <h3>Docker Compose</h3>
+          <ul class="command-list">
+            <li><code>docker compose version</code><span>Memeriksa versi Docker Compose.</span></li>
+            <li><code>docker compose up --build</code><span>Membangun image dan menjalankan layanan di terminal ini.</span></li>
+            <li><code>docker compose up -d --build</code><span>Menjalankan layanan di latar belakang.</span></li>
+            <li><code>docker compose ps</code><span>Melihat status layanan proyek.</span></li>
+            <li><code>docker compose logs -f</code><span>Mengikuti log semua layanan.</span></li>
+            <li><code>docker compose exec web sh</code><span>Membuka shell di layanan bernama <code>web</code>.</span></li>
+            <li><code>docker compose restart web</code><span>Memulai ulang layanan <code>web</code>.</span></li>
+            <li><code>docker compose down</code><span>Menghentikan dan menghapus container serta jaringan proyek.</span></li>
+          </ul>
+        </article>
+        <article class="panel tool-panel">
+          <h3>Jaga data dan ruang disk</h3>
+          <ul class="command-list">
+            <li><code>docker system df</code><span>Melihat pemakaian ruang disk Docker.</span></li>
+            <li><code>docker image prune</code><span>Menghapus image tak terpakai yang menggantung.</span></li>
+          </ul>
+          <div class="warning"><strong>Perhatian:</strong> <code>docker compose down -v</code> menghapus volume proyek dan dapat menghilangkan data database. Perintah pembersihan seperti <code>docker system prune</code> juga bisa menghapus resource yang masih ingin dipakai. Tinjau target dan cadangkan data terlebih dahulu.</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="aman">
+      <div class="section-heading">
+        <h2>Kebiasaan aman</h2>
+        <p>Biasakan memeriksa konteks sebelum menjalankan perintah.</p>
+      </div>
+      <div class="card-grid">
+        <article class="panel"><h3>Cek lokasi dan perubahan</h3><p class="small">Sebelum menghapus atau memindahkan file, periksa folder dengan <code>pwd</code>, lalu tinjau perubahan Git dengan <code>git status</code>.</p></article>
+        <article class="panel"><h3>Lindungi rahasia</h3><p class="small">Jangan unggah kata sandi, token, atau file <code>.env</code> ke GitHub. Pastikan file rahasia masuk ke <code>.gitignore</code>.</p></article>
+      </div>
+    </section>
+
+    <section class="section" id="referensi">
+      <div class="section-heading">
+        <h2>Referensi lanjutan</h2>
+        <p>Gunakan tautan ini saat membutuhkan lebih banyak contoh dan pilihan perintah.</p>
+      </div>
+      <div class="card-grid">
+        <article class="panel">
+          <h3><a href="https://tldr.sh/" target="_blank" rel="noopener noreferrer">tldr pages</a></h3>
+          <p class="small">Contoh singkat untuk perintah terminal yang umum, cocok saat ingin melihat cara pakai sebuah perintah dengan cepat.</p>
+        </article>
+        <article class="panel">
+          <h3><a href="https://devhints.io/" target="_blank" rel="noopener noreferrer">Devhints</a></h3>
+          <p class="small">Kumpulan cheatsheet untuk berbagai alat. Mulai dari <a href="https://devhints.io/bash" target="_blank" rel="noopener noreferrer">Bash</a>, <a href="https://devhints.io/npm" target="_blank" rel="noopener noreferrer">npm</a>, <a href="https://devhints.io/docker" target="_blank" rel="noopener noreferrer">Docker</a>, atau <a href="https://devhints.io/docker-compose" target="_blank" rel="noopener noreferrer">Docker Compose</a>.</p>
+        </article>
+        <article class="panel">
+          <h3><a href="https://training.github.com/downloads/id/github-git-cheat-sheet/" target="_blank" rel="noopener noreferrer">GitHub Docs: Git cheatsheet</a></h3>
+          <p class="small">Ringkasan perintah Git untuk mengelola perubahan dan riwayat proyek.</p>
+        </article>
+        <article class="panel">
+          <h3><a href="https://docs.docker.com/get-started/docker_cheatsheet.pdf" target="_blank" rel="noopener noreferrer">Docker CLI cheatsheet</a></h3>
+          <p class="small">Cheatsheet PDF resmi Docker untuk image, container, dan perintah CLI.</p>
+        </article>
+      </div>
+    </section>
+
+    <footer>
+      <a href="git-dasar.html">Pelajari Git</a> ·
+      <a href="javascript-lanjutan.html">Pelajari JavaScript lanjutan</a> ·
+      <a href="react-dasar.html">Pelajari React</a> ·
+      <a href="index.html">Kembali ke daftar materi</a>
+    </footer>
+  </main>
+</body>
+</html>

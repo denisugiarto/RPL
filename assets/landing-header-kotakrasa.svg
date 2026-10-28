@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 330" role="img" aria-labelledby="t d" font-family="Inter, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <title id="t">Contoh header landing page KotakRasa</title>
+  <desc id="d">Jendela browser dengan header berisi logo KotakRasa, menu Isi kotak, Harga, Cara pesan, dan tombol Minta penawaran. Tiga label menunjuk logo, menu, dan tombol.</desc>
+  <rect width="640" height="330" rx="14" fill="#EAE6DA"/>
+  <!-- browser window -->
+  <rect x="24" y="64" width="592" height="244" rx="10" fill="#fff" stroke="#c2d1c6"/>
+  <path d="M24 74a10 10 0 0 1 10-10h572a10 10 0 0 1 10 10v22H24z" fill="#F1EFE8"/>
+  <circle cx="44" cy="80" r="5" fill="#e8a39b"/><circle cx="62" cy="80" r="5" fill="#ecd08a"/><circle cx="80" cy="80" r="5" fill="#9fcfa6"/>
+  <rect x="104" y="72" width="300" height="16" rx="8" fill="#fff" stroke="#d8d4c6"/>
+  <text x="118" y="84" font-size="10" fill="#7a8a84">kotakrasa.example</text>
+  <!-- header bar -->
+  <rect x="24" y="96" width="592" height="52" fill="#FBFAF6"/>
+  <line x1="24" y1="148" x2="616" y2="148" stroke="#c2d1c6"/>
+  <!-- logo -->
+  <g transform="translate(44 108)">
+    <rect width="28" height="28" rx="6" fill="#195b4c"/>
+    <path d="M7 11l7-4 7 4v9l-7 4-7-4z" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>
+    <path d="M7 11l7 4 7-4M14 15v9" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>
+  </g>
+  <text x="82" y="128" font-size="19" font-weight="800" fill="#16312d" letter-spacing="-0.5">KotakRasa</text>
+  <!-- menu -->
+  <g font-size="13" fill="#34504a" font-weight="500">
+    <text x="280" y="127">Isi kotak</text><text x="352" y="127">Harga</text><text x="408" y="127">Cara pesan</text>
+  </g>
+  <!-- cta -->
+  <rect x="488" y="107" width="108" height="32" rx="6" fill="#195b4c"/>
+  <text x="542" y="127" font-size="12.5" font-weight="700" fill="#fff" text-anchor="middle">Minta penawaran</text>
+  <!-- page body placeholder -->
+  <rect x="44" y="176" width="260" height="16" rx="4" fill="#dfe8e1"/>
+  <rect x="44" y="200" width="200" height="16" rx="4" fill="#dfe8e1"/>
+  <rect x="44" y="232" width="320" height="8" rx="4" fill="#ebf0ec"/>
+  <rect x="44" y="248" width="290" height="8" rx="4" fill="#ebf0ec"/>
+  <rect x="44" y="272" width="90" height="22" rx="5" fill="#cfe0d6"/>
+  <rect x="420" y="170" width="176" height="124" rx="8" fill="#ebf0ec"/>
+  <!-- annotations -->
+  <g font-size="12" font-weight="700" fill="#16312d">
+    <g stroke="#d9772b" stroke-width="1.6" fill="none"><path d="M70 56v34"/><path d="M345 56v54"/><path d="M542 56v44"/></g>
+    <g fill="#d9772b"><circle cx="70" cy="90" r="3.5"/><circle cx="345" cy="110" r="3.5"/><circle cx="542" cy="100" r="3.5"/></g>
+    <text x="70" y="44" text-anchor="middle">① Logo / nama usaha</text>
+    <text x="345" y="44" text-anchor="middle">② Menu singkat</text>
+    <text x="542" y="44" text-anchor="middle">③ Tombol aksi</text>
+  </g>
+</svg>

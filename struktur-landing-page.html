@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0F1419">
+  <meta name="description" content="Materi RPL pemula: struktur marketing landing page, fungsi setiap bagian, contoh snack box, kuis, dan latihan wireframe.">
+  <title>Struktur Marketing Landing Page — Materi RPL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --text:var(--fg); --surface:var(--card); --line:var(--border); --control-line:#4a5a68;
+      --ink:var(--fg); --paper:#1A2229;
+      --mint:rgba(0,217,192,.10); --sun:rgba(255,107,53,.12); --sky:rgba(96,165,250,.10);
+      --slide-padding:84px 56px 88px;
+      --slide-inner-max-height:100%;
+    }
+    body { line-height:1.55; }
+    .slide-inner { font-size:17px; padding-right:4px; }
+    .slide-inner::-webkit-scrollbar { width:6px; }
+    .slide-inner::-webkit-scrollbar-thumb { background:rgba(255,255,255,.14); border-radius:10px; }
+    .inner { width:100%; min-width:0; }
+    .slide-inner > .inner:not(:first-child) { margin-top:20px; }
+    button, input, select, textarea { font:inherit; }
+    a { color:var(--teal); text-underline-offset:4px; }
+    :focus-visible { outline:3px solid var(--orange); outline-offset:3px; }
+    main:focus { outline:none; }
+    h1, h2, h3, p { margin-top:0; }
+    h1, h2, h3 { font-family:'Space Grotesk',sans-serif; line-height:1.12; letter-spacing:-.03em; text-wrap:balance; }
+    h1 { font-size:clamp(36px,4.6vw,60px); margin-bottom:18px; }
+    h2 { font-size:clamp(27px,3vw,40px); margin-bottom:16px; }
+    h3 { font-size:21px; margin-bottom:12px; }
+    p { margin-bottom:14px; }
+    p:last-child { margin-bottom:0; }
+    b, strong { font-weight:700; }
+    .muted, .lede { color:var(--muted); }
+    .lede { max-width:760px; font-size:19px; }
+    .small { font-size:14px; }
+    .teal { color:var(--teal); }
+    .topic { display:inline-block; margin-bottom:14px; padding:5px 12px; border:1px solid rgba(255,255,255,.1); border-radius:99px; background:rgba(255,255,255,.04); color:var(--orange); font-size:12px; font-weight:600; }
+    .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+    .skip-link { position:fixed; top:8px; left:12px; transform:translateY(-160%); z-index:100; padding:12px; background:var(--fg); color:var(--bg); border-radius:8px; }
+    .skip-link:focus { transform:none; }
+    .logo { text-decoration:none; color:inherit; }
+    .logo-text, .logo-sub { margin:0; }
+    .logo-mark i { color:#fff; font-size:12px; }
+    button.dot { border:0; padding:0; }
+    .nav-btn[hidden] { display:none; }
+    .two { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center; }
+    .two.top { align-items:start; }
+    .two > * { min-width:0; }
+    .list { margin:0; padding-left:22px; }
+    .list li { margin-bottom:10px; padding-left:5px; }
+    .list li::marker { color:var(--teal); }
+    .callout { margin-top:20px; padding:12px 18px; border-left:4px solid var(--orange); background:var(--sun); border-radius:0 10px 10px 0; }
+    .actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:22px; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:10px 20px; border:1px solid var(--teal); border-radius:12px; background:var(--teal); color:#0F1419; font-size:15px; font-weight:700; text-decoration:none; transition:transform .2s; }
+    .button:hover { transform:translateY(-2px); }
+    .button.secondary { background:transparent; color:var(--teal); }
+    .comparison { width:100%; border-collapse:collapse; font-size:15px; }
+    .comparison th, .comparison td { padding:13px 16px 13px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    .comparison th { color:var(--teal); font-family:'Space Grotesk',sans-serif; }
+    .comparison td { color:var(--muted); }
+    .comparison td strong { color:var(--text); }
+    .steps { list-style:none; counter-reset:step; padding:0; margin:18px 0 0; }
+    .steps li { counter-increment:step; display:grid; grid-template-columns:44px 1fr; gap:16px; align-items:start; padding:14px 0; border-top:1px solid var(--line); }
+    .steps li::before { content:counter(step,decimal-leading-zero); font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:700; color:var(--teal); line-height:1.2; }
+    .steps p { margin:4px 0 0; font-size:16px; color:var(--muted); }
+    details { padding:11px 0; border-top:1px solid var(--line); }
+    summary { cursor:pointer; font-weight:600; }
+    details p { margin:10px 0 0; font-size:15px; color:var(--muted); }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; overflow-x:auto; max-width:100%; margin:0; padding:16px 18px; border:1px solid var(--line); border-radius:12px; background:#0b1116; font:14px/1.5 ui-monospace,"SFMono-Regular",Consolas,monospace; tab-size:2; }
+    code { font-family:ui-monospace,"SFMono-Regular",Consolas,monospace; font-size:.9em; color:var(--teal); }
+    .result { margin:14px 0 0; font-size:15px; white-space:pre-line; }
+    .result:empty { margin:0; }
+    .quiz-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:18px; }
+    fieldset { min-width:0; margin:0; padding:16px 0 0; border:0; border-top:2px solid var(--line); }
+    legend { padding:0 8px 10px 0; font-size:17px; font-weight:700; }
+    .option { display:flex; align-items:start; gap:10px; padding:9px 11px; margin:4px 0; border:1.5px solid var(--line); border-radius:12px; background:rgba(255,255,255,.03); font-size:15px; cursor:pointer; transition:border-color .25s,background .25s; }
+    .option:hover { border-color:var(--hover-border); background:var(--hover-bg); }
+    .option input { flex-shrink:0; width:18px; height:18px; margin:3px 0 0; accent-color:var(--teal); }
+    .option:has(input:checked):not(.correct):not(.wrong) { border-color:var(--teal); background:var(--hover-bg); }
+    .option.correct { border-color:#22c55e; background:rgba(34,197,94,.12); }
+    .option.wrong { border-color:#ef4444; background:rgba(239,68,68,.10); }
+    .answer { margin:12px 0 0; font-size:14px; color:var(--teal); }
+    .references { margin:14px 0 0; padding-left:22px; font-size:15px; }
+    .references li { margin:8px 0; }
+    @media (max-width:1024px) {
+      .two { gap:28px; }
+      .slide-inner { font-size:16px; }
+    }
+    @media (max-width:700px) {
+      :root { --slide-padding:72px 18px 84px; }
+      .slide { align-items:flex-start; }
+      .hint-keys, .dots { display:none; }
+      .two, .quiz-grid { grid-template-columns:1fr; gap:24px; }
+      h1 { font-size:34px; } h2 { font-size:26px; }
+      .comparison { min-width:620px; }
+    }
+
+    .rule { border-top:1px solid var(--line); padding-top:14px; margin-top:18px; }
+    .half { grid-template-columns:1fr 1fr; }
+    .paper { min-width:0; padding:24px; background:#F7F5EF; color:#16312d; border-radius:16px; }
+    .paper .muted { color:#4b625c; }
+    .paper h3 { font-size:24px; }
+    .paper hr { border:0; border-top:1px solid #c2d1c6; margin:16px 0; }
+    .paper .sample-label { color:#4b625c; font-size:13px; }
+    .paper .sample-cta { display:inline-block; padding:9px 15px; border-radius:6px; background:#195b4c; color:#fff; font-size:15px; font-weight:700; }
+    .browser-line { display:flex; align-items:center; gap:6px; margin:-24px -24px 20px; padding:10px 18px; border-radius:16px 16px 0 0; background:#dce5da; color:#425d51; font-size:12px; }
+    .browser-line i { width:7px; height:7px; border-radius:50%; background:#7c9387; }
+    .browser-line span { margin-left:12px; }
+    .cover-page { transform:rotate(1.5deg); }
+    .cover-page .page-row { border-top:1px solid #bbcdbf; padding:10px 0; font-size:15px; }
+    .cover-page .page-row:last-child { padding-bottom:0; }
+    .cover-page .page-row b { display:inline-block; width:28px; }
+    .cover-page h3 { margin:14px 0; font-size:26px; }
+    .comparison th:first-child { width:23%; }
+    .flow { display:grid; grid-template-columns:1fr 28px 1fr 28px 1fr; align-items:center; gap:12px; margin-top:22px; }
+    .flow-step { padding:14px 0; border-top:3px solid var(--teal); }
+    .flow-step p { margin:6px 0 0; font-size:15px; color:var(--muted); }
+    .flow-arrow { color:var(--orange); text-align:center; }
+    .map-layout { display:grid; grid-template-columns:minmax(240px,.8fr) 1.2fr; gap:40px; align-items:center; }
+    .page-map { display:grid; gap:3px; padding:10px; border:1px solid var(--line); border-radius:14px; background:var(--surface); }
+    .map-block { padding:4px 14px; min-height:30px; border:1px solid transparent; border-radius:8px; background:transparent; color:var(--fg); text-align:left; font-size:14px; line-height:1.2; cursor:pointer; }
+    .map-block[aria-pressed="true"] { border-color:var(--teal); background:rgba(0,217,192,.15); color:var(--teal); }
+    .map-block:hover { background:rgba(255,255,255,.06); }
+    #mapTitle { font-size:26px; }
+    .example { padding-top:14px; margin-top:16px; border-top:1px solid var(--line); color:var(--orange); }
+    .sample-header { display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:15px; }
+    .sample-header strong { font-size:20px; letter-spacing:-.03em; }
+    .sample-menu { font-size:13px; color:#4b625c; }
+    .hero-preview { border-left:4px solid #2c7860; padding-left:18px; }
+    .hero-preview h3 { font-size:26px; }
+    .annotated { display:grid; gap:12px; }
+    .annotation { padding-bottom:12px; border-bottom:1px solid var(--line); }
+    .annotation p { margin:4px 0 0; font-size:15px; color:var(--muted); }
+    .before { padding:16px 0; border-top:2px solid var(--orange); }
+    .after { padding:16px 0; border-top:2px solid var(--teal); }
+    .quote { margin:14px 0; font-size:22px; line-height:1.3; }
+    .price { margin-bottom:12px; font-family:'Space Grotesk',sans-serif; font-size:36px; font-weight:800; letter-spacing:-.04em; line-height:1.15; }
+    .price small { font-size:16px; font-weight:500; letter-spacing:0; }
+    .sample-form { padding:22px; border:1px solid var(--line); border-radius:16px; background:var(--surface); }
+    .sample-form label { display:block; margin-bottom:5px; font-size:15px; }
+    .sample-form input { width:100%; min-height:42px; margin-bottom:14px; padding:8px 12px; border:1px solid #8195a0; border-radius:8px; background:var(--bg); color:var(--text); font-size:16px; }
+    .footer-example { margin-top:14px; padding-top:14px; border-top:1px solid #c2d1c6; font-size:15px; }
+    .phone { width:min(290px,100%); margin-inline:auto; padding:14px; border:5px solid #6b848b; border-radius:26px; background:#F7F5EF; color:#16312d; }
+    .phone .phone-top { width:75px; height:7px; margin:0 auto 16px; border-radius:4px; background:#6b848b; }
+    .phone h3 { margin:12px 0; font-size:22px; }
+    .phone p { font-size:15px; }
+    .phone .sample-cta { display:block; text-align:center; padding:10px; background:#195b4c; color:#fff; font-size:15px; border-radius:6px; }
+    .quiz-form { margin-top:18px; }
+    .rubric { margin-top:8px; }
+    .rubric div { display:grid; grid-template-columns:50px 1fr; gap:14px; padding:12px 0; border-bottom:1px solid var(--line); }
+    .rubric b { color:var(--orange); font-family:'Space Grotesk',sans-serif; font-size:22px; }
+    .rubric span { font-size:15px; }
+    @media (max-width:700px) {
+      .map-layout { grid-template-columns:1fr; gap:24px; }
+      .map-block { min-height:42px; padding-block:9px; }
+      .cover-page { transform:none; }
+      .flow { grid-template-columns:1fr; gap:0; }
+      .flow-arrow { transform:rotate(90deg); }
+      .paper { padding:20px; }
+      .browser-line { margin:-20px -20px 18px; }
+      .comparison { min-width:0; font-size:14px; }
+      .comparison th, .comparison td { padding:10px 8px 10px 0; overflow-wrap:anywhere; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#materi">Lewati navigasi</a>
+  <div class="grain"></div>
+  <div class="blob" style="width:380px;height:380px;background:var(--orange);top:-100px;left:-100px"></div>
+  <div class="blob" style="width:300px;height:300px;background:var(--pink);bottom:-80px;right:-80px;animation-delay:-4s"></div>
+  <header class="top-bar">
+    <a class="logo" href="index.html"><div class="logo-mark" style="background:linear-gradient(135deg,var(--orange),var(--pink))"><i class="fa-solid fa-table-columns"></i></div><div><p class="logo-text">Struktur Landing Page</p><p class="logo-sub">Kelas X RPL</p></div></a>
+    <div class="hint-keys"><span class="key">←</span><span class="key">→</span><span>untuk navigasi</span></div>
+  </header>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="background:linear-gradient(135deg,var(--orange),var(--pink))"></div></div>
+  <main class="deck" id="materi" tabindex="-1"><div class="slides" id="slides">
+
+    <section class="slide" id="pembuka" data-title="Struktur marketing landing page" aria-labelledby="title-pembuka">
+      <div class="slide-inner">
+      <div class="inner two">
+        <div>
+          <p class="topic">Web dasar · Pemula RPL SMK</p>
+          <h1 id="title-pembuka" tabindex="-1">Struktur marketing landing page</h1>
+          <p class="lede">Cara menyusun halaman yang menjelaskan penawaranmu dan mengajak pengunjung melakukan satu hal.</p>
+          <p class="small muted">Kenali bagiannya, pahami fungsinya, lalu buat sketsa (wireframe) buatanmu.</p>
+          <div class="actions">
+            <a class="button" href="#konsep">Mulai materi</a>
+            <a class="button secondary" href="#peta">Lihat peta halaman</a>
+          </div>
+        </div>
+        <div class="paper cover-page" aria-label="Sketsa urutan landing page KotakRasa">
+          <div class="browser-line" aria-hidden="true"><i></i><i></i><i></i><span>Contoh halaman · KotakRasa</span></div>
+          <div class="sample-header"><strong>KotakRasa</strong><span class="sample-menu">Snack box acara sekolah</span></div>
+          <h3>Snack box untuk rapat dan acara sekolah</h3>
+          <p class="muted small">Pilihan isi, jumlah, dan jadwal dalam satu penawaran.</p>
+          <span class="sample-cta">Minta penawaran</span>
+          <div class="page-row" style="margin-top:22px"><b>↓</b> Manfaat & detail produk</div>
+          <div class="page-row"><b>↓</b> Bukti & penawaran</div>
+          <div class="page-row"><b>↓</b> FAQ, formulir & footer</div>
+          <p class="sample-label" style="margin:18px 0 0">Usaha dan seluruh detail contoh bersifat fiktif.</p>
+        </div>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="konsep" data-title="Website marketing, homepage, landing page" aria-labelledby="title-konsep">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Tujuan halaman</p>
+        <h2 id="title-konsep" tabindex="-1">Website marketing dan landing page</h2>
+        <p class="lede">Website biasa memperkenalkan usaha secara luas. Landing page dibuat untuk satu tujuan saja.</p>
+        <table class="comparison">
+          <caption class="sr-only">Perbedaan homepage dan landing page kampanye</caption>
+          <thead><tr><th scope="col">Aspek</th><th scope="col">Homepage / beranda</th><th scope="col">Landing page kampanye</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Fokus</th><td>Mengenalkan usaha secara umum.</td><td><strong>Satu penawaran untuk satu kelompok pembaca.</strong></td></tr>
+            <tr><th scope="row">Pilihan</th><td>Produk, profil, artikel, kontak.</td><td>Isi yang mendukung satu tujuan.</td></tr>
+            <tr><th scope="row">Contoh</th><td>Semua layanan katering KotakRasa.</td><td>Snack box untuk acara sekolah → minta penawaran.</td></tr>
+          </tbody>
+        </table>
+        <p class="small muted rule">Di data analitik, “landing page” juga bisa berarti halaman pertama yang dibuka pengunjung. Di sini kita memakai arti untuk kampanye promosi.</p>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="brief" data-title="Tentukan audiens, penawaran, dan tujuan" aria-labelledby="title-brief">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Sebelum membuat layout</p>
+        <h2 id="title-brief" tabindex="-1">Tentukan tiga hal dulu</h2>
+        <div class="two top">
+          <div class="annotated">
+            <div class="annotation"><strong>Pembaca (audiens)</strong><p>Panitia OSIS atau guru pengelola acara.</p></div>
+            <div class="annotation"><strong>Penawaran</strong><p>Snack box dengan pilihan isi dan jadwal kirim.</p></div>
+            <div class="annotation"><strong>Tindakan utama</strong><p>Mengisi formulir untuk meminta penawaran.</p></div>
+          </div>
+          <div>
+            <p class="quote">“Apa yang perlu diketahui panitia sebelum berani menghubungi kita?”</p>
+            <p class="muted">Jumlah minimum, isi kotak, harga, dan batas waktu pesan akan menentukan isi halaman.</p>
+            <p class="small muted">KotakRasa adalah usaha fiktif; semua detailnya simulasi.</p>
+          </div>
+        </div>
+        <div class="flow" aria-label="Alur pengunjung sampai konversi">
+          <div class="flow-step"><strong>Pesan promosi</strong><p>“Snack box acara sekolah”</p></div><span class="flow-arrow" aria-hidden="true">→</span>
+          <div class="flow-step"><strong>Landing page</strong><p>Penawaran yang sesuai pesan promosi</p></div><span class="flow-arrow" aria-hidden="true">→</span>
+          <div class="flow-step"><strong>Tujuan tercapai (konversi)</strong><p>Permintaan berhasil terkirim</p></div>
+        </div>
+        <p class="small muted">Konversi artinya tujuan halaman tercapai, misalnya formulir terkirim. Sekadar klik tombol belum tentu termasuk.</p>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="peta" data-title="Peta bagian landing page" aria-labelledby="title-peta">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Anatomi halaman</p>
+        <h2 id="title-peta" tabindex="-1">Peta bagian landing page</h2>
+        <div class="map-layout">
+          <div class="page-map" role="group" aria-label="Pilih bagian untuk melihat fungsinya">
+            <button class="map-block" type="button" aria-pressed="true" aria-controls="mapExplanation" data-map="header">1. Header</button>
+            <button class="map-block" type="button" aria-pressed="false" aria-controls="mapExplanation" data-map="hero">2. Hero + CTA awal</button>
+            <button class="map-block" type="button" aria-pressed="false" aria-controls="mapExplanation" data-map="manfaat">3. Masalah & manfaat</button>
+            <button class="map-block" type="button" aria-pressed="false" aria-controls="mapExplanation" data-map="produk">4. Produk / layanan</button>
+            <button class="map-block" type="button" aria-pressed="false" aria-controls="mapExplanation" data-map="proses">5. Cara kerja</button>
+            <button class="map-block" type="button" aria-pressed="false" aria-controls="mapExplanation" data-map="bukti">6. Bukti kepercayaan</button>
+            <button class="map-block" type="button" aria-pressed="false" aria-controls="mapExplanation" data-map="harga">7. Penawaran / harga</button>
+            <button class="map-block" type="button" aria-pressed="false" aria-controls="mapExplanation" data-map="faq">8. FAQ</button>
+            <button class="map-block" type="button" aria-pressed="false" aria-controls="mapExplanation" data-map="formulir">9. CTA akhir / formulir</button>
+            <button class="map-block" type="button" aria-pressed="false" aria-controls="mapExplanation" data-map="footer">10. Footer</button>
+          </div>
+          <div id="mapExplanation" aria-live="polite" aria-atomic="true">
+            <h3 id="mapTitle">Header</h3>
+            <p id="mapQuestion" class="quote">“Ini usaha siapa?”</p>
+            <p id="mapFunction" class="muted">Menunjukkan nama usaha dan jalan pintas ke informasi penting.</p>
+            <p id="mapExample" class="example">Contoh: logo KotakRasa dan tautan menuju penawaran.</p>
+          </div>
+        </div>
+        <p class="small muted rule">Klik nama bagian untuk melihat fungsinya. Urutan ini hanya contoh; bagian boleh digabung, dipindah, atau dibuang sesuai kebutuhan.</p>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="header" data-title="Header: identitas dan arah" aria-labelledby="title-header">
+      <div class="slide-inner">
+      <div class="inner two">
+        <div>
+          <p class="topic">Bagian 1 · Header</p>
+          <h2 id="title-header" tabindex="-1">Identitas dan arah</h2>
+          <ul class="list">
+            <li>Tampilkan nama atau logo usaha.</li>
+            <li>Pilih menu yang membantu tujuan halaman.</li>
+            <li>Kalau perlu, beri jalan pintas ke penawaran.</li>
+          </ul>
+          <p class="callout">Untuk halaman yang fokus, menu boleh sangat singkat atau dihilangkan.</p>
+        </div>
+        <div class="paper">
+          <p class="sample-label">Contoh header sederhana</p>
+          <img src="assets/landing-header-kotakrasa.svg" alt="Contoh header landing page KotakRasa: logo di kiri, menu Isi kotak, Harga, dan Cara pesan di tengah, tombol Minta penawaran di kanan." style="display:block;width:100%;height:auto;border-radius:10px">
+          <hr>
+          <p style="margin:0">Pengunjung langsung mengenali usaha dan dapat menuju informasi yang dibutuhkan.</p>
+          <p class="sample-label" style="margin-top:18px">Menu dapat menuju bagian di halaman yang sama.</p>
+        </div>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="hero" data-title="Hero: penawaran utama" aria-labelledby="title-hero">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Bagian 2 · Hero</p>
+        <h2 id="title-hero" tabindex="-1">Penawaran utama di bagian pembuka</h2>
+        <div class="two">
+          <div class="paper hero-preview">
+            <p class="sample-label">Contoh teks hero</p>
+            <h3>Snack box untuk rapat dan acara sekolah</h3>
+            <p>Pilih isi sesuai kebutuhan panitia. Mulai Rp15.000 per kotak, minimum 20 kotak.</p>
+            <span class="sample-cta">Minta penawaran</span>
+            <hr>
+            <p class="small" style="margin-bottom:0">Visual pendamping: foto asli kotak terbuka agar isi dan porsinya terlihat.</p>
+          </div>
+          <div class="annotated">
+            <div class="annotation"><strong>Headline</strong><p>Produk apa dan untuk siapa?</p></div>
+            <div class="annotation"><strong>Subheadline</strong><p>Tambahkan detail agar penawaran mudah dipahami.</p></div>
+            <div class="annotation"><strong>CTA + visual</strong><p>Tunjukkan langkah berikutnya dan tampilkan produknya.</p></div>
+          </div>
+        </div>
+        <p class="small muted rule">“Above the fold” = bagian yang terlihat sebelum layar digulir. Luasnya beda di tiap perangkat.</p>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="pesan" data-title="Headline yang jelas" aria-labelledby="title-pesan">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Latihan membaca pesan</p>
+        <h2 id="title-pesan" tabindex="-1">Headline yang menjelaskan penawaran</h2>
+        <div class="two top half">
+          <div class="before"><p class="small" style="color:var(--orange)">Masih terlalu umum</p><p class="quote">“Selamat datang di website kami”</p><p class="muted">Belum menjelaskan produk, pembaca, atau alasan untuk lanjut membaca.</p></div>
+          <div class="after"><p class="small teal">Lebih jelas</p><p class="quote">“Snack box untuk rapat dan acara sekolah”</p><p class="muted">Pengunjung langsung tahu produknya dan untuk siapa.</p></div>
+        </div>
+        <div class="callout"><p><strong>Pola latihan:</strong> produk / layanan + untuk siapa.</p><p class="muted">Contoh lain: “Laundry antar jemput untuk mahasiswa di sekitar kampus.” Tulis hanya janji yang benar-benar bisa kamu penuhi.</p></div>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="manfaat" data-title="Masalah, fitur, dan manfaat" aria-labelledby="title-manfaat">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Bagian 3 · Masalah & manfaat</p>
+        <h2 id="title-manfaat" tabindex="-1">Hubungkan fitur dengan kebutuhan</h2>
+        <p class="lede">Masalah panitia: mengatur anggaran, jumlah peserta, dan jadwal konsumsi. Jelaskan bagaimana produkmu membantu.</p>
+        <table class="comparison">
+          <caption class="sr-only">Contoh fitur dan manfaat snack box</caption>
+          <thead><tr><th scope="col">Fitur: apa yang ada?</th><th scope="col">Manfaat: apa gunanya bagi panitia?</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Pilihan isi kotak</th><td>Panitia dapat menyesuaikan isi dengan kebutuhan dan anggaran.</td></tr>
+            <tr><th scope="row">Kemasan per orang</th><td>Konsumsi lebih mudah dibagikan kepada peserta.</td></tr>
+            <tr><th scope="row">Label nama acara</th><td>Kotak lebih mudah dikenali saat ada beberapa acara bersamaan.</td></tr>
+          </tbody>
+        </table>
+        <p class="callout"><strong>Pertanyaan untuk siswa:</strong> “Website responsif” adalah fitur. Apa manfaatnya bagi pengunjung yang memakai HP?</p>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="produk" data-title="Produk: jelaskan yang akan diterima" aria-labelledby="title-produk">
+      <div class="slide-inner">
+      <div class="inner two">
+        <div>
+          <p class="topic">Bagian 4 · Produk / layanan</p>
+          <h2 id="title-produk" tabindex="-1">Jelaskan yang akan diterima</h2>
+          <ul class="list">
+            <li>Tampilkan isi, ukuran, pilihan, atau cakupan layanan.</li>
+            <li>Gunakan foto asli atau contoh hasil yang relevan.</li>
+            <li>Sebutkan batasan yang bisa memengaruhi keputusan pembeli.</li>
+          </ul>
+          <p class="small muted rule">Untuk jasa pembuatan web, detailnya bisa berupa jumlah halaman, fitur, dan batas revisi.</p>
+        </div>
+        <div class="paper">
+          <p class="sample-label">Contoh detail produk · simulasi</p>
+          <h3>Paket Acara Sekolah</h3>
+          <p>Isi: 2 kudapan + 1 air mineral dalam satu kotak.</p>
+          <hr>
+          <p><strong>Pilihan:</strong> isi kotak disepakati sebelum pesanan dikonfirmasi.</p>
+          <p style="margin-bottom:0"><strong>Tanyakan:</strong> alergi atau pantangan bahan. Pastikan usahamu sanggup sebelum berjanji.</p>
+        </div>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="proses" data-title="Cara kerja: langkah setelah tertarik" aria-labelledby="title-proses">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Bagian 5 · Cara kerja</p>
+        <h2 id="title-proses" tabindex="-1">Tunjukkan langkah setelah tertarik</h2>
+        <p class="lede">Pengunjung perlu tahu apa yang terjadi setelah menekan tombol ajakan (CTA).</p>
+        <ol class="steps">
+          <li><div><strong>Kirim kebutuhan acara</strong><p>Panitia mengisi jumlah kotak, tanggal, dan kebutuhan isi.</p></div></li>
+          <li><div><strong>Terima dan sepakati penawaran</strong><p>Usaha mengonfirmasi ketersediaan, rincian biaya, dan jadwal.</p></div></li>
+          <li><div><strong>Konfirmasi pesanan</strong><p>Produksi dan pengiriman mengikuti ketentuan yang disetujui.</p></div></li>
+        </ol>
+        <p class="small muted">Bagian ini berguna kalau prosesnya belum dikenal pengunjung. Untuk penawaran yang sederhana, boleh digabung dengan bagian produk.</p>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="bukti" data-title="Bukti kepercayaan yang dapat diperiksa" aria-labelledby="title-bukti">
+      <div class="slide-inner">
+      <div class="inner two top">
+        <div>
+          <p class="topic">Bagian 6 · Bukti kepercayaan</p>
+          <h2 id="title-bukti" tabindex="-1">Berikan alasan untuk percaya</h2>
+          <p class="lede">Bukti membantu pengunjung menilai apakah janjimu masuk akal.</p>
+          <p class="callout">Belum punya pelanggan? Tampilkan contoh produk, proses kerja, dan identitas usaha yang benar.</p>
+        </div>
+        <div class="annotated">
+          <div class="annotation"><strong>Testimoni atau ulasan asli</strong><p>Sertakan konteks yang relevan dan izin pemiliknya.</p></div>
+          <div class="annotation"><strong>Foto hasil dan proses</strong><p>Perlihatkan produk yang benar-benar dibuat atau hasil pekerjaan.</p></div>
+          <div class="annotation"><strong>Identitas yang bisa diperiksa</strong><p>Kontak, lokasi layanan, dan sertifikasi jika memang dimiliki.</p></div>
+          <p class="small muted">Jangan membuat rating palsu, jumlah pelanggan karangan, atau memakai logo organisasi tanpa izin dan kerja sama yang nyata.</p>
+        </div>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="harga" data-title="Penawaran: harga dan syarat" aria-labelledby="title-harga">
+      <div class="slide-inner">
+      <div class="inner two">
+        <div>
+          <p class="topic">Bagian 7 · Penawaran / harga</p>
+          <h2 id="title-harga" tabindex="-1">Harga perlu konteks</h2>
+          <p class="lede">Jelaskan apa yang termasuk, apa yang belum termasuk, dan syarat untuk mendapatkan penawaran.</p>
+          <ul class="list">
+            <li>Gunakan satuan yang jelas: per kotak, per bulan, atau per proyek.</li>
+            <li>Kalau harga bisa berubah, jelaskan cara menghitungnya.</li>
+            <li>Pakai promo dan batas waktu hanya kalau memang benar.</li>
+          </ul>
+        </div>
+        <div class="paper">
+          <p class="sample-label">Contoh penawaran · simulasi</p>
+          <h3>Paket Acara Sekolah</h3>
+          <p class="price"><small>Mulai</small> Rp15.000 <small>/ kotak</small></p>
+          <p class="small">2 kudapan + air mineral + kemasan.</p>
+          <hr>
+          <p class="small">Minimum 20 kotak · Pesan paling lambat H−3.<br>Ongkir belum termasuk. Harga akhir mengikuti isi dan lokasi yang disepakati.</p>
+          <span class="sample-cta">Minta penawaran</span>
+        </div>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="cta" data-title="CTA: tindakan yang jelas dan konsisten" aria-labelledby="title-cta">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">CTA · Call to action / ajakan bertindak</p>
+        <h2 id="title-cta" tabindex="-1">Satu tujuan, CTA boleh diulang</h2>
+        <p class="lede">CTA (call to action) adalah ajakan untuk melakukan langkah berikutnya. Letakkan saat pengunjung sudah cukup informasi.</p>
+        <div class="two top half">
+          <div class="before"><p class="small" style="color:var(--orange)">Label belum menjelaskan hasil klik</p><p class="quote">“Klik di sini”</p><p class="muted">Pengunjung harus menebak apa yang akan terjadi.</p></div>
+          <div class="after"><p class="small teal">Label sesuai tindakan</p><p class="quote">“Minta penawaran”</p><p class="muted">Membuka bagian formulir permintaan. CTA awal dan akhir menuju tujuan yang sama.</p></div>
+        </div>
+        <p class="callout">Satu tujuan tidak berarti hanya satu tombol. Tautan info tambahan tetap boleh ada kalau membantu.</p>
+        <p class="small muted rule"><code>&lt;a href="#permintaan"&gt;</code> menuju formulir; <code>&lt;button type="submit"&gt;</code> mengirimnya.</p>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="formulir" data-title="Formulir dan konfirmasi" aria-labelledby="title-formulir">
+      <div class="slide-inner">
+      <div class="inner two top">
+        <div>
+          <p class="topic">Bagian 9 · CTA akhir / formulir</p>
+          <h2 id="title-formulir" tabindex="-1">Permudah permintaan</h2>
+          <ul class="list">
+            <li>Minta data yang memang diperlukan saja.</li>
+            <li>Berikan label, petunjuk, dan pesan kesalahan yang jelas.</li>
+            <li>Jelaskan data dipakai untuk apa dan apa yang terjadi setelah terkirim.</li>
+          </ul>
+          <p class="small muted rule">Di situs nyata, pesan “berhasil terkirim” baru muncul setelah server menerima data.</p>
+        </div>
+        <form class="sample-form" id="demoForm">
+          <p class="small muted" id="demoInfo">Demo lokal: gunakan nama fiktif. Data tidak dikirim atau disimpan. Formulir nyata juga perlu tanggal acara dan cara menghubungi panitia.</p>
+          <label for="panitia">Nama panitia (fiktif)</label>
+          <input id="panitia" name="panitia" type="text" required maxlength="60" autocomplete="off" aria-describedby="demoInfo">
+          <label for="jumlah">Jumlah kotak</label>
+          <input id="jumlah" name="jumlah" type="number" min="20" max="1000" step="1" required aria-describedby="jumlahHint">
+          <p class="small muted" id="jumlahHint">Untuk demo: 20–1.000 kotak.</p>
+          <button class="button" type="submit">Minta penawaran (simulasi)</button>
+          <p class="result" id="demoResult" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="faq-footer" data-title="FAQ dan footer" aria-labelledby="title-faq-footer">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Bagian 8 & 10 · Menjawab keraguan dan menutup halaman</p>
+        <h2 id="title-faq-footer" tabindex="-1">FAQ dan footer punya tugas berbeda</h2>
+        <div class="two top half">
+          <div>
+            <h3>FAQ: pertanyaan yang sering muncul</h3>
+            <p class="muted small">Pilih pertanyaan yang memengaruhi keputusan.</p>
+            <details><summary>Berapa minimum pesanannya?</summary><p>Dalam contoh ini, minimum 20 kotak.</p></details>
+            <details><summary>Kapan paling lambat memesan?</summary><p>Paling lambat H−3. Jadwal tetap perlu dikonfirmasi oleh usaha.</p></details>
+            <details><summary>Apakah ongkir sudah termasuk?</summary><p>Belum. Ongkir disepakati berdasarkan lokasi pengiriman.</p></details>
+          </div>
+          <div class="paper">
+            <h3>Footer: informasi penutup</h3>
+            <p class="small">Identitas, kontak, wilayah layanan, serta akses ke kebijakan privasi dan ketentuan yang relevan.</p>
+            <div class="footer-example"><strong>KotakRasa</strong><p class="small" style="margin:10px 0 0">Kontak usaha · Wilayah layanan<br>Kebijakan privasi · Ketentuan pemesanan</p></div>
+            <p class="sample-label" style="margin:18px 0 0">Contoh label informasi. Pada situs nyata, isi dan tautannya harus benar-benar tersedia.</p>
+          </div>
+        </div>
+        <p class="small muted rule">FAQ biasanya diletakkan sebelum CTA akhir. Footer harus mudah ditemukan oleh pengunjung yang ingin mengecek identitas usaha.</p>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="mobile" data-title="Struktur yang nyaman di HP" aria-labelledby="title-mobile">
+      <div class="slide-inner">
+      <div class="inner two">
+        <div>
+          <p class="topic">Membaca dan bertindak di HP</p>
+          <h2 id="title-mobile" tabindex="-1">Urutan isi tetap masuk akal</h2>
+          <ul class="list">
+            <li>Kolom yang berdampingan ditumpuk jadi satu kolom.</li>
+            <li>Judul, detail penting, dan CTA tetap mudah ditemukan.</li>
+            <li>Teks terbaca, tombol mudah disentuh, gambar tidak menutupi isi.</li>
+            <li>Coba tombol dengan keyboard dan beri teks alternatif (alt) pada gambar penting.</li>
+          </ul>
+          <p class="callout">Saat layar mengecil, kurangi kepadatan tata letak, tetapi pertahankan info yang dibutuhkan untuk memutuskan.</p>
+        </div>
+        <div class="phone" aria-label="Contoh susunan satu kolom pada layar HP">
+          <div class="phone-top" aria-hidden="true"></div>
+          <p><strong>KotakRasa</strong></p>
+          <h3>Snack box untuk acara sekolah</h3>
+          <p>Mulai Rp15.000 / kotak.<br>Minimum 20 kotak.</p>
+          <span class="sample-cta">Minta penawaran</span>
+          <hr>
+          <p><strong>Isi mudah dipilih</strong><br>2 kudapan + air mineral.</p>
+          <p style="margin-bottom:0"><strong>Pesan H−3</strong><br>Jadwal dikonfirmasi bersama.</p>
+        </div>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="html" data-title="Hubungan dengan HTML semantik" aria-labelledby="title-html">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Menghubungkan konsep dengan kode</p>
+        <h2 id="title-html" tabindex="-1">Bagian marketing dan elemen HTML</h2>
+        <div class="two top">
+          <pre aria-label="Potongan struktur HTML landing page"><code>&lt;header&gt;…&lt;/header&gt;
+&lt;main&gt;
+  &lt;section id="hero"&gt;
+    &lt;h1&gt;Snack box acara sekolah&lt;/h1&gt;
+    &lt;a href="#permintaan"&gt;Minta penawaran&lt;/a&gt;
+  &lt;/section&gt;
+  &lt;section id="manfaat"&gt;…&lt;/section&gt;
+  &lt;section id="penawaran"&gt;…&lt;/section&gt;
+  &lt;section id="permintaan"&gt;
+    &lt;h2&gt;Minta penawaran&lt;/h2&gt;
+    &lt;form&gt;…&lt;/form&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
+&lt;footer&gt;…&lt;/footer&gt;</code></pre>
+          <div class="annotated">
+            <div class="annotation"><strong><code>header</code> & <code>footer</code></strong><p>Pembuka identitas halaman dan informasi penutup.</p></div>
+            <div class="annotation"><strong><code>main</code> & <code>section</code></strong><p>Isi utama dan kelompok topik yang punya judul.</p></div>
+            <div class="annotation"><strong><code>h1</code>, <code>h2</code>, <code>form</code></strong><p>Judul halaman, judul bagian, dan isian permintaan.</p></div>
+            <p class="small muted">Hero dan CTA adalah nama fungsi, bukan tag HTML. Potongan ini sengaja diringkas.</p>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="kesalahan" data-title="Kesalahan struktur yang sering muncul" aria-labelledby="title-kesalahan">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Mengevaluasi halaman</p>
+        <h2 id="title-kesalahan" tabindex="-1">Kesalahan yang perlu diperbaiki</h2>
+        <table class="comparison">
+          <caption class="sr-only">Kesalahan struktur dan perbaikannya</caption>
+          <thead><tr><th scope="col">Masalah</th><th scope="col">Dampak bagi pengunjung</th><th scope="col">Perbaikan</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Hero hanya slogan</th><td>Tidak tahu apa yang ditawarkan.</td><td><strong>Sebutkan produk dan untuk siapa.</strong></td></tr>
+            <tr><th scope="row">CTA saling bersaing</th><td>Bingung harus memulai dari mana.</td><td>Tetapkan satu tindakan utama.</td></tr>
+            <tr><th scope="row">Harga tanpa syarat</th><td>Ragu terhadap biaya akhir.</td><td>Jelaskan satuan, isi, dan pengecualian.</td></tr>
+            <tr><th scope="row">Formulir terlalu panjang</th><td>Terlalu melelahkan untuk langkah awal.</td><td>Minta data yang penting saja dulu.</td></tr>
+          </tbody>
+        </table>
+        <p class="callout">Saat menilai desain teman: sebut bagian yang bermasalah, dampaknya, lalu satu saran perbaikan.</p>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="kuis-konsep" data-title="Kuis 1: tujuan dan hero" aria-labelledby="title-kuis-konsep">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Cek pemahaman · 1 dari 2</p>
+        <h2 id="title-kuis-konsep" tabindex="-1">Tujuan dan bagian pembuka</h2>
+        <form class="quiz-form" id="quizOne" data-quiz novalidate>
+          <div class="quiz-grid">
+            <fieldset data-answer="b">
+              <legend>1. Apa fokus landing page kampanye?</legend>
+              <label class="option"><input type="radio" name="q1" value="a">Menampilkan semua informasi usaha sekaligus.</label>
+              <label class="option"><input type="radio" name="q1" value="b">Mendukung satu penawaran dan tindakan utama.</label>
+              <label class="option"><input type="radio" name="q1" value="c">Memasang sebanyak mungkin tombol berbeda.</label>
+              <p class="answer" hidden>Jawaban: satu penawaran dan tindakan utama membantu menjaga fokus halaman.</p>
+            </fieldset>
+            <fieldset data-answer="c">
+              <legend>2. Apa fungsi utama hero?</legend>
+              <label class="option"><input type="radio" name="q2" value="a">Menyimpan seluruh kebijakan privasi.</label>
+              <label class="option"><input type="radio" name="q2" value="b">Menampilkan riwayat lengkap pemilik usaha.</label>
+              <label class="option"><input type="radio" name="q2" value="c">Menjelaskan penawaran dan langkah berikutnya.</label>
+              <p class="answer" hidden>Jawaban: hero membantu pengunjung memahami penawaran sejak bagian awal.</p>
+            </fieldset>
+          </div>
+          <div class="actions"><button class="button" type="submit">Periksa jawaban</button></div>
+          <p class="result" id="quizOneResult" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="kuis-keputusan" data-title="Kuis 2: bukti dan CTA" aria-labelledby="title-kuis-keputusan">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Cek pemahaman · 2 dari 2</p>
+        <h2 id="title-kuis-keputusan" tabindex="-1">Bukti dan langkah berikutnya</h2>
+        <form class="quiz-form" id="quizTwo" data-quiz novalidate>
+          <div class="quiz-grid">
+            <fieldset data-answer="a">
+              <legend>3. Usaha baru belum memiliki testimoni. Apa yang layak ditampilkan?</legend>
+              <label class="option"><input type="radio" name="q3" value="a">Foto asli contoh produk dan proses kerja.</label>
+              <label class="option"><input type="radio" name="q3" value="b">Ulasan lima bintang yang dibuat sendiri.</label>
+              <label class="option"><input type="radio" name="q3" value="c">Logo sekolah tanpa dasar kerja sama.</label>
+              <p class="answer" hidden>Jawaban: bukti produk dan proses yang nyata tetap berguna tanpa mengarang pengalaman pelanggan.</p>
+            </fieldset>
+            <fieldset data-answer="b">
+              <legend>4. CTA “Minta penawaran” muncul di hero dan bagian akhir. Bagaimana tujuannya?</legend>
+              <label class="option"><input type="radio" name="q4" value="a">Harus menuju dua tindakan yang berbeda.</label>
+              <label class="option"><input type="radio" name="q4" value="b">Dapat menuju formulir permintaan yang sama.</label>
+              <label class="option"><input type="radio" name="q4" value="c">Satu harus diganti menjadi tautan artikel acak.</label>
+              <p class="answer" hidden>Jawaban: CTA boleh diulang agar mudah ditemukan, dengan tindakan utama yang konsisten.</p>
+            </fieldset>
+          </div>
+          <div class="actions"><button class="button" type="submit">Periksa jawaban</button></div>
+          <p class="result" id="quizTwoResult" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="latihan" data-title="Praktik: menyusun wireframe" aria-labelledby="title-latihan">
+      <div class="slide-inner">
+      <div class="inner two top">
+        <div>
+          <p class="topic">Praktik berpasangan</p>
+          <h2 id="title-latihan" tabindex="-1">Buat wireframe landing page</h2>
+          <p class="lede">Wireframe adalah sketsa susunan isi dan posisi elemen. Gunakan kertas atau alat desain yang tersedia.</p>
+          <p>Pilih usaha fiktif: snack box, laundry, atau kursus. Tulis pembaca, penawaran, dan satu tujuan utama di atas sketsa.</p>
+          <p class="small muted rule">Tidak perlu akun media sosial, iklan berbayar, atau data pribadi asli.</p>
+        </div>
+        <div>
+          <h3>Yang dikumpulkan</h3>
+          <ol class="list">
+            <li>Wireframe satu halaman dari header sampai footer.</li>
+            <li>Headline, dua manfaat, dan detail penawaran.</li>
+            <li>Rencana bukti yang benar, satu FAQ, dan CTA yang jelas.</li>
+            <li>Sketsa versi HP dan alasan urutan bagiannya.</li>
+          </ol>
+          <p class="callout small">Tandai harga, kontak, dan bukti yang masih perkiraan. Kalau belum punya testimoni, sebutkan bukti lain yang akan disiapkan.</p>
+        </div>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="evaluasi" data-title="Checklist dan rubrik praktik" aria-labelledby="title-evaluasi">
+      <div class="slide-inner">
+      <div class="inner">
+        <p class="topic">Ulasan teman & penilaian</p>
+        <h2 id="title-evaluasi" tabindex="-1">Periksa struktur sebelum menghias</h2>
+        <div class="two top half">
+          <div>
+            <h3>Checklist ulasan teman</h3>
+            <ul class="list">
+              <li>Saya tahu produk ini untuk siapa.</li>
+              <li>Manfaat dan detail penawarannya jelas.</li>
+              <li>Bukti serta syarat harga tidak menyesatkan.</li>
+              <li>Saya tahu langkah setelah menekan CTA.</li>
+              <li>Urutan di HP mudah diikuti.</li>
+            </ul>
+          </div>
+          <div>
+            <h3>Rubrik · total 100 poin</h3>
+            <div class="rubric">
+              <div><b>30</b><span>Pembaca, penawaran, dan tujuan jelas.</span></div>
+              <div><b>25</b><span>Urutan bagian mendukung kebutuhan pengunjung.</span></div>
+              <div><b>25</b><span>Isi, bukti, harga, dan CTA jelas serta jujur.</span></div>
+              <div><b>20</b><span>Keterbacaan dan susunan versi HP.</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="small muted rule">Beri nilai 0 sampai bobot maksimum untuk tiap kriteria, lalu jumlahkan. Tulis satu alasan dan satu saran perbaikan.</p>
+      </div>
+    </div>
+    </section>
+
+    <section class="slide" id="rangkuman" data-title="Rangkuman dan referensi" aria-labelledby="title-rangkuman">
+      <div class="slide-inner">
+      <div class="inner two top">
+        <div>
+          <p class="topic">Refleksi</p>
+          <h2 id="title-rangkuman" tabindex="-1">Susun isi untuk membantu keputusan</h2>
+          <p class="lede">Pengunjung perlu paham penawaran, tahu apakah cocok untuknya, punya alasan untuk percaya, dan tahu cara melangkah.</p>
+          <p class="callout">Pilih satu bagian wireframe-mu. Pertanyaan pengunjung apa yang dijawab bagian itu?</p>
+          <div class="actions"><a class="button secondary" href="#peta">Kembali ke peta</a><a class="button" href="prompting-landing-page.html">Lanjut: buat landing page dengan AI</a><a class="button secondary" href="materi-html.html">Lanjut belajar HTML</a></div>
+        </div>
+        <div>
+          <h3>Referensi pendalaman</h3>
+          <ul class="references">
+            <li><a href="https://documentation.unbounce.com/hc/en-us/articles/203510194-Building-Your-First-Landing-Page" target="_blank" rel="noopener noreferrer">Unbounce · Konsep landing page kampanye</a></li>
+            <li><a href="https://unbounce.com/landing-page-articles/the-anatomy-of-a-landing-page/" target="_blank" rel="noopener noreferrer">Unbounce · Anatomi landing page</a></li>
+            <li><a href="https://unbounce.com/landing-page-articles/landing-page-best-practices/" target="_blank" rel="noopener noreferrer">Unbounce · Praktik desain landing page</a></li>
+            <li><a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content/Structuring_documents" target="_blank" rel="noopener noreferrer">MDN · Struktur dokumen HTML</a></li>
+            <li><a href="https://www.w3.org/WAI/tutorials/forms/labels/" target="_blank" rel="noopener noreferrer">W3C WAI · Label formulir</a></li>
+          </ul>
+          <p class="small muted">Materi ini disesuaikan untuk belajar. Susunan halaman tidak menjamin hasil. Semua contoh KotakRasa fiktif. Isi slide bisa dibuka offline; tautan referensi butuh internet.</p>
+          <details><summary class="small">Catatan untuk pengajar</summary><p>Mulai dari brief, bedah peta bersama, lalu minta siswa menjelaskan fungsi bagian sebelum praktik. Kunci kuis: 1 B, 2 C, 3 A, 4 B. Jawaban diskusi fitur responsif: pengunjung HP lebih mudah membaca dan menggunakan halaman.</p></details>
+        </div>
+      </div>
+    </div>
+    </section>
+
+  </div></main>
+  <nav class="nav-bar" aria-label="Navigasi materi">
+    <button class="nav-btn" id="prevBtn" type="button" aria-label="Slide sebelumnya" title="Slide sebelumnya"><i class="fa-solid fa-chevron-left" style="font-size:12px"></i></button>
+    <div class="dots" id="dots"></div>
+    <span class="slide-counter" id="counter" aria-live="polite" aria-atomic="true">1</span>
+    <button class="nav-btn" id="nextBtn" type="button" aria-label="Slide berikutnya" title="Slide berikutnya"><i class="fa-solid fa-chevron-right" style="font-size:12px"></i></button>
+    <button class="nav-btn" id="fullscreenBtn" type="button" aria-label="Layar penuh" title="Layar penuh"><i class="fa-solid fa-expand" style="font-size:12px"></i></button>
+  </nav>
+  <p class="sr-only" id="liveStatus" role="status"></p>
+  <noscript><style>html,body{height:auto;overflow:auto}.deck,.slides{height:auto}.slide{position:static;height:auto;opacity:1;pointer-events:auto}.nav-bar,.top-bar,.progress-track{display:none}</style><p style="padding:20px">JavaScript nonaktif. Semua bagian materi ditampilkan berurutan; kuis dan simulasi memerlukan JavaScript.</p></noscript>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const dots = document.getElementById('dots');
+    const progressFill = document.getElementById('progressFill');
+    const counter = document.getElementById('counter');
+    const prev = document.getElementById('prevBtn');
+    const next = document.getElementById('nextBtn');
+    let currentIndex = 0;
+
+    slides.forEach((slide, index) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'dot';
+      dot.title = (index + 1) + '. ' + slide.dataset.title;
+      dot.setAttribute('aria-label', 'Ke slide ' + (index + 1) + ': ' + slide.dataset.title);
+      dot.addEventListener('click', () => goToSlide(index));
+      dots.appendChild(dot);
+    });
+
+    function goToSlide(index) {
+      const focusInSlide = slides.some(slide => slide.contains(document.activeElement));
+      currentIndex = Math.max(0, Math.min(slides.length - 1, index));
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === currentIndex);
+        slide.inert = i !== currentIndex;
+      });
+      Array.from(dots.children).forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
+      progressFill.style.width = ((currentIndex + 1) / slides.length * 100) + '%';
+      counter.textContent = (currentIndex + 1) + ' / ' + slides.length;
+      prev.disabled = currentIndex === 0;
+      next.disabled = currentIndex === slides.length - 1;
+      history.replaceState(null, '', '#' + slides[currentIndex].id);
+      slides[currentIndex].querySelector('.slide-inner').scrollTop = 0;
+      if (focusInSlide) slides[currentIndex].querySelector('h1, h2').focus({ preventScroll: true });
+    }
+
+    function readHash() {
+      if (location.hash === '#materi') { goToSlide(currentIndex); return; }
+      const index = slides.findIndex(slide => slide.id === location.hash.slice(1));
+      goToSlide(index < 0 ? 0 : index);
+    }
+    prev.addEventListener('click', () => goToSlide(currentIndex - 1));
+    next.addEventListener('click', () => goToSlide(currentIndex + 1));
+    window.addEventListener('hashchange', readHash);
+    document.addEventListener('keydown', event => {
+      if (event.ctrlKey || event.metaKey || event.altKey || event.defaultPrevented ||
+          event.target.closest('input, textarea, select, button, a, summary, .table-wrap, [contenteditable]')) return;
+      const targets = { ArrowRight: currentIndex + 1, PageDown: currentIndex + 1,
+        ArrowLeft: currentIndex - 1, PageUp: currentIndex - 1, Home: 0, End: slides.length - 1 };
+      if (Object.hasOwn(targets, event.key)) {
+        event.preventDefault();
+        goToSlide(targets[event.key]);
+      }
+    });
+    readHash();
+
+    const mapContent = {
+      header: ['Header', '“Ini usaha siapa?”', 'Menunjukkan nama usaha dan jalan pintas ke informasi penting.', 'Logo KotakRasa dan tautan menuju penawaran.'],
+      hero: ['Hero + CTA awal', '“Apa yang ditawarkan untuk saya?”', 'Memperkenalkan penawaran, untuk siapa, dan langkah berikutnya.', 'Snack box untuk acara sekolah + ajakan minta penawaran.'],
+      manfaat: ['Masalah & manfaat', '“Apa manfaatnya bagi saya?”', 'Menghubungkan fitur produk dengan kebutuhan pengunjung.', 'Kotak per orang memudahkan pembagian konsumsi.'],
+      produk: ['Produk / layanan', '“Apa saja yang saya terima?”', 'Menjelaskan isi, pilihan, dan batasan produk atau jasa.', 'Dua kudapan, air mineral, dan kemasan per kotak.'],
+      proses: ['Cara kerja', '“Setelah tertarik, prosesnya bagaimana?”', 'Menjelaskan langkah pemesanan atau penggunaan layanan.', 'Kirim kebutuhan, sepakati penawaran, konfirmasi pesanan.'],
+      bukti: ['Bukti kepercayaan', '“Mengapa saya bisa percaya?”', 'Memberi bukti yang bisa dicek pengunjung.', 'Foto asli produk, proses produksi, atau ulasan asli dengan izin.'],
+      harga: ['Penawaran / harga', '“Berapa biayanya dan apa syaratnya?”', 'Menjelaskan harga, satuannya, dan syarat penting.', 'Mulai Rp15.000 per kotak, minimum 20, belum termasuk ongkir.'],
+      faq: ['FAQ', '“Bagaimana dengan keraguan saya?”', 'Menjawab keraguan umum sebelum pengunjung bertindak.', 'Batas pemesanan H−3 dan konfirmasi jadwal.'],
+      formulir: ['CTA akhir / formulir', '“Bagaimana saya mengambil langkah berikutnya?”', 'Memudahkan pengunjung melakukan tindakan utama setelah membaca.', 'Formulir permintaan penawaran dengan petunjuk dan konfirmasi.'],
+      footer: ['Footer', '“Di mana informasi usaha dan ketentuannya?”', 'Menyediakan informasi penutup dan akses ke kontak atau kebijakan.', 'Identitas, wilayah layanan, kontak, dan kebijakan privasi.']
+    };
+    document.querySelectorAll('[data-map]').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('[data-map]').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+        const [title, question, purpose, example] = mapContent[button.dataset.map];
+        document.getElementById('mapTitle').textContent = title;
+        document.getElementById('mapQuestion').textContent = question;
+        document.getElementById('mapFunction').textContent = purpose;
+        document.getElementById('mapExample').textContent = 'Contoh: ' + example;
+      });
+    });
+
+    const demoForm = document.getElementById('demoForm');
+    demoForm.addEventListener('input', () => { document.getElementById('demoResult').textContent = ''; });
+    demoForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const name = document.getElementById('panitia').value.trim();
+      const quantity = document.getElementById('jumlah').valueAsNumber;
+      const result = document.getElementById('demoResult');
+      if (!name || !Number.isInteger(quantity) || quantity < 20 || quantity > 1000) {
+        result.textContent = 'Isi nama fiktif dan jumlah bulat antara 20–1.000 kotak.';
+        return;
+      }
+      result.textContent = 'Simulasi selesai: kebutuhan ' + quantity + ' kotak terbaca.\nTidak ada permintaan yang dikirim.';
+    });
+
+    document.querySelectorAll('[data-quiz]').forEach(form => {
+      const fields = Array.from(form.querySelectorAll('fieldset'));
+      const result = form.querySelector('.result');
+      fields.forEach(field => {
+        const answer = field.querySelector('.answer');
+        answer.dataset.explanation = answer.textContent;
+      });
+      form.addEventListener('change', () => {
+        result.textContent = '';
+        form.querySelectorAll('.option').forEach(label => label.classList.remove('correct', 'wrong'));
+        form.querySelectorAll('.answer').forEach(answer => { answer.hidden = true; });
+      });
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const missing = fields.find(field => !field.querySelector('input:checked'));
+        if (missing) {
+          result.textContent = 'Jawab semua pertanyaan terlebih dahulu.';
+          missing.querySelector('input').focus();
+          return;
+        }
+        let score = 0;
+        fields.forEach(field => {
+          const selected = field.querySelector('input:checked');
+          const correct = selected.value === field.dataset.answer;
+          if (correct) score++;
+          field.querySelectorAll('.option').forEach(label => label.classList.remove('correct', 'wrong'));
+          selected.closest('label').classList.add(correct ? 'correct' : 'wrong');
+          const answer = field.querySelector('.answer');
+          answer.hidden = false;
+          answer.textContent = (correct ? 'Benar. ' : 'Belum tepat. ') + answer.dataset.explanation;
+        });
+        result.textContent = 'Skor: ' + score + ' dari ' + fields.length + '. Baca penjelasan setiap jawaban.';
+      });
+    });
+
+    const fullscreen = document.getElementById('fullscreenBtn');
+    fullscreen.hidden = !document.fullscreenEnabled;
+    fullscreen.addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await document.documentElement.requestFullscreen();
+      } catch {
+        document.getElementById('liveStatus').textContent = 'Layar penuh tidak tersedia pada browser ini.';
+      }
+    });
+  </script>
+</body>
+</html>

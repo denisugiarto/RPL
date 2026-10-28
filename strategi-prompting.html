@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0F1419">
+  <meta name="description" content="Materi RPL pemula: cara memberi perintah ke AI, enam strategi, kerangka RTF dan RACE, latihan, dan kuis.">
+  <title>Strategi Prompting Bagian 1 — Materi RPL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --text:var(--fg); --surface:var(--card); --line:var(--border); --control-line:#4a5a68;
+      --ink:var(--fg); --paper:#1A2229;
+      --mint:rgba(0,217,192,.10); --sun:rgba(255,107,53,.12); --sky:rgba(96,165,250,.10);
+      --slide-padding:84px 56px 88px;
+      --slide-inner-max-height:100%;
+    }
+    body { line-height:1.55; }
+    .slide-inner { font-size:17px; padding-right:4px; }
+    .slide-inner::-webkit-scrollbar { width:6px; }
+    .slide-inner::-webkit-scrollbar-thumb { background:rgba(255,255,255,.14); border-radius:10px; }
+    .inner { width:100%; min-width:0; }
+    .slide-inner > .inner:not(:first-child) { margin-top:20px; }
+    button, input, select, textarea { font:inherit; }
+    a { color:var(--teal); text-underline-offset:4px; }
+    :focus-visible { outline:3px solid var(--orange); outline-offset:3px; }
+    main:focus { outline:none; }
+    h1, h2, h3, p { margin-top:0; }
+    h1, h2, h3 { font-family:'Space Grotesk',sans-serif; line-height:1.12; letter-spacing:-.03em; text-wrap:balance; }
+    h1 { font-size:clamp(36px,4.6vw,60px); margin-bottom:18px; }
+    h2 { font-size:clamp(27px,3vw,40px); margin-bottom:16px; }
+    h3 { font-size:21px; margin-bottom:12px; }
+    p { margin-bottom:14px; }
+    p:last-child { margin-bottom:0; }
+    b, strong { font-weight:700; }
+    .muted, .lede { color:var(--muted); }
+    .lede { max-width:760px; font-size:19px; }
+    .small { font-size:14px; }
+    .teal { color:var(--teal); }
+    .topic { display:inline-block; margin-bottom:14px; padding:5px 12px; border:1px solid rgba(255,255,255,.1); border-radius:99px; background:rgba(255,255,255,.04); color:var(--orange); font-size:12px; font-weight:600; }
+    .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+    .skip-link { position:fixed; top:8px; left:12px; transform:translateY(-160%); z-index:100; padding:12px; background:var(--fg); color:var(--bg); border-radius:8px; }
+    .skip-link:focus { transform:none; }
+    .logo { text-decoration:none; color:inherit; }
+    .logo-text, .logo-sub { margin:0; }
+    .logo-mark i { color:#fff; font-size:12px; }
+    button.dot { border:0; padding:0; }
+    .nav-btn[hidden] { display:none; }
+    .two { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center; }
+    .two.top { align-items:start; }
+    .two > * { min-width:0; }
+    .list { margin:0; padding-left:22px; }
+    .list li { margin-bottom:10px; padding-left:5px; }
+    .list li::marker { color:var(--teal); }
+    .callout { margin-top:20px; padding:12px 18px; border-left:4px solid var(--orange); background:var(--sun); border-radius:0 10px 10px 0; }
+    .actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:22px; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:10px 20px; border:1px solid var(--teal); border-radius:12px; background:var(--teal); color:#0F1419; font-size:15px; font-weight:700; text-decoration:none; transition:transform .2s; }
+    .button:hover { transform:translateY(-2px); }
+    .button.secondary { background:transparent; color:var(--teal); }
+    .comparison { width:100%; border-collapse:collapse; font-size:15px; }
+    .comparison th, .comparison td { padding:13px 16px 13px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    .comparison th { color:var(--teal); font-family:'Space Grotesk',sans-serif; }
+    .comparison td { color:var(--muted); }
+    .comparison td strong { color:var(--text); }
+    .steps { list-style:none; counter-reset:step; padding:0; margin:18px 0 0; }
+    .steps li { counter-increment:step; display:grid; grid-template-columns:44px 1fr; gap:16px; align-items:start; padding:14px 0; border-top:1px solid var(--line); }
+    .steps li::before { content:counter(step,decimal-leading-zero); font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:700; color:var(--teal); line-height:1.2; }
+    .steps p { margin:4px 0 0; font-size:16px; color:var(--muted); }
+    details { padding:11px 0; border-top:1px solid var(--line); }
+    summary { cursor:pointer; font-weight:600; }
+    details p { margin:10px 0 0; font-size:15px; color:var(--muted); }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; overflow-x:auto; max-width:100%; margin:0; padding:16px 18px; border:1px solid var(--line); border-radius:12px; background:#0b1116; font:14px/1.5 ui-monospace,"SFMono-Regular",Consolas,monospace; tab-size:2; }
+    code { font-family:ui-monospace,"SFMono-Regular",Consolas,monospace; font-size:.9em; color:var(--teal); }
+    .result { margin:14px 0 0; font-size:15px; white-space:pre-line; }
+    .result:empty { margin:0; }
+    .quiz-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:18px; }
+    fieldset { min-width:0; margin:0; padding:16px 0 0; border:0; border-top:2px solid var(--line); }
+    legend { padding:0 8px 10px 0; font-size:17px; font-weight:700; }
+    .option { display:flex; align-items:start; gap:10px; padding:9px 11px; margin:4px 0; border:1.5px solid var(--line); border-radius:12px; background:rgba(255,255,255,.03); font-size:15px; cursor:pointer; transition:border-color .25s,background .25s; }
+    .option:hover { border-color:var(--hover-border); background:var(--hover-bg); }
+    .option input { flex-shrink:0; width:18px; height:18px; margin:3px 0 0; accent-color:var(--teal); }
+    .option:has(input:checked):not(.correct):not(.wrong) { border-color:var(--teal); background:var(--hover-bg); }
+    .option.correct { border-color:#22c55e; background:rgba(34,197,94,.12); }
+    .option.wrong { border-color:#ef4444; background:rgba(239,68,68,.10); }
+    .answer { margin:12px 0 0; font-size:14px; color:var(--teal); }
+    .references { margin:14px 0 0; padding-left:22px; font-size:15px; }
+    .references li { margin:8px 0; }
+    @media (max-width:1024px) {
+      .two { gap:28px; }
+      .slide-inner { font-size:16px; }
+    }
+    @media (max-width:700px) {
+      :root { --slide-padding:72px 18px 84px; }
+      .slide { align-items:flex-start; }
+      .hint-keys, .dots { display:none; }
+      .two, .quiz-grid { grid-template-columns:1fr; gap:24px; }
+      h1 { font-size:34px; } h2 { font-size:26px; }
+      .comparison { min-width:620px; }
+    }
+
+    .prompt-label { display:block; margin-bottom:14px; font-size:13px; color:var(--muted); }
+    .paper { min-width:0; padding:24px; border:1px solid var(--line); border-radius:20px; background:linear-gradient(180deg,var(--card),#141A21); }
+    .paper h3 { font-size:22px; }
+    .prompt-panel { min-width:0; padding:24px; border:1px solid var(--line); border-radius:20px; background:var(--surface); }
+    .prompt { white-space:pre-wrap; overflow-wrap:anywhere; margin:0; font-size:16px; line-height:1.6; }
+    .prompt b { color:var(--teal); }
+    .clauses { display:grid; gap:14px; }
+    .clause { border-left:3px solid var(--teal); padding:2px 0 2px 14px; }
+    .clause b { display:block; color:var(--teal); font-size:16px; }
+    .clause p { margin:4px 0 0; font-size:16px; }
+    .before, .after { padding:18px 20px; margin-top:14px; border-top:3px solid var(--orange); background:var(--sun); border-radius:0 0 12px 12px; }
+    .after { border-color:var(--teal); background:var(--mint); }
+    .before h3 { color:var(--orange); }
+    .after h3 { color:var(--teal); }
+    .flow { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:22px; }
+    .flow > div { padding-top:14px; border-top:3px solid var(--teal); }
+    .flow p { color:var(--muted); font-size:16px; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+    .table-hint { display:none; }
+    .comparison thead { background:var(--sky); }
+    .source { margin:18px 0 0; color:var(--muted); font-size:14px; }
+    .lab { padding:22px; background:var(--mint); border:1px solid var(--line); border-radius:20px; }
+    .lab-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 16px; }
+    .lab label { display:block; font-size:14px; font-weight:600; }
+    .lab textarea, #promptOutput { display:block; width:100%; min-height:96px; resize:vertical; padding:10px 12px; margin-top:6px; border:1px solid var(--control-line); border-radius:10px; background:var(--bg); color:var(--text); font-size:14px; font-weight:400; line-height:1.5; }
+    #promptOutput { min-height:300px; font-size:14px; }
+    .lab-status { white-space:pre-line; font-size:15px; margin:14px 0 0; }
+    .lab-status:empty { margin:0; }
+    @media (max-width:700px) {
+      .flow, .lab-grid { grid-template-columns:1fr; gap:20px; }
+      .table-hint { display:block; margin-bottom:10px; font-size:14px; color:var(--muted); }
+      .paper, .prompt-panel { padding:18px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#materi">Lewati navigasi</a>
+  <div class="grain"></div>
+  <div class="blob" style="width:380px;height:380px;background:var(--teal);top:-100px;left:-100px"></div>
+  <div class="blob" style="width:300px;height:300px;background:var(--purple);bottom:-80px;right:-80px;animation-delay:-4s"></div>
+  <header class="top-bar">
+    <a class="logo" href="index.html"><div class="logo-mark" style="background:linear-gradient(135deg,var(--teal),var(--purple))"><i class="fa-solid fa-wand-magic-sparkles"></i></div><div><p class="logo-text">Strategi Prompting · 1</p><p class="logo-sub">Kelas X RPL</p></div></a>
+    <div class="hint-keys"><span class="key">←</span><span class="key">→</span><span>untuk navigasi</span></div>
+  </header>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="background:linear-gradient(135deg,var(--teal),var(--purple))"></div></div>
+  <main class="deck" id="materi" tabindex="-1"><div class="slides" id="slides">
+    <section class="slide" id="pembuka" data-title="Cara memberi perintah ke AI" aria-labelledby="title-pembuka">
+      <div class="slide-inner"><div class="inner two"><div><p class="topic">Strategi prompting · Bagian 1 · Kelas X RPL</p><h1 id="title-pembuka" tabindex="-1">Cara memberi perintah ke AI</h1><p class="lede">AI menjawab sesuai perintahmu. Perintah yang jelas membuat jawabannya jauh lebih berguna.</p><div class="actions"><a class="button" href="#coba">Coba dulu</a><a class="button secondary" href="#peta-framework">Lihat dua kerangka</a></div><p class="small muted" style="margin-top:20px">Gunakan tombol ← → untuk berpindah slide.</p></div>
+<div class="paper"><span class="prompt-label">Dari perintah umum menjadi perintah yang jelas</span><h3>“Bantu aku belajar HTML.”</h3><div class="clauses"><div class="clause"><b>Siapa yang belajar?</b><p>Siswa kelas X yang baru kenal HTML.</p></div><div class="clause"><b>Apa yang dibutuhkan?</b><p>Latihan membuat tautan dan gambar.</p></div><div class="clause"><b>Bagaimana hasilnya?</b><p>3 soal bertahap, petunjuk, lalu kunci jawaban terpisah.</p></div></div><p class="small" style="margin-top:18px">Makin jelas permintaanmu, makin mudah jawabannya kamu nilai.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="coba" data-title="Praktik 5 menit: coba dulu" aria-labelledby="title-coba">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Coba dulu · 5 menit</p><h2 id="title-coba" tabindex="-1">Kirim satu perintah ke AI, lalu nilai hasilnya</h2><ol class="steps"><li><div><strong>Kirim perintah di samping</strong><p>Buka AI yang biasa kamu pakai, lalu kirim persis seperti yang tertulis.</p></div></li><li><div><strong>Baca jawabannya</strong><p>Tulis 2 hal yang kurang pas. Terlalu sulit? Terlalu panjang? Tidak ada latihan?</p></div></li><li><div><strong>Tulis ulang perintahmu</strong><p>Tambahkan siapa kamu, apa yang ingin dipelajari, dan bentuk jawaban yang kamu mau. Kirim lagi, lalu bandingkan.</p></div></li></ol></div>
+<div><div class="paper"><span class="prompt-label">Perintah pertama</span><p class="prompt">Bantu aku belajar HTML.</p></div><div class="callout"><strong>AI yang bisa kamu coba</strong><ul class="list" style="margin-top:10px"><li><a href="https://chatgpt.com" target="_blank" rel="noopener noreferrer">ChatGPT</a></li><li><a href="https://gemini.google.com" target="_blank" rel="noopener noreferrer">Gemini</a></li><li><a href="https://claude.ai" target="_blank" rel="noopener noreferrer">Claude</a></li><li><a href="https://copilot.microsoft.com" target="_blank" rel="noopener noreferrer">Microsoft Copilot</a></li><li><a href="https://chat.z.ai" target="_blank" rel="noopener noreferrer">GLM Chat (Z.ai)</a></li><li><a href="https://chat.qwen.ai" target="_blank" rel="noopener noreferrer">Qwen</a></li><li><a href="https://chat.deepseek.com" target="_blank" rel="noopener noreferrer">DeepSeek</a></li></ul><p class="small muted" style="margin-top:10px">Pilih satu saja. Syarat akun, batas usia, dan jumlah pemakaian gratis berbeda-beda dan bisa berubah, jadi cek ketentuannya dan pakai yang sudah disetujui gurumu.</p></div><p class="small muted" style="margin-top:14px">Jangan masukkan nama lengkap, alamat, atau kata sandi ke AI. Belum bisa memakai AI? Tulis perintah barumu di buku dan tukar dengan teman untuk dinilai: apakah jelas siapa yang belajar, apa yang diminta, dan bentuk jawabannya?</p></div></div></div>
+    </section>
+
+    <section class="slide" id="tujuan" data-title="Tujuan belajar" aria-labelledby="title-tujuan">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Tujuan belajar</p><h2 id="title-tujuan" tabindex="-1">Setelah pelajaran ini, kamu bisa …</h2><ul class="list"><li>Mengubah perintah yang umum menjadi perintah yang jelas.</li><li>Memakai kerangka RTF atau RACE untuk menyusun perintah.</li><li>Mengecek jawaban AI, lalu memperbaiki perintahmu.</li></ul></div>
+<div class="paper"><h3>Kenapa ini penting?</h3><p>AI bisa salah, tetapi jawabannya sering terdengar yakin.</p><p>Kamu yang bertanggung jawab atas hasil yang kamu pakai. Karena itu, belajar menyusun perintah dan mengecek jawaban sama pentingnya.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="jawaban-bagus" data-title="Jawaban AI yang bagus" aria-labelledby="title-jawaban-bagus">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Ukuran jawaban bagus</p><h2 id="title-jawaban-bagus" tabindex="-1">“Bagus” itu seperti apa?</h2><p class="lede">Jawaban bagus membantu tugasmu selesai dan bisa kamu cek kebenarannya.</p><p class="callout">Sebelum memakai jawaban AI, tanyakan empat hal di samping.</p></div>
+<div><ol class="steps"><li><div><strong>Benar</strong><p>Fakta, hitungan, atau kode bisa kamu cek.</p></div></li><li><div><strong>Sesuai</strong><p>Menjawab yang kamu minta, dan tidak ada bagian yang terlewat.</p></div></li><li><div><strong>Mudah dipahami</strong><p>Bahasa dan bentuknya cocok untukmu.</p></div></li><li><div><strong>Jujur</strong><p>Bilang “belum tahu” atau menandai bagian yang hanya perkiraan.</p></div></li></ol></div></div></div>
+    </section>
+
+    <section class="slide" id="konsep" data-title="Konsep dasar: prompt" aria-labelledby="title-konsep">
+      <div class="slide-inner"><div class="inner"><p class="topic">Konsep dasar</p><h2 id="title-konsep" tabindex="-1">Prompt itu seperti memesan makanan</h2><p class="lede">Kalau kamu hanya bilang “makanan”, penjualnya bingung. Sebut menu, jumlah, dan catatan, maka pesananmu tepat.</p><div class="flow"><div><h3>Prompt</h3><p>Pesan yang kamu tulis ke AI: tugas, bahan, dan bentuk jawaban.</p></div><div><h3>Strategi</h3><p>Kebiasaan yang membuat pesananmu tepat, misalnya memberi contoh atau membagi tugas.</p></div><div><h3>Kerangka</h3><p>Formulir pesanan siap pakai supaya tidak ada yang terlupa. Contohnya RTF dan RACE.</p></div></div><p class="callout">Kerangka hanya membantu menyusun perintah. Hasilnya tetap harus kamu cek.</p></div></div>
+    </section>
+
+    <section class="slide" id="sebelum-sesudah" data-title="Contoh sebelum dan sesudah" aria-labelledby="title-sebelum-sesudah">
+      <div class="slide-inner"><div class="inner"><p class="topic">Bedah contoh</p><h2 id="title-sebelum-sesudah" tabindex="-1">Ubah kata “bagus” menjadi syarat yang jelas</h2><div class="two top"><div class="before"><h3>Masih terlalu umum</h3><p class="prompt">Buatkan materi CSS yang bagus.</p><p class="muted" style="margin-top:16px">Untuk siapa? Topik apa? Sepanjang apa? Perlu latihan atau kode?</p></div><div class="after"><h3>Lebih jelas</h3><p class="prompt">Jelaskan <b>CSS Flexbox untuk siswa kelas X RPL</b> yang sudah kenal HTML.
+
+Fokus pada <b>display:flex, justify-content, dan align-items</b>.
+
+Berikan <b>tabel 3 properti, satu contoh kode, dan 2 latihan</b>. Pakai bahasa sederhana, maksimal 400 kata.</p></div></div><p class="small muted" style="margin-top:18px">Contoh ini dibuat untuk belajar, bukan hasil uji pada AI tertentu.</p></div></div>
+    </section>
+
+    <section class="slide" id="s-spesifik" data-title="Strategi 1: tugas yang spesifik" aria-labelledby="title-s-spesifik">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Strategi 1 dari 6</p><h2 id="title-s-spesifik" tabindex="-1">Sebut tugas, pembaca, dan batasan</h2><ul class="list"><li>Pakai kata kerja yang jelas: jelaskan, bandingkan, rangkum, atau periksa.</li><li>Ceritakan kemampuanmu sekarang, misalnya “baru kenal variabel”.</li><li>Tentukan isi dan bentuk jawaban: tabel, daftar, atau kode.</li></ul><p class="callout">“Singkat tapi lengkap” membingungkan. Tulis: “5 poin, tiap poin maksimal 2 kalimat.”</p></div>
+<div class="prompt-panel"><span class="prompt-label">Contoh perintah yang jelas</span><p class="prompt">Bandingkan <b>let dan const</b> untuk siswa yang sudah paham variabel.
+
+Pakai tabel dengan kolom <b>aturan, contoh, dan kesalahan umum</b>.
+
+Tambahkan satu contoh mengubah nilai. <b>Jangan bahas var dulu</b>.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="s-bahan" data-title="Strategi 2: berikan bahan" aria-labelledby="title-s-bahan">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Strategi 2 dari 6</p><h2 id="title-s-bahan" tabindex="-1">Berikan bahan yang dibutuhkan</h2><p>Untuk merangkum atau menilai sesuatu, tempelkan teks, kode, atau datanya.</p><ul class="list"><li>Beri tanda awal dan akhir bahan.</li><li>Tulis “gunakan hanya bahan ini”.</li><li>Kalau datanya kurang, minta AI bertanya atau menulis “belum diketahui”.</li></ul></div>
+<div class="prompt-panel"><span class="prompt-label">Data simulasi: catatan kelas</span><p class="prompt">Rangkum catatan di bawah menjadi 3 poin.
+Gunakan hanya isi catatan. Kalau informasinya tidak ada, tulis “belum diketahui”.
+
+<b>--- awal catatan ---</b>
+20 siswa mengikuti latihan HTML.
+12 siswa selesai, 8 belum selesai.
+Penyebab belum selesai belum dicatat.
+<b>--- akhir catatan ---</b></p></div></div></div>
+    </section>
+
+    <section class="slide" id="s-contoh" data-title="Strategi 3: beri contoh" aria-labelledby="title-s-contoh">
+      <div class="slide-inner"><div class="inner"><p class="topic">Strategi 3 dari 6</p><h2 id="title-s-contoh" tabindex="-1">Tunjukkan contoh kalau hasilnya belum sesuai pola</h2><div class="flow"><div><h3>Tanpa contoh</h3><p>Langsung beri tugas.</p><p>“Kelompokkan pesan menjadi pertanyaan atau keluhan.”</p></div><div><h3>Satu contoh</h3><p>Satu contoh untuk menunjukkan pola.</p><p>“Berapa harganya?” → pertanyaan</p></div><div><h3>Beberapa contoh</h3><p>Beberapa contoh yang berbeda-beda.</p><p>“Berapa harganya?” → pertanyaan<br>“Tombolnya rusak.” → keluhan</p></div></div><p class="callout">Setelah contoh, beri bahan baru: “Cara mengganti tema?” → …<br>Pastikan semua contoh memakai label dan aturan yang sama.</p><p class="small muted">Istilah bahasa Inggrisnya: zero-shot, one-shot, dan few-shot. Mulailah dari perintah yang jelas; tambah contoh kalau perlu.</p></div></div>
+    </section>
+
+    <section class="slide" id="s-pecah" data-title="Strategi 4: pecah tugas" aria-labelledby="title-s-pecah">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Strategi 4 dari 6</p><h2 id="title-s-pecah" tabindex="-1">Pecah tugas besar menjadi langkah kecil</h2><p>Pakai hasil satu langkah sebagai bahan langkah berikutnya, dan cek hasilnya sebelum lanjut.</p><ol class="steps"><li><div><strong>Rancang</strong><p>“Usulkan struktur halaman portofolio pemula.”</p></div></li><li><div><strong>Bangun satu bagian</strong><p>“Dari struktur yang dipilih, buat HTML bagian profil.”</p></div></li><li><div><strong>Uji</strong><p>“Buat checklist untuk memeriksa heading, tautan, dan gambar.”</p></div></li></ol></div>
+<div class="paper"><h3>Minta alasan singkat</h3><p>Minta AI menulis <strong>alasan singkat dan cara mengecek jawabannya</strong>.</p><p class="small muted">Kamu tidak perlu meminta seluruh proses berpikirnya.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="s-revisi" data-title="Strategi 5: revisi" aria-labelledby="title-s-revisi">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Strategi 5 dari 6</p><h2 id="title-s-revisi" tabindex="-1">Revisi dengan masukan yang jelas</h2><p class="lede">“Kurang bagus” sulit diperbaiki. Sebut bagian yang bermasalah.</p><ol class="steps"><li><div><strong>Periksa hasil</strong><p>Contoh: istilahnya sulit, kodenya tidak jalan, atau bentuknya melenceng.</p></div></li><li><div><strong>Ubah satu hal</strong><p>Tambahkan konteks, batasan, atau contoh.</p></div></li><li><div><strong>Bandingkan lagi</strong><p>Pakai tugas yang sama dan catat kekurangan yang masih ada.</p></div></li></ol></div>
+<div class="prompt-panel"><span class="prompt-label">Contoh perintah lanjutan</span><p class="prompt">Penjelasanmu masih memakai “main axis” tanpa arti.
+
+Revisi untuk pemula: <b>jelaskan istilah itu dalam satu kalimat</b>, lalu beri contoh tombol yang tersusun mendatar.
+
+Pertahankan tabelnya dan batasi jawaban jadi <b>250 kata</b>.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="s-cek" data-title="Strategi 6: cek sebelum dipakai" aria-labelledby="title-s-cek">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Strategi 6 dari 6</p><h2 id="title-s-cek" tabindex="-1">Cek jawaban sebelum kamu pakai</h2><ul class="list"><li><strong>Fakta:</strong> buka sumber aslinya dan cocokkan.</li><li><strong>Hitungan:</strong> hitung ulang dengan kalkulator.</li><li><strong>Kode:</strong> baca, lalu jalankan di tempat latihan.</li><li><strong>Data pribadi:</strong> pakai contoh fiktif. Jangan kirim kata sandi atau API key.</li></ul><p class="callout">“Berperan sebagai ahli” mengubah gaya jawaban, tetapi tidak menjamin jawabannya benar.</p></div>
+<div class="paper"><h3>Tambahkan aturan bukti</h3><p class="prompt">Pisahkan <b>fakta dari bahan, perkiraan, dan hal yang belum diketahui</b>.
+
+Kalau kamu tidak bisa mengecek sumber, katakan. Jangan mengarang judul, kutipan, atau tautan.</p><p class="small muted" style="margin-top:16px">Tautan dari AI tetap harus kamu buka dan periksa.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="peta-framework" data-title="Dua kerangka untuk memulai" aria-labelledby="title-peta-framework">
+      <div class="slide-inner"><div class="inner"><p class="topic">Memilih kerangka</p><h2 id="title-peta-framework" tabindex="-1">Mulai dari dua kerangka ini</h2><p class="lede">Kerangka itu daftar pengingat. Cukup kuasai RTF dan RACE dulu.</p><p class="table-hint">Geser tabel ke samping untuk membaca semua kolom.</p><div class="table-wrap" role="region" aria-label="Tabel materi, dapat digeser ke samping" tabindex="0"><table class="comparison"><caption class="sr-only">Dua kerangka prompt dan kapan dipakai</caption><thead><tr><th scope="col">Kerangka</th><th scope="col">Isi</th><th scope="col">Pakai kalau …</th></tr></thead><tbody><tr><td><a href="#rtf">RTF</a></td><td>Role · Task · Format</td><td>tugasmu singkat: menjelaskan, merangkum, atau membuat daftar.</td></tr><tr><td><a href="#race">RACE</a></td><td>Role · Action · Context · Expectation</td><td>kamu perlu memberi latar dan syarat hasil yang jelas.</td></tr></tbody></table></div><p class="callout">Pilih yang paling singkat tetapi cukup. Jangan menumpuk semua singkatan dalam satu perintah. Kerangka lain (TAG, CO-STAR, CREATE) ada di <a href="#kerangka-lain">slide tambahan</a>.</p></div></div>
+    </section>
+
+    <section class="slide" id="rtf" data-title="RTF: Role, Task, Format" aria-labelledby="title-rtf">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Kerangka 1 · Untuk tugas singkat</p><h2 id="title-rtf" tabindex="-1">RTF</h2><div class="clauses"><div class="clause"><b>Role — peran</b><p>Siapa yang kamu minta menjawab?</p></div><div class="clause"><b>Task — tugas</b><p>Apa yang harus dikerjakan?</p></div><div class="clause"><b>Format — bentuk hasil</b><p>Tabel, daftar, paragraf, atau kode?</p></div></div><p class="callout">Template: “Sebagai [peran], kerjakan [tugas]. Sajikan dalam [bentuk].”</p></div>
+<div class="paper"><span class="prompt-label">Contoh RTF · Penjelasan HTML</span><p class="prompt"><b>Role:</b> Berperan sebagai tutor HTML untuk pemula.
+
+<b>Task:</b> Jelaskan beda tag &lt;a&gt; dan &lt;button&gt;, lengkap dengan satu contoh masing-masing.
+
+<b>Format:</b> Tabel 2 baris dengan kolom fungsi, kapan dipakai, dan contoh kode. Pakai bahasa sederhana.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="race" data-title="RACE: Role, Action, Context, Expectation" aria-labelledby="title-race">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Kerangka 2 · Kalau perlu konteks</p><h2 id="title-race" tabindex="-1">RACE</h2><div class="clauses"><div class="clause"><b>Role — peran</b><p>Siapa yang kamu minta menjawab?</p></div><div class="clause"><b>Action — tindakan</b><p>Apa yang harus dikerjakan?</p></div><div class="clause"><b>Context — latar</b><p>Kondisimu, bahan, dan batasan.</p></div><div class="clause"><b>Expectation — harapan</b><p>Hasil seperti apa yang bisa kamu cek?</p></div></div></div>
+<div class="paper"><span class="prompt-label">Contoh RACE · Latihan JavaScript</span><p class="prompt"><b>Role:</b> Jadilah tutor JavaScript untuk pemula.
+<b>Action:</b> Buat latihan tentang if/else.
+<b>Context:</b> Saya sudah belajar variabel dan operator perbandingan, belum belajar loop. Saya memakai console browser.
+<b>Expectation:</b> 3 soal dari mudah ke menengah, petunjuk, dan kunci jawaban terpisah. Jangan pakai loop dan library.</p><p class="small muted" style="margin-top:14px">Harapan yang bisa dicek: jumlah soal, urutan kesulitan, dan topik yang dipakai.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="lab-prompt" data-title="Praktik: perakit prompt RACE" aria-labelledby="title-lab-prompt">
+      <div class="slide-inner"><div class="inner"><p class="topic">Praktik terpandu</p><h2 id="title-lab-prompt" tabindex="-1">Rakit perintah RACE milikmu</h2><p class="small muted">Ubah isiannya, salin hasilnya, lalu coba di AI pilihanmu. Alat ini hanya menyusun teks; tidak mengirim data apa pun.</p><div class="two top lab"><form id="promptLab"><div class="lab-grid"><label for="labRole">R · Role<textarea id="labRole" data-label="Role" maxlength="1500">Tutor HTML yang sabar untuk pemula.</textarea></label><label for="labAction">A · Action<textarea id="labAction" data-label="Action" maxlength="1500">Buat latihan membuat tautan dan gambar dalam HTML.</textarea></label><label for="labContext">C · Context<textarea id="labContext" data-label="Context" maxlength="1500">Saya siswa kelas X RPL. Saya sudah kenal tag HTML dasar, tetapi belum belajar CSS.</textarea></label><label for="labExpectation">E · Expectation<textarea id="labExpectation" data-label="Expectation" maxlength="1500">3 soal dari mudah ke sulit, petunjuk singkat, dan kunci jawaban terpisah. Maksimal 350 kata. Hanya HTML, tanpa CSS atau JavaScript.</textarea></label></div><div class="actions"><button class="button secondary" type="reset">Kembalikan contoh</button></div></form><div><label for="promptOutput" class="small">Perintah yang siap dicoba</label><textarea id="promptOutput" readonly aria-describedby="labHelp"></textarea><p id="labHelp" class="small muted">Bisa juga dipilih dan disalin manual. Hasil tergantung AI yang kamu pakai.</p><div class="actions"><button id="copyPrompt" type="button" class="button">Salin perintah</button></div><p class="lab-status" id="labStatus" role="status"></p></div></div><noscript><p class="callout">Alat ini perlu JavaScript. Pakai contoh RACE di slide sebelumnya sebagai template manual.</p></noscript></div></div>
+    </section>
+
+    <section class="slide" id="debugging" data-title="Contoh RPL: minta bantuan debugging" aria-labelledby="title-debugging">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Penerapan di RPL</p><h2 id="title-debugging" tabindex="-1">Tunjukkan error-nya, jangan hanya bilang “error”</h2><p>“Kodeku error” belum cukup. Sertakan konteks, potongan kode kecil, pesan error, dan hasil yang kamu harapkan.</p><pre><code>function sapa(nama) {
+  return nama.toUpperCase();
+}
+sapa();</code></pre><p class="small muted" style="margin-top:14px">Kode ini sengaja bermasalah: <code>nama</code> bernilai undefined saat tidak diisi.</p></div>
+<div class="prompt-panel"><span class="prompt-label">Contoh RACE · Tempel kodenya di bawah perintah ini</span><p class="prompt"><b>Role:</b> Tutor JavaScript untuk pemula.
+<b>Action:</b> Jelaskan penyebab error dan beri perbaikan terkecil.
+<b>Context:</b> Kode dijalankan di console browser. Saat sapa() dipanggil muncul TypeError karena toUpperCase dibaca dari undefined.
+<b>Expectation:</b> Kalau argumen kosong, hasilnya “Nama belum diisi”. Kalau “Rani”, hasilnya “RANI”. Tampilkan perbaikan, alasan singkat, dan 2 contoh pemanggilan. Jangan pakai library.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="baca-hasil" data-title="Contoh: cek rangkuman AI" aria-labelledby="title-baca-hasil">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Membaca hasil dengan kritis</p><h2 id="title-baca-hasil" tabindex="-1">Apakah jawabannya sesuai bahan?</h2><div class="paper"><span class="prompt-label">Data simulasi kelas</span><p>20 siswa mengikuti latihan.<br>12 selesai, 8 belum selesai.<br>Penyebab belum selesai belum dicatat.</p></div><p class="callout">Tugas AI: ringkas jadi tiga poin dan jangan menambah penyebab yang tidak ada di bahan.</p></div>
+<div><h3>Bandingkan dua jawaban</h3><div class="before"><p><strong>A.</strong> 60% siswa selesai. Sisanya belum selesai karena internet buruk.</p></div><div class="after"><p><strong>B.</strong> Dari 20 siswa, 12 selesai (60%) dan 8 belum (40%). Penyebabnya belum diketahui.</p></div><details><summary>Mana yang lebih baik? Mengapa?</summary><p><strong>B lebih sesuai data.</strong> Hitungannya benar dan tidak mengarang penyebab. Tetapi bentuknya belum tiga poin, jadi beri masukan agar bentuknya juga sesuai.</p></details><p class="small muted" style="margin-top:14px">Kedua jawaban ini ditulis untuk materi, bukan hasil uji AI.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="kesalahan" data-title="Kesalahan yang sering terjadi" aria-labelledby="title-kesalahan">
+      <div class="slide-inner"><div class="inner"><p class="topic">Hindari kebiasaan ini</p><h2 id="title-kesalahan" tabindex="-1">Perintah panjang belum tentu bagus</h2><p class="table-hint">Geser tabel ke samping untuk membaca semua kolom.</p><div class="table-wrap" role="region" aria-label="Tabel materi, dapat digeser ke samping" tabindex="0"><table class="comparison"><caption class="sr-only">Kesalahan umum dan perbaikannya</caption><thead><tr><th scope="col">Kebiasaan</th><th scope="col">Masalahnya</th><th scope="col">Perbaikan</th></tr></thead><tbody><tr><td>“Buat yang paling bagus.”</td><td>Ukuran “bagus” tidak jelas.</td><td>Sebut pembaca, isi, dan bentuk hasil.</td></tr><tr><td>Perintah yang saling bertentangan.</td><td>Contoh: “sangat detail” tetapi hanya 1 kalimat.</td><td>Tentukan mana yang lebih penting.</td></tr><tr><td>Menempel semua informasi.</td><td>Bahan yang tidak perlu mengaburkan tugas.</td><td>Pilih bahan yang berhubungan saja.</td></tr><tr><td>Langsung memakai jawaban pertama.</td><td>Kesalahan bisa terlewat.</td><td>Nilai, revisi, lalu cek.</td></tr></tbody></table></div><p class="callout">Tidak ada kerangka yang selalu terbaik. Bandingkan pilihanmu dengan tugas dan ukuran yang sama.</p></div></div>
+    </section>
+
+    <section class="slide" id="latihan" data-title="Latihan: perbaiki perintah" aria-labelledby="title-latihan">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Latihan berpasangan</p><h2 id="title-latihan" tabindex="-1">Perbaiki perintah, lalu buktikan</h2><div class="paper"><span class="prompt-label">Perintah awal (A)</span><p class="prompt">Buatkan latihan HTML.</p></div><p class="callout">Target: lembar latihan untuk siswa kelas X yang baru belajar tautan dan gambar, berisi 3 soal bertahap, petunjuk, dan kunci jawaban terpisah, tanpa CSS atau JavaScript.</p></div>
+<div><ol class="steps"><li><div><strong>Tulis perintah B</strong><p>Pilih RTF atau RACE. Tandai bagian kerangka yang kamu pakai.</p></div></li><li><div><strong>Uji dengan syarat sama</strong><p>Pakai AI yang sama. Mulai percakapan baru untuk A dan B.</p></div></li><li><div><strong>Nilai dan perbaiki</strong><p>Pakai rubrik di slide berikutnya, ubah satu hal, lalu coba lagi.</p></div></li></ol><p class="small muted" style="margin-top:16px">Tanpa AI? Tulis perintah B, lalu tukar dengan temanmu untuk dicek kelengkapannya.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="rubrik" data-title="Rubrik penilaian" aria-labelledby="title-rubrik">
+      <div class="slide-inner"><div class="inner"><p class="topic">Menilai hasil latihan</p><h2 id="title-rubrik" tabindex="-1">Nilai hasil dengan ukuran yang sama</h2><p class="table-hint">Geser tabel ke samping untuk membaca semua kolom.</p><div class="table-wrap" role="region" aria-label="Tabel materi, dapat digeser ke samping" tabindex="0"><table class="comparison"><caption class="sr-only">Rubrik 0 sampai 2 per aspek, total maksimal 8</caption><thead><tr><th scope="col">Aspek</th><th scope="col">0 — belum</th><th scope="col">1 — sebagian</th><th scope="col">2 — sesuai</th></tr></thead><tbody><tr><td><strong>Benar</strong></td><td>Isi atau kode utama salah.</td><td>Ada kesalahan kecil.</td><td>Sudah dicek dan benar.</td></tr><tr><td><strong>Lengkap</strong></td><td>Bagian utama hilang.</td><td>Ada yang terlewat.</td><td>3 soal, petunjuk, dan kunci ada.</td></tr><tr><td><strong>Mudah dipahami</strong></td><td>Terlalu sulit untuk pemula.</td><td>Beberapa istilah belum dijelaskan.</td><td>Bahasa dan urutan cocok.</td></tr><tr><td><strong>Sesuai batasan</strong></td><td>Melanggar batasan utama.</td><td>Ada sedikit melenceng.</td><td>Tanpa CSS/JS, kunci terpisah.</td></tr></tbody></table></div><p class="small" style="margin-top:16px"><strong>Total maksimal 8.</strong> Catat: versi perintah, AI yang dipakai, skor, dan bukti kekurangannya. Kode yang belum dijalankan belum boleh diberi skor 2 untuk “Benar”.</p></div></div>
+    </section>
+
+    <section class="slide" id="kuis" data-title="Kuis" aria-labelledby="title-kuis">
+      <div class="slide-inner"><div class="inner"><p class="topic">Cek pemahaman</p><h2 id="title-kuis" tabindex="-1">Empat soal singkat</h2><form data-quiz><div class="quiz-grid"><fieldset data-answer="b"><legend>1. Jawaban AI terlalu sulit untuk pemula. Perbaikan apa yang paling membantu?</legend><label class="option"><input type="radio" name="q1" value="a">A. “Jawab lebih bagus lagi!”</label><label class="option"><input type="radio" name="q1" value="b">B. Sebutkan kemampuanmu dan minta istilah teknis dijelaskan.</label><label class="option"><input type="radio" name="q1" value="c">C. Tambahkan banyak singkatan kerangka.</label><p class="answer" hidden>Kemampuan awalmu memberi konteks yang jelas untuk menyesuaikan penjelasan.</p></fieldset><fieldset data-answer="c"><legend>2. AI memberi tautan sumber. Apa langkah berikutnya?</legend><label class="option"><input type="radio" name="q2" value="a">A. Langsung percaya karena ada tautan.</label><label class="option"><input type="radio" name="q2" value="b">B. Menilai dari panjang jawabannya.</label><label class="option"><input type="radio" name="q2" value="c">C. Buka sumbernya dan cocokkan dengan klaimnya.</label><p class="answer" hidden>Tautan bisa keliru atau tidak mendukung klaim. Periksa sumber aslinya.</p></fieldset><fieldset data-answer="c"><legend>3. Dalam RACE, kalimat “Berikan 3 soal, petunjuk, dan kunci jawaban terpisah” termasuk …</legend><label class="option"><input type="radio" name="q3" value="a">A. Role.</label><label class="option"><input type="radio" name="q3" value="b">B. Context.</label><label class="option"><input type="radio" name="q3" value="c">C. Expectation.</label><p class="answer" hidden>Expectation menyebut hasil yang diharapkan. Role adalah peran AI, dan Context adalah latar serta batasanmu.</p></fieldset><fieldset data-answer="b"><legend>4. Perintah B menghasilkan jawaban lebih baik satu kali. Kesimpulan yang masuk akal?</legend><label class="option"><input type="radio" name="q4" value="a">A. Kerangka B pasti terbaik untuk semua tugas.</label><label class="option"><input type="radio" name="q4" value="b">B. B lebih cocok pada percobaan ini; perlu diulang untuk melihat konsistensinya.</label><label class="option"><input type="radio" name="q4" value="c">C. Perintah A pasti selalu gagal.</label><p class="answer" hidden>Hasil bergantung pada tugas, AI yang dipakai, dan variasi jawaban. Jangan menyimpulkan dari satu percobaan.</p></fieldset></div><div class="actions"><button class="button" type="submit">Periksa jawaban</button></div><p class="result" role="status"></p></form></div></div>
+    </section>
+
+    <section class="slide" id="ringkasan" data-title="Ringkasan dan template" aria-labelledby="title-ringkasan">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Pegangan praktis</p><h2 id="title-ringkasan" tabindex="-1">Jelas sebelum dikirim, kritis sesudah diterima</h2><ul class="list"><li>Tugas dan pembacanya sudah jelas?</li><li>Bahan dan batasan sudah ada?</li><li>Bentuk hasil bisa dicek?</li><li>Perlu contoh atau pertanyaan balik?</li><li>Bagaimana aku mengecek jawabannya?</li></ul><p class="callout">Mulai → beri konteks → cek hasil → revisi.</p><div class="actions"><a class="button" href="prompting-landing-page.html">Lanjut ke Bagian 2: landing page</a><a class="button secondary" href="#lab-prompt">Coba perakit prompt</a></div></div>
+<div class="paper"><span class="prompt-label">Template fleksibel · Ganti bagian [ ]</span><p class="prompt">Bantu saya <b>[tugas yang spesifik]</b> untuk <b>[siapa yang memakai]</b>.
+
+Bahan: [informasi yang relevan].
+Batasan: [isi, panjang, hal yang wajib].
+Hasil: [bentuk dan bagian yang diminta].
+Kalau informasi penting kurang, tanyakan dulu. Tandai perkiraan dan beri cara mengecek hasilnya.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="kerangka-lain" data-title="Tambahan: kerangka lain" aria-labelledby="title-kerangka-lain">
+      <div class="slide-inner"><div class="inner"><p class="topic">Untuk yang penasaran</p><h2 id="title-kerangka-lain" tabindex="-1">Tiga kerangka lain</h2><p class="table-hint">Geser tabel ke samping untuk membaca semua kolom.</p><div class="table-wrap" role="region" aria-label="Tabel materi, dapat digeser ke samping" tabindex="0"><table class="comparison"><caption class="sr-only">Tiga kerangka tambahan</caption><thead><tr><th scope="col">Kerangka</th><th scope="col">Isi</th><th scope="col">Cocok untuk</th></tr></thead><tbody><tr><td>TAG</td><td>Task · Action · Goal</td><td>Tugas yang perlu tindakan dan tujuan jelas.</td></tr><tr><td>CO-STAR</td><td>Context · Objective · Style · Tone · Audience · Response</td><td>Tulisan untuk pembaca dan suasana tertentu.</td></tr><tr><td>CREATE</td><td>Character · Request · Examples · Adjustments · Type of output · Extras</td><td>Hasil yang butuh contoh dan aturan rinci.</td></tr></tbody></table></div><p class="small muted" style="margin-top:16px">Singkatan ini bukan standar wajib, dan kepanjangannya bisa berbeda di sumber lain. TAG dan RACE di sini versi yang dipakai di materi. CO-STAR mengikuti GovTech Singapura dan CREATE mengikuti versi Dave Birss. Kerangka bukan peringkat kualitas.</p></div></div>
+    </section>
+
+    <section class="slide" id="referensi" data-title="Referensi dan catatan guru" aria-labelledby="title-referensi">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Bacaan lanjutan</p><h2 id="title-referensi" tabindex="-1">Sumber dan catatan</h2><ul class="references"><li><a href="https://ai.google.dev/gemini-api/docs/prompting-strategies" target="_blank" rel="noopener noreferrer">Google · Prompt design strategies</a><br><span class="muted">Instruksi, konteks, contoh, dan iterasi.</span></li><li><a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices" target="_blank" rel="noopener noreferrer">Anthropic · Prompting best practices</a><br><span class="muted">Struktur, contoh, peran, dan pembagian tugas.</span></li><li><a href="https://developers.openai.com/api/docs/guides/reasoning-best-practices" target="_blank" rel="noopener noreferrer">OpenAI · Reasoning best practices</a><br><span class="muted">Instruksi langsung untuk model reasoning.</span></li><li><a href="https://www.tech.gov.sg/technews/mastering-the-art-of-prompt-engineering-with-empower/" target="_blank" rel="noopener noreferrer">GovTech Singapore · CO-STAR</a></li><li><a href="https://davebirss.com/downloads/smarter_learning_with_AI_summary.pdf" target="_blank" rel="noopener noreferrer">Dave Birss · Smarter Learning with AI (PDF, hal. 9)</a></li></ul><p class="small muted">Disusun untuk pembelajaran pada 27 Oktober 2026. Contoh perintah dan jawaban dibuat khusus untuk materi ini. Isi slide bisa dibuka offline; tautan referensi butuh internet.</p></div>
+<div><details open><summary>Catatan untuk guru</summary><p>Mulai dari praktik 5 menit, lalu bahas contoh sebelum/sesudah. Peragakan satu kerangka, lalu minta pasangan menguji satu revisi dengan rubrik. Kunci kuis: 1 B, 2 C, 3 C, 4 B. Tanpa akses AI, nilai kelengkapan perintah dan jadwalkan pengujian hasilnya nanti.</p></details><details><summary>Catatan akurasi</summary><p>Tanda awal/akhir bahan membantu keterbacaan, tetapi tidak menjamin AI mengabaikan instruksi berbahaya di dalam bahan. Pada model reasoning, perintah “think step by step” belum tentu meningkatkan hasil; cukup minta alasan singkat dan cara mengecek. Meminta sumber tidak otomatis mengaktifkan pencarian internet. Satu hasil belum cukup untuk menyimpulkan keunggulan umum, jadi ulangi 3 kali bila memungkinkan.</p></details></div></div></div>
+    </section>
+
+</div></main>
+  <nav class="nav-bar" aria-label="Navigasi materi">
+    <button class="nav-btn" id="prevBtn" type="button" aria-label="Slide sebelumnya" title="Slide sebelumnya"><i class="fa-solid fa-chevron-left" style="font-size:12px"></i></button>
+    <div class="dots" id="dots"></div>
+    <span class="slide-counter" id="counter" aria-live="polite" aria-atomic="true">1</span>
+    <button class="nav-btn" id="nextBtn" type="button" aria-label="Slide berikutnya" title="Slide berikutnya"><i class="fa-solid fa-chevron-right" style="font-size:12px"></i></button>
+    <button class="nav-btn" id="fullscreenBtn" type="button" aria-label="Layar penuh" title="Layar penuh"><i class="fa-solid fa-expand" style="font-size:12px"></i></button>
+  </nav>
+  <p class="sr-only" id="liveStatus" role="status"></p>
+  <noscript><style>html,body{height:auto;overflow:auto}.deck,.slides{height:auto}.slide{position:static;height:auto;opacity:1;pointer-events:auto}.nav-bar,.top-bar,.progress-track{display:none}</style><p style="padding:20px">JavaScript nonaktif. Semua bagian materi ditampilkan berurutan; kuis dan simulasi memerlukan JavaScript.</p></noscript>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const dots = document.getElementById('dots');
+    const progressFill = document.getElementById('progressFill');
+    const counter = document.getElementById('counter');
+    const prev = document.getElementById('prevBtn');
+    const next = document.getElementById('nextBtn');
+    let currentIndex = 0;
+
+    slides.forEach((slide, index) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'dot';
+      dot.title = (index + 1) + '. ' + slide.dataset.title;
+      dot.setAttribute('aria-label', 'Ke slide ' + (index + 1) + ': ' + slide.dataset.title);
+      dot.addEventListener('click', () => goToSlide(index));
+      dots.appendChild(dot);
+    });
+
+    function goToSlide(index) {
+      const focusInSlide = slides.some(slide => slide.contains(document.activeElement));
+      currentIndex = Math.max(0, Math.min(slides.length - 1, index));
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === currentIndex);
+        slide.inert = i !== currentIndex;
+      });
+      Array.from(dots.children).forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
+      progressFill.style.width = ((currentIndex + 1) / slides.length * 100) + '%';
+      counter.textContent = (currentIndex + 1) + ' / ' + slides.length;
+      prev.disabled = currentIndex === 0;
+      next.disabled = currentIndex === slides.length - 1;
+      history.replaceState(null, '', '#' + slides[currentIndex].id);
+      slides[currentIndex].querySelector('.slide-inner').scrollTop = 0;
+      if (focusInSlide) slides[currentIndex].querySelector('h1, h2').focus({ preventScroll: true });
+    }
+
+    function readHash() {
+      if (location.hash === '#materi') { goToSlide(currentIndex); return; }
+      const index = slides.findIndex(slide => slide.id === location.hash.slice(1));
+      goToSlide(index < 0 ? 0 : index);
+    }
+    prev.addEventListener('click', () => goToSlide(currentIndex - 1));
+    next.addEventListener('click', () => goToSlide(currentIndex + 1));
+    window.addEventListener('hashchange', readHash);
+    document.addEventListener('keydown', event => {
+      if (event.ctrlKey || event.metaKey || event.altKey || event.defaultPrevented ||
+          event.target.closest('input, textarea, select, button, a, summary, .table-wrap, [contenteditable]')) return;
+      const targets = { ArrowRight: currentIndex + 1, PageDown: currentIndex + 1,
+        ArrowLeft: currentIndex - 1, PageUp: currentIndex - 1, Home: 0, End: slides.length - 1 };
+      if (Object.hasOwn(targets, event.key)) {
+        event.preventDefault();
+        goToSlide(targets[event.key]);
+      }
+    });
+    readHash();
+
+    const promptLab = document.getElementById('promptLab');
+    const promptOutput = document.getElementById('promptOutput');
+    const labStatus = document.getElementById('labStatus');
+    function buildPrompt() {
+      promptOutput.value = Array.from(promptLab.querySelectorAll('textarea')).map(field =>
+        field.dataset.label + ': ' + (field.value.trim() || '[Isi ' + field.dataset.label + ']')
+      ).join('\n\n');
+      labStatus.textContent = '';
+    }
+    promptLab.addEventListener('input', buildPrompt);
+    promptLab.addEventListener('reset', () => setTimeout(buildPrompt, 0));
+    buildPrompt();
+    document.getElementById('copyPrompt').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(promptOutput.value);
+        labStatus.textContent = 'Prompt tersalin. Uji hasilnya menggunakan rubrik.';
+      } catch {
+        promptOutput.focus();
+        promptOutput.select();
+        labStatus.textContent = 'Salin otomatis tidak tersedia. Teks sudah dipilih; gunakan Ctrl+C atau ⌘C.';
+      }
+    });
+
+    document.querySelectorAll('[data-quiz]').forEach(form => {
+      const fields = Array.from(form.querySelectorAll('fieldset'));
+      const result = form.querySelector('.result');
+      fields.forEach(field => {
+        const answer = field.querySelector('.answer');
+        answer.dataset.explanation = answer.textContent;
+      });
+      form.addEventListener('change', () => {
+        result.textContent = '';
+        form.querySelectorAll('.option').forEach(label => label.classList.remove('correct', 'wrong'));
+        form.querySelectorAll('.answer').forEach(answer => { answer.hidden = true; });
+      });
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const missing = fields.find(field => !field.querySelector('input:checked'));
+        if (missing) {
+          result.textContent = 'Jawab semua pertanyaan terlebih dahulu.';
+          missing.querySelector('input').focus();
+          return;
+        }
+        let score = 0;
+        fields.forEach(field => {
+          const selected = field.querySelector('input:checked');
+          const correct = selected.value === field.dataset.answer;
+          if (correct) score++;
+          field.querySelectorAll('.option').forEach(label => label.classList.remove('correct', 'wrong'));
+          selected.closest('label').classList.add(correct ? 'correct' : 'wrong');
+          const answer = field.querySelector('.answer');
+          answer.hidden = false;
+          answer.textContent = (correct ? 'Benar. ' : 'Belum tepat. ') + answer.dataset.explanation;
+        });
+        result.textContent = 'Skor: ' + score + ' dari ' + fields.length + '. Baca penjelasan setiap jawaban.';
+      });
+    });
+
+    const fullscreen = document.getElementById('fullscreenBtn');
+    fullscreen.hidden = !document.fullscreenEnabled;
+    fullscreen.addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await document.documentElement.requestFullscreen();
+      } catch {
+        document.getElementById('liveStatus').textContent = 'Layar penuh tidak tersedia pada browser ini.';
+      }
+    });
+  </script>
+</body>
+</html>

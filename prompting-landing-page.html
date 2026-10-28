@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0F1419">
+  <meta name="description" content="Tutorial RPL pemula: membuat landing page usaha dengan prompt bertahap memakai RTF dan RACE, lalu menguji dan merevisi hasilnya.">
+  <title>Strategi Prompting Bagian 2: Landing Page — Materi RPL</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --text:var(--fg); --surface:var(--card); --line:var(--border); --control-line:#4a5a68;
+      --ink:var(--fg); --paper:#1A2229;
+      --mint:rgba(0,217,192,.10); --sun:rgba(255,107,53,.12); --sky:rgba(96,165,250,.10);
+      --slide-padding:84px 56px 88px;
+      --slide-inner-max-height:100%;
+    }
+    body { line-height:1.55; }
+    .slide-inner { font-size:17px; padding-right:4px; }
+    .slide-inner::-webkit-scrollbar { width:6px; }
+    .slide-inner::-webkit-scrollbar-thumb { background:rgba(255,255,255,.14); border-radius:10px; }
+    .inner { width:100%; min-width:0; }
+    .slide-inner > .inner:not(:first-child) { margin-top:20px; }
+    button, input, select, textarea { font:inherit; }
+    a { color:var(--teal); text-underline-offset:4px; }
+    :focus-visible { outline:3px solid var(--orange); outline-offset:3px; }
+    main:focus { outline:none; }
+    h1, h2, h3, p { margin-top:0; }
+    h1, h2, h3 { font-family:'Space Grotesk',sans-serif; line-height:1.12; letter-spacing:-.03em; text-wrap:balance; }
+    h1 { font-size:clamp(36px,4.6vw,60px); margin-bottom:18px; }
+    h2 { font-size:clamp(27px,3vw,40px); margin-bottom:16px; }
+    h3 { font-size:21px; margin-bottom:12px; }
+    p { margin-bottom:14px; }
+    p:last-child { margin-bottom:0; }
+    b, strong { font-weight:700; }
+    .muted, .lede { color:var(--muted); }
+    .lede { max-width:760px; font-size:19px; }
+    .small { font-size:14px; }
+    .teal { color:var(--teal); }
+    .topic { display:inline-block; margin-bottom:14px; padding:5px 12px; border:1px solid rgba(255,255,255,.1); border-radius:99px; background:rgba(255,255,255,.04); color:var(--orange); font-size:12px; font-weight:600; }
+    .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+    .skip-link { position:fixed; top:8px; left:12px; transform:translateY(-160%); z-index:100; padding:12px; background:var(--fg); color:var(--bg); border-radius:8px; }
+    .skip-link:focus { transform:none; }
+    .logo { text-decoration:none; color:inherit; }
+    .logo-text, .logo-sub { margin:0; }
+    .logo-mark i { color:#fff; font-size:12px; }
+    button.dot { border:0; padding:0; }
+    .nav-btn[hidden] { display:none; }
+    .two { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center; }
+    .two.top { align-items:start; }
+    .two > * { min-width:0; }
+    .list { margin:0; padding-left:22px; }
+    .list li { margin-bottom:10px; padding-left:5px; }
+    .list li::marker { color:var(--teal); }
+    .callout { margin-top:20px; padding:12px 18px; border-left:4px solid var(--orange); background:var(--sun); border-radius:0 10px 10px 0; }
+    .actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:22px; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:10px 20px; border:1px solid var(--teal); border-radius:12px; background:var(--teal); color:#0F1419; font-size:15px; font-weight:700; text-decoration:none; transition:transform .2s; }
+    .button:hover { transform:translateY(-2px); }
+    .button.secondary { background:transparent; color:var(--teal); }
+    .comparison { width:100%; border-collapse:collapse; font-size:15px; }
+    .comparison th, .comparison td { padding:13px 16px 13px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    .comparison th { color:var(--teal); font-family:'Space Grotesk',sans-serif; }
+    .comparison td { color:var(--muted); }
+    .comparison td strong { color:var(--text); }
+    .steps { list-style:none; counter-reset:step; padding:0; margin:18px 0 0; }
+    .steps li { counter-increment:step; display:grid; grid-template-columns:44px 1fr; gap:16px; align-items:start; padding:14px 0; border-top:1px solid var(--line); }
+    .steps li::before { content:counter(step,decimal-leading-zero); font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:700; color:var(--teal); line-height:1.2; }
+    .steps p { margin:4px 0 0; font-size:16px; color:var(--muted); }
+    details { padding:11px 0; border-top:1px solid var(--line); }
+    summary { cursor:pointer; font-weight:600; }
+    details p { margin:10px 0 0; font-size:15px; color:var(--muted); }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; overflow-x:auto; max-width:100%; margin:0; padding:16px 18px; border:1px solid var(--line); border-radius:12px; background:#0b1116; font:14px/1.5 ui-monospace,"SFMono-Regular",Consolas,monospace; tab-size:2; }
+    code { font-family:ui-monospace,"SFMono-Regular",Consolas,monospace; font-size:.9em; color:var(--teal); }
+    .result { margin:14px 0 0; font-size:15px; white-space:pre-line; }
+    .result:empty { margin:0; }
+    .quiz-grid { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:18px; }
+    fieldset { min-width:0; margin:0; padding:16px 0 0; border:0; border-top:2px solid var(--line); }
+    legend { padding:0 8px 10px 0; font-size:17px; font-weight:700; }
+    .option { display:flex; align-items:start; gap:10px; padding:9px 11px; margin:4px 0; border:1.5px solid var(--line); border-radius:12px; background:rgba(255,255,255,.03); font-size:15px; cursor:pointer; transition:border-color .25s,background .25s; }
+    .option:hover { border-color:var(--hover-border); background:var(--hover-bg); }
+    .option input { flex-shrink:0; width:18px; height:18px; margin:3px 0 0; accent-color:var(--teal); }
+    .option:has(input:checked):not(.correct):not(.wrong) { border-color:var(--teal); background:var(--hover-bg); }
+    .option.correct { border-color:#22c55e; background:rgba(34,197,94,.12); }
+    .option.wrong { border-color:#ef4444; background:rgba(239,68,68,.10); }
+    .answer { margin:12px 0 0; font-size:14px; color:var(--teal); }
+    .references { margin:14px 0 0; padding-left:22px; font-size:15px; }
+    .references li { margin:8px 0; }
+    @media (max-width:1024px) {
+      .two { gap:28px; }
+      .slide-inner { font-size:16px; }
+    }
+    @media (max-width:700px) {
+      :root { --slide-padding:72px 18px 84px; }
+      .slide { align-items:flex-start; }
+      .hint-keys, .dots { display:none; }
+      .two, .quiz-grid { grid-template-columns:1fr; gap:24px; }
+      h1 { font-size:34px; } h2 { font-size:26px; }
+      .comparison { min-width:620px; }
+    }
+
+    .prompt-label { display:block; margin-bottom:14px; font-size:13px; color:var(--muted); }
+    .paper { min-width:0; padding:24px; border:1px solid var(--line); border-radius:20px; background:linear-gradient(180deg,var(--card),#141A21); }
+    .paper h3 { font-size:22px; }
+    .prompt-panel { min-width:0; padding:24px; border:1px solid var(--line); border-radius:20px; background:var(--surface); }
+    .prompt { white-space:pre-wrap; overflow-wrap:anywhere; margin:0; font-size:16px; line-height:1.6; }
+    .prompt b { color:var(--teal); }
+    .clauses { display:grid; gap:14px; }
+    .clause { border-left:3px solid var(--teal); padding:2px 0 2px 14px; }
+    .clause b { display:block; color:var(--teal); font-size:16px; }
+    .clause p { margin:4px 0 0; font-size:16px; }
+    .before, .after { padding:18px 20px; margin-top:14px; border-top:3px solid var(--orange); background:var(--sun); border-radius:0 0 12px 12px; }
+    .after { border-color:var(--teal); background:var(--mint); }
+    .before h3 { color:var(--orange); }
+    .after h3 { color:var(--teal); }
+    .flow { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:22px; }
+    .flow > div { padding-top:14px; border-top:3px solid var(--teal); }
+    .flow p { color:var(--muted); font-size:16px; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+    .table-hint { display:none; }
+    .comparison thead { background:var(--sky); }
+    .source { margin:18px 0 0; color:var(--muted); font-size:14px; }
+    .lab { padding:22px; background:var(--mint); border:1px solid var(--line); border-radius:20px; }
+    .lab-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 16px; }
+    .lab label { display:block; font-size:14px; font-weight:600; }
+    .lab textarea, #promptOutput { display:block; width:100%; min-height:96px; resize:vertical; padding:10px 12px; margin-top:6px; border:1px solid var(--control-line); border-radius:10px; background:var(--bg); color:var(--text); font-size:14px; font-weight:400; line-height:1.5; }
+    #promptOutput { min-height:300px; font-size:14px; }
+    .lab-status { white-space:pre-line; font-size:15px; margin:14px 0 0; }
+    .lab-status:empty { margin:0; }
+    @media (max-width:700px) {
+      .flow, .lab-grid { grid-template-columns:1fr; gap:20px; }
+      .table-hint { display:block; margin-bottom:10px; font-size:14px; color:var(--muted); }
+      .paper, .prompt-panel { padding:18px; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#materi">Lewati navigasi</a>
+  <div class="grain"></div>
+  <div class="blob" style="width:380px;height:380px;background:var(--teal);top:-100px;left:-100px"></div>
+  <div class="blob" style="width:300px;height:300px;background:var(--purple);bottom:-80px;right:-80px;animation-delay:-4s"></div>
+  <header class="top-bar">
+    <a class="logo" href="index.html"><div class="logo-mark" style="background:linear-gradient(135deg,var(--teal),var(--purple))"><i class="fa-solid fa-wand-magic-sparkles"></i></div><div><p class="logo-text">Prompt: Landing Page</p><p class="logo-sub">Kelas X RPL</p></div></a>
+    <div class="hint-keys"><span class="key">←</span><span class="key">→</span><span>untuk navigasi</span></div>
+  </header>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="background:linear-gradient(135deg,var(--teal),var(--purple))"></div></div>
+  <main class="deck" id="materi" tabindex="-1"><div class="slides" id="slides">
+    <section class="slide" id="pembuka" data-title="Tutorial landing page dengan prompt" aria-labelledby="title-pembuka">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Strategi prompting · Bagian 2 · Tutorial</p><h1 id="title-pembuka" tabindex="-1">Buat landing page usaha dengan bantuan AI</h1><p class="lede">Pakai RTF dan RACE dari Bagian 1 untuk membuat halaman penawaran, langkah demi langkah.</p><p>Contoh latihan: <strong>KotakRasa, usaha snack box fiktif</strong>. Semua harga dan ketentuan di sini hanya simulasi.</p><div class="actions"><a class="button" href="#brief">Mulai dari brief</a><a class="button secondary" href="struktur-landing-page.html">Pelajari struktur landing page dulu</a></div></div>
+<div class="paper"><h3>Yang akan kamu buat</h3><p>Satu file <code>index.html</code> yang rapi di HP, berisi paket, harga, dan cara memesan.</p><ol class="steps"><li><div><strong>Siapkan bahan</strong><p>Tulis fakta usaha dan tujuan halaman.</p></div></li><li><div><strong>Minta hasil bertahap</strong><p>Struktur → naskah → kode HTML/CSS.</p></div></li><li><div><strong>Buka dan cek</strong><p>Coba di browser, lalu perbaiki dengan bukti.</p></div></li></ol></div></div>
+<p class="source inner">Pakai satu percakapan AI untuk langkah 1–4 agar brief dan naskah tetap tersimpan. Kalau mulai percakapan baru, tempel lagi brief dan hasil yang sudah kamu periksa.</p></div>
+    </section>
+
+    <section class="slide" id="brief" data-title="Langkah 1: brief usaha" aria-labelledby="title-brief">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Langkah 1 dari 6 · Siapkan bahan</p><h2 id="title-brief" tabindex="-1">Beri fakta dulu sebelum minta desain</h2><p>Kirim brief di samping sebagai pesan pertama. Data ini jadi acuan untuk struktur, tulisan, dan kode.</p><ul class="list"><li>Siapa calon pelanggan dan apa yang ditawarkan.</li><li>Harga beserta satuan dan syaratnya.</li><li>Satu tindakan utama pengunjung.</li><li>Tandai data yang belum ada.</li></ul><p class="callout">Untuk usaha nyata, ganti semua data simulasi dengan informasi yang sudah dikonfirmasi pemilik usaha.</p></div>
+<div class="paper"><span class="prompt-label">Pesan 1 · Brief siap salin · Usaha fiktif</span><p class="prompt">Pakai brief <b>simulasi</b> ini untuk latihan landing page.
+
+<b>Nama:</b> KotakRasa, snack box untuk acara sekolah.
+<b>Pembaca:</b> panitia kegiatan sekolah.
+<b>Isi:</b> 2 kudapan, air mineral, dan kemasan.
+<b>Harga:</b> mulai Rp15.000 per kotak; minimum 20 kotak.
+<b>Ketentuan:</b> pesan paling lambat H−3; ongkir belum termasuk; isi, harga akhir, dan jadwal perlu dikonfirmasi.
+<b>Tujuan:</b> pengunjung paham paket dan cara meminta penawaran.
+<b>Tombol:</b> “Lihat cara pesan”, menuju bagian #pesan.
+<b>Belum ada:</b> wilayah layanan, kontak resmi, foto produk, dan testimoni.
+
+Jangan mengarang data yang belum ada.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="struktur" data-title="Langkah 2: struktur halaman" aria-labelledby="title-struktur">
+      <div class="slide-inner"><div class="inner"><p class="topic">Langkah 2 dari 6 · Pakai RACE</p><h2 id="title-struktur" tabindex="-1">Minta struktur dulu, bukan kode</h2><div class="prompt-panel"><span class="prompt-label">Pesan 2 · Kirim setelah brief</span><p class="prompt"><b>Role:</b> Perancang landing page untuk usaha kecil.
+<b>Action:</b> Rancang struktur landing page KotakRasa dari brief yang saya kirim.
+<b>Context:</b> Pengunjungnya panitia kegiatan sekolah. Mereka perlu paham paket dan cara meminta penawaran. Belum perlu kode.
+<b>Expectation:</b> Tabel bagian | tujuan | isi utama untuk hero, manfaat, isi paket dan harga, cara pesan, FAQ, dan footer. Tombol “Lihat cara pesan” ada di bagian yang tepat. Pakai hanya fakta di brief; tandai yang perlu dikonfirmasi.</p></div><p class="callout"><strong>Cek hasilnya:</strong> apakah alurnya masuk akal, harga dan syarat lengkap, dan tombol mengarah ke tujuan yang sama? Perbaiki struktur sebelum lanjut.</p></div></div>
+    </section>
+
+    <section class="slide" id="naskah" data-title="Langkah 3: naskah" aria-labelledby="title-naskah">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Langkah 3 dari 6 · Pakai RTF</p><h2 id="title-naskah" tabindex="-1">Ubah struktur menjadi tulisan yang jelas</h2><p>Setelah struktur kamu periksa, minta naskah tiap bagian. Contoh headline membantu mengarahkan gaya.</p><div class="paper"><span class="prompt-label">Contoh arah tulisan · Ilustrasi</span><h3>Snack box untuk acara sekolah</h3><p>2 kudapan dan air mineral dalam satu kemasan. Mulai Rp15.000 per kotak, minimum 20 kotak.</p><p class="small muted">Jangan tambahkan klaim “terlaris”, “nomor satu”, atau ulasan pelanggan tanpa bukti.</p></div></div>
+<div class="prompt-panel"><span class="prompt-label">Pesan 3 · Kirim setelah struktur diperiksa</span><p class="prompt"><b>Role:</b> Penulis naskah landing page usaha.
+<b>Task:</b> Tulis isi tiap bagian dari struktur KotakRasa yang sudah saya periksa. Headline lugas seperti “Snack box untuk acara sekolah”. Bahasa sederhana dan paragraf pendek. Harga dan ketentuan harus sama dengan brief. Jangan buat testimoni, jumlah pelanggan, atau janji baru; tulis “perlu dikonfirmasi” untuk data yang belum ada.
+<b>Format:</b> Naskah per bagian: headline, penjelasan, isi paket, cara pesan, 3 FAQ, dan teks tombol. Tandai halaman sebagai simulasi usaha fiktif.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="kode" data-title="Langkah 4: kode" aria-labelledby="title-kode">
+      <div class="slide-inner"><div class="inner"><p class="topic">Langkah 4 dari 6 · Pakai RTF dan syarat teknis</p><h2 id="title-kode" tabindex="-1">Minta satu file yang langsung bisa dibuka</h2><div class="prompt-panel"><span class="prompt-label">Pesan 4 · Kirim setelah naskah diperiksa</span><p class="prompt"><b>Role:</b> Programmer frontend yang membantu siswa SMK pemula.
+<b>Task:</b> Ubah naskah KotakRasa yang sudah saya periksa menjadi landing page responsif. Pertahankan fakta, harga, ketentuan, dan label simulasi.
+<b>Format:</b> Satu file index.html lengkap. CSS di dalam &lt;style&gt;, tanpa framework, CDN, atau gambar eksternal.
+
+Warna: latar biru muda #F3F7FC, kotak putih, teks #17334B, aksen #206A63.
+Aturan: satu h1, heading berurutan, fokus keyboard terlihat, tidak ada geser horizontal di lebar 390 px.
+Tombol “Lihat cara pesan” menuju bagian ber-id pesan. Bagian itu berisi langkah meminta penawaran dan tulisan “Simulasi: pemesanan belum terhubung”. Jangan buat formulir, nomor WhatsApp, atau tautan kontak palsu. Foto belum ada: pakai kotak ilustrasi CSS berlabel “Ilustrasi”.
+
+Tampilkan kode lengkap dari &lt;!DOCTYPE html&gt; sampai &lt;/html&gt;.</p></div><p class="small muted" style="margin-top:16px">Periksa jawabannya sebelum disimpan. Kode yang tampak rapi belum tentu berfungsi.</p></div></div>
+    </section>
+
+    <section class="slide" id="jalankan" data-title="Langkah 5: simpan dan uji" aria-labelledby="title-jalankan">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Langkah 5 dari 6 · Uji di browser</p><h2 id="title-jalankan" tabindex="-1">Simpan, buka, lalu periksa hasilnya</h2><ol class="steps"><li><div><strong>Buat file latihan</strong><p>Di editor kode, buat folder <code>latihan-landing-page</code> dan file <code>index.html</code>.</p></div></li><li><div><strong>Salin kode HTML</strong><p>Salin dari <code>&lt;!DOCTYPE html&gt;</code> sampai <code>&lt;/html&gt;</code>. Jangan ikut menyalin tanda tiga backtick. Simpan sebagai <code>.html</code>, bukan <code>.txt</code>.</p></div></li><li><div><strong>Buka di browser</strong><p>Buka filenya. Setelah mengedit, simpan lalu muat ulang halaman.</p></div></li></ol><p class="small muted" style="margin-top:16px">Ini pratinjau di perangkatmu sendiri. Halamannya belum terbit di internet.</p></div>
+<div class="paper"><h3>Checklist hasil</h3><ul class="list"><li>Harga mulai Rp15.000, minimum 20 kotak, H−3, dan ongkir sesuai brief.</li><li>Tombol membawa ke bagian cara pesan; tulisan simulasi terlihat.</li><li>Di layar HP (±390 px), teks terbaca dan halaman tidak melebar.</li><li>Tombol bisa dipilih dengan Tab dan diaktifkan dengan keyboard.</li><li>Label usaha fiktif terlihat; tidak ada kontak atau testimoni karangan.</li></ul><p class="small muted" style="margin-top:16px">Catat yang benar-benar sudah kamu uji. Kalau belum dibuka di browser, tulis “belum diuji”.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="revisi" data-title="Langkah 6: revisi" aria-labelledby="title-revisi">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Langkah 6 dari 6 · Revisi dengan bukti</p><h2 id="title-revisi" tabindex="-1">Sebut bagian yang perlu diperbaiki</h2><p>Pakai hasil pengecekanmu sebagai masukan. Sebut ukuran layar, gejala, dan hasil yang kamu harapkan.</p><div class="before"><h3>Masih umum</h3><p>“Desainnya kurang bagus. Perbaiki.”</p></div><div class="after"><h3>Lebih jelas</h3><p>“Di layar 390 px, tulisan harga keluar dari kotaknya. Harga harus terbaca penuh tanpa geser ke samping.”</p></div><p class="small muted" style="margin-top:16px">Temuan di atas hanya contoh. Ganti dengan masalah yang kamu lihat di halamanmu.</p></div>
+<div class="prompt-panel"><span class="prompt-label">Pesan 5 · Template revisi</span><p class="prompt">Periksa kode landing page terakhir. Saya mengujinya di <b>[ukuran layar/browser]</b>.
+
+<b>Temuan:</b> [gejala dan bagian yang bermasalah].
+<b>Hasil yang diharapkan:</b> [syarat yang bisa dicek].
+
+Perbaiki bagian yang menyebabkan masalah itu. Pertahankan naskah, fakta usaha, dan bagian lain yang sudah benar. Jangan menambah library atau fitur baru.
+
+Berikan index.html lengkap yang baru, ringkasan perubahan, dan 3 langkah untuk mengujinya. Jangan bilang pengujian berhasil kalau belum dijalankan.</p></div></div></div>
+    </section>
+
+    <section class="slide" id="usaha-sendiri" data-title="Terapkan pada usahamu" aria-labelledby="title-usaha-sendiri">
+      <div class="slide-inner"><div class="inner two top"><div><p class="topic">Terapkan pada usaha pilihanmu</p><h2 id="title-usaha-sendiri" tabindex="-1">Ganti brief, ulangi alurnya</h2><p class="lede">Pilih usaha lain, misalnya laundry, katering, atau servis komputer. Pakai data fiktif dan beri label simulasi.</p><ol class="steps"><li><div><strong>Siapkan brief</strong><p>Nama, pelanggan, penawaran, harga, ketentuan, dan satu tombol utama.</p></div></li><li><div><strong>Buat bertahap</strong><p>Cek struktur dan naskah sebelum minta kode.</p></div></li><li><div><strong>Simpan bukti belajar</strong><p>Kumpulkan brief, perintah, <code>index.html</code>, dan catatan hasil uji.</p></div></li></ol><div class="actions"><a class="button secondary" href="#brief">Ulangi tutorial</a><a class="button secondary" href="strategi-prompting.html">Kembali ke Bagian 1</a><a class="button secondary" href="index.html">Menu materi</a></div></div>
+<div class="paper"><span class="prompt-label">Template brief · Isi bagian [ ]</span><p class="prompt"><b>Nama dan jenis usaha:</b> [isi].
+<b>Calon pelanggan:</b> [siapa dan kebutuhannya].
+<b>Produk/layanan:</b> [isi dan manfaat yang bisa dibuktikan].
+<b>Harga dan ketentuan:</b> [satuan, minimum, waktu, biaya tambahan].
+<b>Tujuan halaman:</b> [satu tindakan utama].
+<b>Tombol dan tujuannya:</b> [teks tombol dan bagian yang dituju].
+<b>Gaya dan warna:</b> [sesuai usaha dan pembaca].
+<b>Data yang belum ada:</b> [tulis apa adanya].
+<b>Status:</b> [simulasi / fakta yang sudah dikonfirmasi].
+
+Untuk usaha nyata, konfirmasi semua informasi dan ganti tombol simulasi dengan kontak resmi yang sudah diuji.</p></div></div></div>
+    </section>
+
+</div></main>
+  <nav class="nav-bar" aria-label="Navigasi materi">
+    <button class="nav-btn" id="prevBtn" type="button" aria-label="Slide sebelumnya" title="Slide sebelumnya"><i class="fa-solid fa-chevron-left" style="font-size:12px"></i></button>
+    <div class="dots" id="dots"></div>
+    <span class="slide-counter" id="counter" aria-live="polite" aria-atomic="true">1</span>
+    <button class="nav-btn" id="nextBtn" type="button" aria-label="Slide berikutnya" title="Slide berikutnya"><i class="fa-solid fa-chevron-right" style="font-size:12px"></i></button>
+    <button class="nav-btn" id="fullscreenBtn" type="button" aria-label="Layar penuh" title="Layar penuh"><i class="fa-solid fa-expand" style="font-size:12px"></i></button>
+  </nav>
+  <p class="sr-only" id="liveStatus" role="status"></p>
+  <noscript><style>html,body{height:auto;overflow:auto}.deck,.slides{height:auto}.slide{position:static;height:auto;opacity:1;pointer-events:auto}.nav-bar,.top-bar,.progress-track{display:none}</style><p style="padding:20px">JavaScript nonaktif. Semua bagian materi ditampilkan berurutan; kuis dan simulasi memerlukan JavaScript.</p></noscript>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const dots = document.getElementById('dots');
+    const progressFill = document.getElementById('progressFill');
+    const counter = document.getElementById('counter');
+    const prev = document.getElementById('prevBtn');
+    const next = document.getElementById('nextBtn');
+    let currentIndex = 0;
+
+    slides.forEach((slide, index) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'dot';
+      dot.title = (index + 1) + '. ' + slide.dataset.title;
+      dot.setAttribute('aria-label', 'Ke slide ' + (index + 1) + ': ' + slide.dataset.title);
+      dot.addEventListener('click', () => goToSlide(index));
+      dots.appendChild(dot);
+    });
+
+    function goToSlide(index) {
+      const focusInSlide = slides.some(slide => slide.contains(document.activeElement));
+      currentIndex = Math.max(0, Math.min(slides.length - 1, index));
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === currentIndex);
+        slide.inert = i !== currentIndex;
+      });
+      Array.from(dots.children).forEach((dot, i) => dot.classList.toggle('active', i === currentIndex));
+      progressFill.style.width = ((currentIndex + 1) / slides.length * 100) + '%';
+      counter.textContent = (currentIndex + 1) + ' / ' + slides.length;
+      prev.disabled = currentIndex === 0;
+      next.disabled = currentIndex === slides.length - 1;
+      history.replaceState(null, '', '#' + slides[currentIndex].id);
+      slides[currentIndex].querySelector('.slide-inner').scrollTop = 0;
+      if (focusInSlide) slides[currentIndex].querySelector('h1, h2').focus({ preventScroll: true });
+    }
+
+    function readHash() {
+      if (location.hash === '#materi') { goToSlide(currentIndex); return; }
+      const index = slides.findIndex(slide => slide.id === location.hash.slice(1));
+      goToSlide(index < 0 ? 0 : index);
+    }
+    prev.addEventListener('click', () => goToSlide(currentIndex - 1));
+    next.addEventListener('click', () => goToSlide(currentIndex + 1));
+    window.addEventListener('hashchange', readHash);
+    document.addEventListener('keydown', event => {
+      if (event.ctrlKey || event.metaKey || event.altKey || event.defaultPrevented ||
+          event.target.closest('input, textarea, select, button, a, summary, .table-wrap, [contenteditable]')) return;
+      const targets = { ArrowRight: currentIndex + 1, PageDown: currentIndex + 1,
+        ArrowLeft: currentIndex - 1, PageUp: currentIndex - 1, Home: 0, End: slides.length - 1 };
+      if (Object.hasOwn(targets, event.key)) {
+        event.preventDefault();
+        goToSlide(targets[event.key]);
+      }
+    });
+    readHash();
+
+    const fullscreen = document.getElementById('fullscreenBtn');
+    fullscreen.hidden = !document.fullscreenEnabled;
+    fullscreen.addEventListener('click', async () => {
+      try {
+        if (document.fullscreenElement) await document.exitFullscreen();
+        else await document.documentElement.requestFullscreen();
+      } catch {
+        document.getElementById('liveStatus').textContent = 'Layar penuh tidak tersedia pada browser ini.';
+      }
+    });
+  </script>
+</body>
+</html>
